@@ -36,7 +36,7 @@ object Gens {
 
   def genMinMax[T : Ordering](genOrderedPair: Gen[(T, T)]): Gen[(T, T)] =
     genOrderedPair.map { case (x, y) =>
-      if (implicitly[Ordering[T]].compare(x, y) < 0) (x, y) else (y, x)
+      if (implicitly[Ordering[T]].compare(x, y) <= 0) (x, y) else (y, x)
     }
 
   def genInt(min: Int, max: Int): Gen[Int] =
