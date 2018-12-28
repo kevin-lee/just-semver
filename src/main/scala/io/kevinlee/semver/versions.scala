@@ -1,8 +1,8 @@
 package io.kevinlee.semver
 
-import io.kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import io.kevinlee.Common._
 import io.kevinlee.CommonPredef._
+import io.kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 
 import scala.annotation.tailrec
 import scala.util.matching.Regex
@@ -267,6 +267,14 @@ object SemanticVersion {
 
   val semanticVersionRegex: Regex =
     """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
+
+  def parseUnsafe(version: String): SemanticVersion =
+    parse(version) match {
+      case Right(semVer) =>
+        semVer
+      case Left(error) =>
+        sys.error(ParseError.render(error))
+    }
 
   def parse(version: String): Either[ParseError, SemanticVersion] = version match {
     case semanticVersionRegex(major, minor, patch, pre, meta) =>
