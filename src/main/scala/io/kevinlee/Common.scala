@@ -8,6 +8,7 @@ import CommonPredef._
   * @since 2018-12-15
   */
 object Common {
+  // $COVERAGE-OFF$
   @tailrec
   def compareElems[A <: Ordered[A]](x: Seq[A], y: Seq[A]): Int =
     (x, y) match {
@@ -23,4 +24,5 @@ object Common {
       case (_ +: _, Seq()) =>
         1
     }
+  // $COVERAGE-ON$
 }
