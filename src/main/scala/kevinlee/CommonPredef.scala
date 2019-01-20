@@ -1,4 +1,4 @@
-package io.kevinlee
+package kevinlee
 
 /**
   * @author Kevin Lee
