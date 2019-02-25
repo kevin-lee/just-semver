@@ -1,27 +1,19 @@
 package kevinlee.semver
 
 import hedgehog._
+
 import kevinlee.CommonPredef._
+import kevinlee.GenPlus
+import kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
+import kevinlee.semver.AlphaNumHyphen._
 
 import scala.annotation.tailrec
-import AlphaNumHyphen._
-import kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 
 /**
   * @author Kevin Lee
   * @since 2018-11-04
   */
 object Gens {
-
-  def genPlus[A](r: Range[A])(f: Range[A] => Gen[A]): Gen[A] ={
-    val (min, max) = r.bounds(Size(Size.max))
-    Gen.frequency1(
-        (1, Gen.constant(min))
-      , (1, Gen.constant(max))
-      , (1, Gen.constant(r.origin))
-      , (97, f(r))
-    )
-  }
 
   def genAlphabetChar: Gen[Char] =
     Gen.frequency1(
@@ -40,10 +32,10 @@ object Gens {
     }
 
   def genInt(min: Int, max: Int): Gen[Int] =
-    genPlus(Range.linear(min, max))(Gen.int)
+    GenPlus.range(Range.linear(min, max))(Gen.int)
 
   def genNonNegativeInt: Gen[Int] =
-    genPlus(Range.linear(0, Int.MaxValue))(Gen.int)
+    GenPlus.range(Range.linear(0, Int.MaxValue))(Gen.int)
 
   def genDifferentNonNegIntPair: Gen[(Int, Int)] = for {
     x <- genNonNegativeInt
