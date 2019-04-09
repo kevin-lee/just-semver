@@ -6,12 +6,12 @@ import wartremover.WartRemover.autoImport.{Wart, Warts}
   */
 object ProjectInfo {
 
-  val ProjectScalaVersion = "2.12.7"
-  val CrossScalaVersions = Seq("2.11.12", ProjectScalaVersion)
+  val ProjectScalaVersion: String = "2.12.8"
+  val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", ProjectScalaVersion)
 
-  val ProjectVersion = "0.1.0-SNAPSHOT"
+  val ProjectVersion: String = "0.1.0-SNAPSHOT"
 
-  val commonScalacOptions = Seq(
+  val commonScalacOptions: Seq[String] = Seq(
       "-deprecation"
     , "-unchecked"
     , "-feature"
@@ -23,10 +23,11 @@ object ProjectInfo {
     , "-Ywarn-inaccessible"
     , "-Ywarn-nullary-unit"
     , "-Ywarn-nullary-override"
-    , "-Ywarn-numeric-widen"
     , "-encoding", "UTF-8"
+    , "-Ywarn-unused-import"
+    , "-Ywarn-numeric-widen"
   )
 
-  val commonWarts = Warts.allBut(Wart.DefaultArguments, Wart.Overloading, Wart.Any, Wart.Nothing, Wart.NonUnitStatements)
+  val commonWarts: Seq[wartremover.Wart] = Warts.allBut(Wart.DefaultArguments, Wart.Overloading, Wart.Any, Wart.Nothing, Wart.NonUnitStatements)
 
 }
