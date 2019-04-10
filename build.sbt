@@ -2,6 +2,7 @@ import Dependencies._
 import ProjectInfo._
 import kevinlee.sbt.SbtCommon.crossVersionProps
 import kevinlee.semver.{Major, Minor, SemanticVersion}
+import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 lazy val root = (project in file("."))
   .settings(
@@ -37,9 +38,22 @@ lazy val root = (project in file("."))
         Seq.empty
     }
   , testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
-  , bintrayPackageLabels := Seq("Scala", "SemanticVersion")
+
+  /* Bintray { */
+  , bintrayPackageLabels := Seq("Scala", "SemanticVersion", "SemVer")
   , bintrayVcsUrl := Some("""git@github.com:Kevin-Lee/just-semver.git""")
+  /* } Bintray */
+
   , initialCommands in console := """import kevinlee.semver._"""
 
+  /* Coveralls { */
+  , coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 10)) =>
+      false
+    case _ =>
+      true
+  })
+  , coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
+  /* } Coveralls */
 
 )
