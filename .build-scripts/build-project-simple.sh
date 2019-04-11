@@ -12,7 +12,13 @@ else
   echo "Build projects"
   echo "--------------------------------------------"
   echo ""
-  sbt -d -J-Xmx2048m "; ++ ${scala_version}!; clean; test; package"
+  if [[ "$BRANCH_NAME" == "rc" ]]
+  then
+    sbt -d -J-Xmx2048m "; ++ ${scala_version}!; clean; test"
+    sbt -d -J-Xmx2048m "; ++ ${scala_version}!; packageBin; packageSrc; packageDoc"
+  else
+    sbt -d -J-Xmx2048m "; ++ ${scala_version}!; clean; test; package"
+  fi
 
   echo "============================================"
   echo "Building projects: Done"
