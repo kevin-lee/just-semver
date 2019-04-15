@@ -9,25 +9,25 @@ import kevinlee.semver.Gens._
   * @author Kevin Lee
   * @since 2018-11-04
   */
-object SemanticVersionMajorSpec extends Properties {
+object SemVerMajorSpec extends Properties {
 
   override def tests: List[Test] = List(
-    property("Two SemanticVersions with the same Major and the rest are equal then it should be equal", testSameMajors)
-  , property("Two SemanticVersions with the different Majors and the rest are equal then it should be not equal", testDifferentMajors)
-  , property("Test SemanticVersion(Major(less)) < SemanticVersion(Major(greater)) is true", testMajorLessCase)
-  , property("Test SemanticVersion(Major(greater)) > SemanticVersion(Major(less)) is true", testMajorMoreCase)
-  , property("Test SemanticVersion(same Major) <= SemanticVersion(same Major) is true", testLeeThanEqualWithSameMajors)
-  , property("Test SemanticVersion(Major(less)) <= SemanticVersion(Major(greater)) is true", testLeeThanEqualWithLess)
-  , property("Test SemanticVersion(same Major) >= SemanticVersion(same Major) is true", testMoreThanEqualWithSameMajors)
-  , property("Test SemanticVersion(Major(greater)) >= SemanticVersion(Major(less)) is true", testMoreThanEqualWithGreater)
+    property("Two SemVers with the same Major and the rest are equal then it should be equal", testSameMajors)
+  , property("Two SemVers with the different Majors and the rest are equal then it should be not equal", testDifferentMajors)
+  , property("Test SemVer(Major(less)) < SemVer(Major(greater)) is true", testMajorLessCase)
+  , property("Test SemVer(Major(greater)) > SemVer(Major(less)) is true", testMajorMoreCase)
+  , property("Test SemVer(same Major) <= SemVer(same Major) is true", testLeeThanEqualWithSameMajors)
+  , property("Test SemVer(Major(less)) <= SemVer(Major(greater)) is true", testLeeThanEqualWithLess)
+  , property("Test SemVer(same Major) >= SemVer(same Major) is true", testMoreThanEqualWithSameMajors)
+  , property("Test SemVer(Major(greater)) >= SemVer(Major(less)) is true", testMoreThanEqualWithGreater)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testSameMajors: Property = for {
     major <- genMajor.log("major")
   } yield {
-    val v1 = SemanticVersion.withMajor(major)
-    val v2 = SemanticVersion.withMajor(major)
+    val v1 = SemVer.withMajor(major)
+    val v2 = SemVer.withMajor(major)
     Result.assert(v1 == v2).log("major == major")
   }
 
@@ -36,8 +36,8 @@ object SemanticVersionMajorSpec extends Properties {
     major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
     (major1, major2) = major1AndMajor2
   } yield {
-    val v1 = SemanticVersion.withMajor(major1)
-    val v2 = SemanticVersion.withMajor(major2)
+    val v1 = SemVer.withMajor(major1)
+    val v2 = SemVer.withMajor(major2)
     Result.assert(v1 != v2).log("major1 != major2")
   }
 
@@ -45,8 +45,8 @@ object SemanticVersionMajorSpec extends Properties {
     major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
     (major1, major2) = major1AndMajor2
   } yield {
-    val v1 = SemanticVersion.withMajor(major1)
-    val v2 = SemanticVersion.withMajor(major2)
+    val v1 = SemVer.withMajor(major1)
+    val v2 = SemVer.withMajor(major2)
     Result.assert(v1 < v2).log("major1 < major2")
   }
 
@@ -54,16 +54,16 @@ object SemanticVersionMajorSpec extends Properties {
     major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
     (major1, major2) = major1AndMajor2
   } yield {
-    val v1 = SemanticVersion.withMajor(major1)
-    val v2 = SemanticVersion.withMajor(major2)
+    val v1 = SemVer.withMajor(major1)
+    val v2 = SemVer.withMajor(major2)
     Result.assert(v2 > v1).log("major2 > major1")
   }
 
   def testLeeThanEqualWithSameMajors: Property = for {
     major <- genMajor.log("major")
   } yield {
-    val v1 = SemanticVersion.withMajor(major)
-    val v2 = SemanticVersion.withMajor(major)
+    val v1 = SemVer.withMajor(major)
+    val v2 = SemVer.withMajor(major)
     Result.assert(v1 <= v2).log("major1 <= major2")
   }
 
@@ -71,16 +71,16 @@ object SemanticVersionMajorSpec extends Properties {
     major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
     (major1, major2) = major1AndMajor2
   } yield {
-    val v1 = SemanticVersion.withMajor(major1)
-    val v2 = SemanticVersion.withMajor(major2)
+    val v1 = SemVer.withMajor(major1)
+    val v2 = SemVer.withMajor(major2)
     Result.assert(v1 <= v2).log("major1 <= major2")
   }
 
   def testMoreThanEqualWithSameMajors: Property = for {
     major <- genMajor.log("major")
   } yield {
-    val v1 = SemanticVersion.withMajor(major)
-    val v2 = SemanticVersion.withMajor(major)
+    val v1 = SemVer.withMajor(major)
+    val v2 = SemVer.withMajor(major)
     Result.assert(v1 >= v2)
   }
 
@@ -88,32 +88,32 @@ object SemanticVersionMajorSpec extends Properties {
     major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
     (major1, major2) = major1AndMajor2
   } yield {
-    val v1 = SemanticVersion.withMajor(major1)
-    val v2 = SemanticVersion.withMajor(major2)
+    val v1 = SemVer.withMajor(major1)
+    val v2 = SemVer.withMajor(major2)
     Result.assert(v2 >= v1).log("major2 >= major1")
   }
 
 }
 
-object SemanticVersionMinorSpec extends Properties {
+object SemVerMinorSpec extends Properties {
 
   override def tests: List[Test] = List(
-    property("Two SemanticVersions with the same Minor and the rest are equal then it should be equal", testSameMinors)
-    , property("Two SemanticVersions with the different Minors and the rest are equal then it should be not equal", testDifferentMinors)
-    , property("Test SemanticVersion(Minor(less)) < SemanticVersion(Minor(greater)) is true", testMinorLessCase)
-    , property("Test SemanticVersion(Minor(greater)) > SemanticVersion(Minor(less)) is true", testMinorMoreCase)
-    , property("Test SemanticVersion(same Minor) <= SemanticVersion(same Minor) is true", testLeeThanEqualWithSameMinors)
-    , property("Test SemanticVersion(Minor(less)) <= SemanticVersion(Minor(greater)) is true", testLeeThanEqualWithLess)
-    , property("Test SemanticVersion(same Minor) >= SemanticVersion(same Minor) is true", testMoreThanEqualWithSameMinors)
-    , property("Test SemanticVersion(Minor(greater)) >= SemanticVersion(Minor(less)) is true", testMoreThanEqualWithGreater)
+    property("Two SemVers with the same Minor and the rest are equal then it should be equal", testSameMinors)
+    , property("Two SemVers with the different Minors and the rest are equal then it should be not equal", testDifferentMinors)
+    , property("Test SemVer(Minor(less)) < SemVer(Minor(greater)) is true", testMinorLessCase)
+    , property("Test SemVer(Minor(greater)) > SemVer(Minor(less)) is true", testMinorMoreCase)
+    , property("Test SemVer(same Minor) <= SemVer(same Minor) is true", testLeeThanEqualWithSameMinors)
+    , property("Test SemVer(Minor(less)) <= SemVer(Minor(greater)) is true", testLeeThanEqualWithLess)
+    , property("Test SemVer(same Minor) >= SemVer(same Minor) is true", testMoreThanEqualWithSameMinors)
+    , property("Test SemVer(Minor(greater)) >= SemVer(Minor(less)) is true", testMoreThanEqualWithGreater)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testSameMinors: Property = for {
     minor <- genMinor.log("minor")
   } yield {
-    val v1 = SemanticVersion.withMinor(minor)
-    val v2 = SemanticVersion.withMinor(minor)
+    val v1 = SemVer.withMinor(minor)
+    val v2 = SemVer.withMinor(minor)
     Result.assert(v1 == v2).log("minor == minor")
   }
 
@@ -122,8 +122,8 @@ object SemanticVersionMinorSpec extends Properties {
     minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
     (minor1, minor2) = minor1AndMinor2
   } yield {
-    val v1 = SemanticVersion.withMinor(minor1)
-    val v2 = SemanticVersion.withMinor(minor2)
+    val v1 = SemVer.withMinor(minor1)
+    val v2 = SemVer.withMinor(minor2)
     Result.assert(v1 != v2).log("minor1 != minor2")
   }
 
@@ -131,8 +131,8 @@ object SemanticVersionMinorSpec extends Properties {
     minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
     (minor1, minor2) = minor1AndMinor2
   } yield {
-    val v1 = SemanticVersion.withMinor(minor1)
-    val v2 = SemanticVersion.withMinor(minor2)
+    val v1 = SemVer.withMinor(minor1)
+    val v2 = SemVer.withMinor(minor2)
     Result.assert(v1 < v2).log("minor1 < minor2")
   }
 
@@ -140,16 +140,16 @@ object SemanticVersionMinorSpec extends Properties {
     minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
     (minor1, minor2) = minor1AndMinor2
   } yield {
-    val v1 = SemanticVersion.withMinor(minor1)
-    val v2 = SemanticVersion.withMinor(minor2)
+    val v1 = SemVer.withMinor(minor1)
+    val v2 = SemVer.withMinor(minor2)
     Result.assert(v2 > v1).log("minor2 > minor1")
   }
 
   def testLeeThanEqualWithSameMinors: Property = for {
     minor <- genMinor.log("minor")
   } yield {
-    val v1 = SemanticVersion.withMinor(minor)
-    val v2 = SemanticVersion.withMinor(minor)
+    val v1 = SemVer.withMinor(minor)
+    val v2 = SemVer.withMinor(minor)
     Result.assert(v1 <= v2).log("minor1 <= minor2")
   }
 
@@ -157,16 +157,16 @@ object SemanticVersionMinorSpec extends Properties {
     minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
     (minor1, minor2) = minor1AndMinor2
   } yield {
-    val v1 = SemanticVersion.withMinor(minor1)
-    val v2 = SemanticVersion.withMinor(minor2)
+    val v1 = SemVer.withMinor(minor1)
+    val v2 = SemVer.withMinor(minor2)
     Result.assert(v1 <= v2).log("minor1 <= minor2")
   }
 
   def testMoreThanEqualWithSameMinors: Property = for {
     minor <- genMinor.log("minor")
   } yield {
-    val v1 = SemanticVersion.withMinor(minor)
-    val v2 = SemanticVersion.withMinor(minor)
+    val v1 = SemVer.withMinor(minor)
+    val v2 = SemVer.withMinor(minor)
     Result.assert(v1 >= v2)
   }
 
@@ -174,32 +174,32 @@ object SemanticVersionMinorSpec extends Properties {
     minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
     (minor1, minor2) = minor1AndMinor2
   } yield {
-    val v1 = SemanticVersion.withMinor(minor1)
-    val v2 = SemanticVersion.withMinor(minor2)
+    val v1 = SemVer.withMinor(minor1)
+    val v2 = SemVer.withMinor(minor2)
     Result.assert(v2 >= v1).log("minor2 >= minor1")
   }
 
 }
 
-object SemanticVersionPatchSpec extends Properties {
+object SemVerPatchSpec extends Properties {
 
   override def tests: List[Test] = List(
-    property("Two SemanticVersions with the same Patch and the rest are equal then it should be equal", testSamePatchs)
-    , property("Two SemanticVersions with the different Patchs and the rest are equal then it should be not equal", testDifferentPatchs)
-    , property("Test SemanticVersion(Patch(less)) < SemanticVersion(Patch(greater)) is true", testPatchLessCase)
-    , property("Test SemanticVersion(Patch(greater)) > SemanticVersion(Patch(less)) is true", testPatchMoreCase)
-    , property("Test SemanticVersion(same Patch) <= SemanticVersion(same Patch) is true", testLeeThanEqualWithSamePatchs)
-    , property("Test SemanticVersion(Patch(less)) <= SemanticVersion(Patch(greater)) is true", testLeeThanEqualWithLess)
-    , property("Test SemanticVersion(same Patch) >= SemanticVersion(same Patch) is true", testMoreThanEqualWithSamePatchs)
-    , property("Test SemanticVersion(Patch(greater)) >= SemanticVersion(Patch(less)) is true", testMoreThanEqualWithGreater)
+    property("Two SemVers with the same Patch and the rest are equal then it should be equal", testSamePatchs)
+    , property("Two SemVers with the different Patchs and the rest are equal then it should be not equal", testDifferentPatchs)
+    , property("Test SemVer(Patch(less)) < SemVer(Patch(greater)) is true", testPatchLessCase)
+    , property("Test SemVer(Patch(greater)) > SemVer(Patch(less)) is true", testPatchMoreCase)
+    , property("Test SemVer(same Patch) <= SemVer(same Patch) is true", testLeeThanEqualWithSamePatchs)
+    , property("Test SemVer(Patch(less)) <= SemVer(Patch(greater)) is true", testLeeThanEqualWithLess)
+    , property("Test SemVer(same Patch) >= SemVer(same Patch) is true", testMoreThanEqualWithSamePatchs)
+    , property("Test SemVer(Patch(greater)) >= SemVer(Patch(less)) is true", testMoreThanEqualWithGreater)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testSamePatchs: Property = for {
     patch <- genPatch.log("patch")
   } yield {
-    val v1 = SemanticVersion.withPatch(patch)
-    val v2 = SemanticVersion.withPatch(patch)
+    val v1 = SemVer.withPatch(patch)
+    val v2 = SemVer.withPatch(patch)
     Result.assert(v1 == v2).log("patch == patch")
   }
 
@@ -208,8 +208,8 @@ object SemanticVersionPatchSpec extends Properties {
     patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
     (patch1, patch2) = patch1AndPatch2
   } yield {
-    val v1 = SemanticVersion.withPatch(patch1)
-    val v2 = SemanticVersion.withPatch(patch2)
+    val v1 = SemVer.withPatch(patch1)
+    val v2 = SemVer.withPatch(patch2)
     Result.assert(v1 != v2).log("patch1 != patch2")
   }
 
@@ -217,8 +217,8 @@ object SemanticVersionPatchSpec extends Properties {
     patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
     (patch1, patch2) = patch1AndPatch2
   } yield {
-    val v1 = SemanticVersion.withPatch(patch1)
-    val v2 = SemanticVersion.withPatch(patch2)
+    val v1 = SemVer.withPatch(patch1)
+    val v2 = SemVer.withPatch(patch2)
     Result.assert(v1 < v2).log("patch1 < patch2")
   }
 
@@ -226,16 +226,16 @@ object SemanticVersionPatchSpec extends Properties {
     patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
     (patch1, patch2) = patch1AndPatch2
   } yield {
-    val v1 = SemanticVersion.withPatch(patch1)
-    val v2 = SemanticVersion.withPatch(patch2)
+    val v1 = SemVer.withPatch(patch1)
+    val v2 = SemVer.withPatch(patch2)
     Result.assert(v2 > v1).log("patch2 > patch1")
   }
 
   def testLeeThanEqualWithSamePatchs: Property = for {
     patch <- genPatch.log("patch")
   } yield {
-    val v1 = SemanticVersion.withPatch(patch)
-    val v2 = SemanticVersion.withPatch(patch)
+    val v1 = SemVer.withPatch(patch)
+    val v2 = SemVer.withPatch(patch)
     Result.assert(v1 <= v2).log("patch1 <= patch2")
   }
 
@@ -243,16 +243,16 @@ object SemanticVersionPatchSpec extends Properties {
     patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
     (patch1, patch2) = patch1AndPatch2
   } yield {
-    val v1 = SemanticVersion.withPatch(patch1)
-    val v2 = SemanticVersion.withPatch(patch2)
+    val v1 = SemVer.withPatch(patch1)
+    val v2 = SemVer.withPatch(patch2)
     Result.assert(v1 <= v2).log("patch1 <= patch2")
   }
 
   def testMoreThanEqualWithSamePatchs: Property = for {
     patch <- genPatch.log("patch")
   } yield {
-    val v1 = SemanticVersion.withPatch(patch)
-    val v2 = SemanticVersion.withPatch(patch)
+    val v1 = SemVer.withPatch(patch)
+    val v2 = SemVer.withPatch(patch)
     Result.assert(v1 >= v2)
   }
 
@@ -260,8 +260,8 @@ object SemanticVersionPatchSpec extends Properties {
     patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
     (patch1, patch2) = patch1AndPatch2
   } yield {
-    val v1 = SemanticVersion.withPatch(patch1)
-    val v2 = SemanticVersion.withPatch(patch2)
+    val v1 = SemVer.withPatch(patch1)
+    val v2 = SemVer.withPatch(patch2)
     Result.assert(v2 >= v1).log("patch2 >= patch1")
   }
 
@@ -322,34 +322,34 @@ object AlphaNumHyphenSpec extends Properties {
 
 }
 
-object SemanticVersionSpec extends Properties {
+object SemVerSpec extends Properties {
   override def tests: List[Test] = List(
-      example("""SemanticVersion.parse("1.0.5") should return SementicVersion(Major(1), Minor(0), Patch(5), None, None)""", parseExample1)
-    , example("""SemanticVersion.parse("1.0.5-beta") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre1)
-    , example("""SemanticVersion.parse("1.0.5-a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre2)
-    , example("""SemanticVersion.parse("1.0.5-a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre3)
-    , example("""SemanticVersion.parse("1.0.5-0") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre4)
-    , example("""SemanticVersion.parse("1.0.5-000a") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre5)
-    , example("""SemanticVersion.parse("1.0.5-001") should return Left(Invalid)""", parseExamplePreInvalid1)
-    , example("""SemanticVersion.parse("1.0.5+1234") should return SementicVersion(Major(1), Minor(0), Patch(5), None, Some(build meta info)""", parseExampleMeta1)
-    , example("""SemanticVersion.parse("1.0.5+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta2)
-    , example("""SemanticVersion.parse("1.0.5+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta3)
-    , example("""SemanticVersion.parse("1.0.5+0") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta4)
-    , example("""SemanticVersion.parse("1.0.5+000a") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta5)
-    , example("""SemanticVersion.parse("1.0.5+001") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta6)
-    , example("""SemanticVersion.parse("1.0.5-beta+1234") should return SementicVersion(Major(1), Minor(0), Patch(5), None, Some(build meta info)""", parseExamplePreMeta1)
-    , example("""SemanticVersion.parse("1.0.5-a.3.7.xyz+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta2)
-    , example("""SemanticVersion.parse("1.0.5-a-b.xyz+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta3)
-    , property("SemanticVersion(same) == SemanticVersion(same) should be true", testSemanticVersionEqual)
-    , property("SemanticVersion(less).compare(SemanticVersion(greater)) should the value less than 0", testSemanticVersionLess)
-    , property("SemanticVersion(greater).compare(SemanticVersion(less)) should the value more than 0", testSemanticVersionGreater)
-    , property("SemanticVersion round trip", roundTripSemanticVersion)
+      example("""SemVer.parse("1.0.5") should return SementicVersion(Major(1), Minor(0), Patch(5), None, None)""", parseExample1)
+    , example("""SemVer.parse("1.0.5-beta") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre1)
+    , example("""SemVer.parse("1.0.5-a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre2)
+    , example("""SemVer.parse("1.0.5-a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre3)
+    , example("""SemVer.parse("1.0.5-0") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre4)
+    , example("""SemVer.parse("1.0.5-000a") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePre5)
+    , example("""SemVer.parse("1.0.5-001") should return Left(Invalid)""", parseExamplePreInvalid1)
+    , example("""SemVer.parse("1.0.5+1234") should return SementicVersion(Major(1), Minor(0), Patch(5), None, Some(build meta info)""", parseExampleMeta1)
+    , example("""SemVer.parse("1.0.5+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta2)
+    , example("""SemVer.parse("1.0.5+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta3)
+    , example("""SemVer.parse("1.0.5+0") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta4)
+    , example("""SemVer.parse("1.0.5+000a") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta5)
+    , example("""SemVer.parse("1.0.5+001") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExampleMeta6)
+    , example("""SemVer.parse("1.0.5-beta+1234") should return SementicVersion(Major(1), Minor(0), Patch(5), None, Some(build meta info)""", parseExamplePreMeta1)
+    , example("""SemVer.parse("1.0.5-a.3.7.xyz+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta2)
+    , example("""SemVer.parse("1.0.5-a-b.xyz+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta3)
+    , property("SemVer(same) == SemVer(same) should be true", testSemVerEqual)
+    , property("SemVer(less).compare(SemVer(greater)) should the value less than 0", testSemVerLess)
+    , property("SemVer(greater).compare(SemVer(less)) should the value more than 0", testSemVerGreater)
+    , property("SemVer round trip", roundTripSemVer)
     )
 
   def parseExample1: Result = {
     val input = "1.0.5"
-    val expected = Right(SemanticVersion(Major(1), Minor(0), Patch(5), None, None))
-    val actual = SemanticVersion.parse(input)
+    val expected = Right(SemVer(Major(1), Minor(0), Patch(5), None, None))
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -357,7 +357,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-beta"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -370,7 +370,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -378,7 +378,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-a.3.7.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -406,7 +406,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -414,7 +414,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-a-b.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -434,7 +434,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -442,7 +442,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-0"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -459,7 +459,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -467,7 +467,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-000a"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -484,7 +484,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -497,7 +497,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -505,7 +505,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+1234"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -518,7 +518,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -526,7 +526,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+a.3.7.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -554,7 +554,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -562,7 +562,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+a-b.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -582,7 +582,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -590,7 +590,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+0"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -607,7 +607,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -615,7 +615,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+000a"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -632,7 +632,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -640,7 +640,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5+001"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -657,7 +657,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -665,7 +665,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-beta+1234"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -682,7 +682,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -690,7 +690,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-a.3.7.xyz+a.3.7.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -737,7 +737,7 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
@@ -745,7 +745,7 @@ object SemanticVersionSpec extends Properties {
     val input = "1.0.5-a-b.xyz+a-b.xyz"
     val expected =
       Right(
-        SemanticVersion(
+        SemVer(
             Major(1)
           , Minor(0)
           , Patch(5)
@@ -776,37 +776,37 @@ object SemanticVersionSpec extends Properties {
         )
       )
 
-    val actual = SemanticVersion.parse(input)
+    val actual = SemVer.parse(input)
     actual ==== expected
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testSemanticVersionEqual: Property = for {
-    v <- genSemanticVersion.log("v")
+  def testSemVerEqual: Property = for {
+    v <- genSemVer.log("v")
   } yield {
     Result.assert(v == v).log("v == v")
   }
 
-  def testSemanticVersionLess: Property = for {
-    v1AndV2 <- genMinMaxSemanticVersions.log("(v1, v2)")
+  def testSemVerLess: Property = for {
+    v1AndV2 <- genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v1.compare(v2) < 0)
   }
 
-  def testSemanticVersionGreater: Property = for {
-    v1AndV2 <- genMinMaxSemanticVersions.log("(v1, v2)")
+  def testSemVerGreater: Property = for {
+    v1AndV2 <- genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v2.compare(v1) > 0)
   }
 
-  def roundTripSemanticVersion: Property = for {
-    semanticVersion <- genSemanticVersion.log("semanticVersion")
+  def roundTripSemVer: Property = for {
+    semVer <- genSemVer.log("semVer")
   } yield {
-    val rendered = semanticVersion.render
-    val actual = SemanticVersion.parse(rendered)
-    actual ==== Right(semanticVersion)
+    val rendered = semVer.render
+    val actual = SemVer.parse(rendered)
+    actual ==== Right(semVer)
   }
 
 }

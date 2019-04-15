@@ -228,15 +228,15 @@ object Gens {
     genMinMaxIdentifier(genMinMaxAlphaNumHyphenGroup)
       .map { case (min, max) => (BuildMetaInfo(min), BuildMetaInfo(max)) }
 
-  def genSemanticVersion: Gen[SemanticVersion] = for {
+  def genSemVer: Gen[SemVer] = for {
     major <- genMajor
     minor <- genMinor
     patch <- genPatch
     pre <- genPreRelease.option
     meta <- genBuildMetaInfo.option
-  } yield SemanticVersion(major, minor, patch, pre, meta)
+  } yield SemVer(major, minor, patch, pre, meta)
 
-  def genMinMaxSemanticVersions: Gen[(SemanticVersion, SemanticVersion)] = for {
+  def genMinMaxSemVers: Gen[(SemVer, SemVer)] = for {
     majorPair <- genMinMaxMajors
     minorPair <- genMinMaxMinors
     patchPair <- genMinMaxPatches
@@ -252,14 +252,14 @@ object Gens {
         xy => (Option(xy._1), Option(xy._2))
       )
 
-    (SemanticVersion(
+    (SemVer(
         majorPair._1
       , minorPair._1
       , patchPair._1
       , pre1
       , meta1
     ),
-    SemanticVersion(
+    SemVer(
         majorPair._2
       , minorPair._2
       , patchPair._2
