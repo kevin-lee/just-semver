@@ -211,15 +211,15 @@ trait SequenceBasedVersion[T] extends Ordered[T] {
   def render: String
 }
 
-final case class SemanticVersion(
+final case class SemVer(
   major: Major
 , minor: Minor
 , patch: Patch
 , pre: Option[PreRelease]
 , buildMetadata: Option[BuildMetaInfo]
-) extends SequenceBasedVersion[SemanticVersion] {
+) extends SequenceBasedVersion[SemVer] {
 
-  override def compare(that: SemanticVersion): Int = {
+  override def compare(that: SemVer): Int = {
     val mj = this.major.major.compareTo(that.major.major)
     if (mj === 0) {
       val mn = this.minor.minor.compareTo(that.minor.minor)
@@ -260,15 +260,15 @@ final case class SemanticVersion(
       }).toString
 }
 
-object SemanticVersion {
+object SemVer {
   val major0: Major = Major(0)
   val minor0: Minor = Minor(0)
   val patch0: Patch = Patch(0)
 
-  val semanticVersionRegex: Regex =
+  val semVerRegex: Regex =
     """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
 
-  def parseUnsafe(version: String): SemanticVersion =
+  def parseUnsafe(version: String): SemVer =
     parse(version) match {
       case Right(semVer) =>
         semVer
@@ -276,8 +276,8 @@ object SemanticVersion {
         sys.error(ParseError.render(error))
     }
 
-  def parse(version: String): Either[ParseError, SemanticVersion] = version match {
-    case semanticVersionRegex(major, minor, patch, pre, meta) =>
+  def parse(version: String): Either[ParseError, SemVer] = version match {
+    case semVerRegex(major, minor, patch, pre, meta) =>
       val preRelease = AdditionalInfo.parsePreRelease(pre)
       val metaInfo = AdditionalInfo.parseBuildMetaInfo(meta)
       (preRelease, metaInfo) match {
@@ -289,7 +289,7 @@ object SemanticVersion {
           Left(ParseError.buildMetadataParseError(metaError))
         case (Right(preR), Right(metaI)) =>
           Right(
-            SemanticVersion(
+            SemVer(
               Major(major.toInt), Minor(minor.toInt), Patch(patch.toInt),
               preR, metaI
             )
@@ -300,17 +300,17 @@ object SemanticVersion {
       Left(ParseError.invalidVersionStringError(version))
   }
 
-  def noIdentifier(major: Major, minor: Minor, patch: Patch): SemanticVersion =
-    SemanticVersion(major, minor, patch, None, None)
+  def noIdentifier(major: Major, minor: Minor, patch: Patch): SemVer =
+    SemVer(major, minor, patch, None, None)
 
-  def withMajor(major: Major): SemanticVersion =
-    SemanticVersion(major, minor0, patch0, None, None)
+  def withMajor(major: Major): SemVer =
+    SemVer(major, minor0, patch0, None, None)
 
-  def withMinor(minor: Minor): SemanticVersion =
-    SemanticVersion(major0, minor, patch0, None, None)
+  def withMinor(minor: Minor): SemVer =
+    SemVer(major0, minor, patch0, None, None)
 
-  def withPatch(patch: Patch): SemanticVersion =
-    SemanticVersion(major0, minor0, patch, None, None)
+  def withPatch(patch: Patch): SemVer =
+    SemVer(major0, minor0, patch, None, None)
 }
 
 sealed trait ParseError
@@ -353,7 +353,7 @@ object ParseError {
          |""".stripMargin
 
     case InvalidVersionStringError(value) =>
-      s"Invalid SemanticVersion String. value: $value"
+      s"Invalid SemVer String. value: $value"
   }
 
   def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): ParseError =
