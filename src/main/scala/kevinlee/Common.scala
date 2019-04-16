@@ -10,10 +10,11 @@ import CommonPredef._
 object Common {
   // $COVERAGE-OFF$
   @tailrec
-  def compareElems[A <: Ordered[A]](x: Seq[A], y: Seq[A]): Int =
+  def compareElems[A : Ordering](x: Seq[A], y: Seq[A]): Int = {
+    val ordering = implicitly[Ordering[A]]
     (x, y) match {
       case (head1 +: tail1, head2 +: tail2) =>
-        val result = head1.compare(head2)
+        val result = ordering.compare(head1, head2)
         if (result === 0) {
           compareElems(tail1, tail2)
         } else {
@@ -24,5 +25,6 @@ object Common {
       case (_ +: _, Seq()) =>
         1
     }
+  }
   // $COVERAGE-ON$
 }
