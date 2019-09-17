@@ -1,9 +1,9 @@
-package kevinlee.semver
+package just.semver
 
 import hedgehog._
 import hedgehog.runner._
-import kevinlee.semver.AlphaNumHyphen.{alphabet, hyphen, num, numFromStringUnsafe}
-import kevinlee.semver.Gens._
+import AlphaNumHyphen.{alphabet, hyphen, num, numFromStringUnsafe}
+import Gens._
 
 /**
   * @author Kevin Lee
