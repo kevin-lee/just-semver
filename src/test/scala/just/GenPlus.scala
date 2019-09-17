@@ -1,4 +1,4 @@
-package kevinlee
+package just
 
 import hedgehog._
 

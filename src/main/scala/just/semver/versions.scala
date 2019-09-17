@@ -1,8 +1,9 @@
-package kevinlee.semver
+package just.semver
 
-import kevinlee.Common._
-import kevinlee.CommonPredef._
-import kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
+import just.Common._
+import just.CommonPredef._
+
+import AdditionalInfo.{BuildMetaInfo, PreRelease}
 
 import just.EitherCompat
 

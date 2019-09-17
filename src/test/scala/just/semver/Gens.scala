@@ -1,11 +1,12 @@
-package kevinlee.semver
+package just.semver
 
 import hedgehog._
 
-import kevinlee.CommonPredef._
-import kevinlee.GenPlus
-import kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
-import kevinlee.semver.AlphaNumHyphen._
+import just.CommonPredef._
+import just.GenPlus
+
+import AdditionalInfo.{BuildMetaInfo, PreRelease}
+import AlphaNumHyphen._
 
 import scala.annotation.tailrec
 
