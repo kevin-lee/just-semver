@@ -4,6 +4,8 @@ import kevinlee.Common._
 import kevinlee.CommonPredef._
 import kevinlee.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 
+import just.EitherCompat
+
 import scala.annotation.tailrec
 import scala.util.matching.Regex
 
@@ -72,7 +74,7 @@ object AlphaNumHyphenGroup {
               ParseError.invalidAlphaNumHyphenError(x, xs)
             )
 
-        result.right.map(groups => AlphaNumHyphenGroup(groups.toList))
+        EitherCompat.map(result)(groups => AlphaNumHyphenGroup(groups.toList))
 
       case Nil =>
         Left(ParseError.emptyAlphaNumHyphenError)
@@ -88,7 +90,7 @@ sealed trait AlphaNumHyphen extends Ordered[AlphaNumHyphen] {
   override def compare(that: AlphaNumHyphen): Int =
     (this, that) match {
       case (Num(thisValue), Num(thatValue)) =>
-        thisValue.toInt.compareTo(thatValue.toInt)
+        Ordering[Int].compare(thisValue.toInt, thatValue.toInt)
       case (Num(_), Alphabet(_)) =>
         -1
       case (Num(_), Hyphen) =>
@@ -157,7 +159,7 @@ object AdditionalInfo {
   final case class BuildMetaInfo(identifier: Identifier)
 
   def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
-    parse(value, {
+    EitherCompat.map(parse(value, {
       case a @ AlphaNumHyphenGroup(Num(n) :: Nil) =>
         if ((n === "0") || n.takeWhile(_ === '0').length === 0)
           Right(a)
@@ -165,10 +167,10 @@ object AdditionalInfo {
           Left(ParseError.leadingZeroNumError(n))
       case a @ AlphaNumHyphenGroup(_) =>
         Right(a)
-    }).right.map(_.map(PreRelease))
+    }))(_.map(PreRelease))
 
   def parseBuildMetaInfo(value: String): Either[ParseError, Option[BuildMetaInfo]] =
-    parse(value, Right.apply).right.map(_.map(BuildMetaInfo))
+    EitherCompat.map(parse(value, Right.apply))(_.map(BuildMetaInfo))
 
   def parse(
     value: String
@@ -181,9 +183,9 @@ object AdditionalInfo {
           case Some(preRelease) =>
             preRelease.foldRight[Either[ParseError, List[AlphaNumHyphenGroup]]](Right(List.empty)){
               (x, acc) =>
-                x.right.flatMap(validator) match {
+                EitherCompat.flatMap(x)(validator) match {
                   case Right(alp) =>
-                    acc.right.map(alps => alp :: alps)
+                    EitherCompat.map(acc)(alps => alp :: alps)
                   case Left(error) =>
                     Left(error)
                 }
@@ -191,7 +193,7 @@ object AdditionalInfo {
           case None =>
             Right(List.empty)
         }
-    alphaNumHyphens.right.map {
+    EitherCompat.map(alphaNumHyphens) {
       case Nil =>
         None
       case xs =>
@@ -248,7 +250,8 @@ final case class SemVer(
   }
 
   def render: String =
-    s"${major.major}.${minor.minor}.${patch.patch}" + ((pre, buildMetadata) match {
+    s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}" + (
+      (pre, buildMetadata) match {
         case (Some(p), Some(m)) =>
           s"-${Identifier.render(p.identifier)}+${Identifier.render(m.identifier)}"
         case (Some(p), None) =>
@@ -257,7 +260,8 @@ final case class SemVer(
           s"+${Identifier.render(m.identifier)}"
         case (None, None) =>
           ""
-      }).toString
+      }
+    ).toString
 }
 
 object SemVer {
@@ -332,7 +336,7 @@ object ParseError {
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def render(parseError: ParseError): String = parseError match {
     case InvalidAlphaNumHyphenError(c, rest) =>
-      s"Invalid char for AlphaNumHyphen found. value: $c / rest: $rest"
+      s"Invalid char for AlphaNumHyphen found. value: ${c.toString} / rest: ${rest.toString}"
 
     case EmptyAlphaNumHyphenError =>
       "AlphaNumHyphen cannot be empty but the given value is an empty String."

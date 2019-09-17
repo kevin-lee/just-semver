@@ -1,7 +1,7 @@
 import sbt._
 
 object Dependencies {
-  val hedgehogVersion = "14aa04a77eece609f831684913288f7d7e6c1408"
+  val hedgehogVersion = "06b22e95ca1a32a2569914824ffe6fc4cfd62c62"
   val hedgehogRepo =
     Resolver.url(
       "bintray-scala-hedgehog",
@@ -13,9 +13,5 @@ object Dependencies {
     , "hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test
     , "hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test
   )
-
-  val wartRemover: ModuleID = "org.wartremover" % "sbt-wartremover" % "2.2.1"
-
-  val scoverage: ModuleID = "org.scoverage" % "sbt-scoverage" % "1.5.1"
 
 }
