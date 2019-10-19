@@ -5,7 +5,6 @@ import AlphaNumHyphen.{alphabet, hyphen, num, numFromStringUnsafe}
 import hedgehog._
 import hedgehog.runner._
 
-import just.semver.AdditionalInfo.Identifier
 import just.semver.SemVer.{Major, Minor, Patch}
 
 /**
@@ -53,7 +52,7 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(List(AlphaNumHyphenGroup(List(alphabet("beta"))))
+              List(AlphaNumHyphenGroup(List(alphabet("beta")))
               ))
             )
           , None
@@ -74,20 +73,18 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(
-                List(
-                  AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("a"))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(3))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(7))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("xyz"))
-                  )
+              List(
+                AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("a"))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(3))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(7))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("xyz"))
                 )
               )
             )
@@ -110,14 +107,14 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("a"), hyphen, alphabet("b"))
                 )
               , AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("xyz"))
                 )
-              ))
+              )
             )
           )
           , None
@@ -138,11 +135,11 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](num(0))
                 )
-              ))
+              )
             )
           )
           , None
@@ -163,11 +160,11 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](numFromStringUnsafe("000"), alphabet("a"))
                 )
-              ))
+              )
             )
           )
           , None
@@ -202,7 +199,7 @@ object SemVerSpec extends Properties {
           , None
           , Option(
               AdditionalInfo.BuildMetaInfo(
-                Identifier(List(AlphaNumHyphenGroup(List(num(1234)))))
+                List(AlphaNumHyphenGroup(List(num(1234))))
               )
             )
         )
@@ -223,20 +220,18 @@ object SemVerSpec extends Properties {
           , None
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(
-                List(
-                  AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("a"))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(3))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(7))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("xyz"))
-                  )
+              List(
+                AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("a"))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(3))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(7))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("xyz"))
                 )
               )
             )
@@ -259,14 +254,14 @@ object SemVerSpec extends Properties {
           , None
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("a"), hyphen, alphabet("b"))
                 )
               , AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("xyz"))
                 )
-              ))
+              )
             )
           )
         )
@@ -287,11 +282,11 @@ object SemVerSpec extends Properties {
           , None
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](num(0))
                 )
-              ))
+              )
             )
           )
         )
@@ -312,11 +307,11 @@ object SemVerSpec extends Properties {
           , None
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](numFromStringUnsafe("000"), alphabet("a"))
                 )
-              ))
+              )
             )
           )
         )
@@ -337,11 +332,11 @@ object SemVerSpec extends Properties {
           , None
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](numFromStringUnsafe("001"))
                 )
-              ))
+              )
             )
           )
         )
@@ -361,12 +356,12 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
               AdditionalInfo.PreRelease(
-                Identifier(List(AlphaNumHyphenGroup(List(alphabet("beta")))))
+                List(AlphaNumHyphenGroup(List(alphabet("beta"))))
               )
             )
           , Option(
               AdditionalInfo.BuildMetaInfo(
-                Identifier(List(AlphaNumHyphenGroup(List(num(1234)))))
+                List(AlphaNumHyphenGroup(List(num(1234))))
               )
             )
         )
@@ -386,40 +381,36 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(
-                List(
-                  AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("a"))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(3))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(7))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("xyz"))
-                  )
+              List(
+                AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("a"))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(3))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(7))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("xyz"))
                 )
               )
             )
           )
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(
-                List(
-                  AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("a"))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(3))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](num(7))
-                  )
-                , AlphaNumHyphenGroup(
-                    List[AlphaNumHyphen](alphabet("xyz"))
-                  )
+              List(
+                AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("a"))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(3))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](num(7))
+                )
+              , AlphaNumHyphenGroup(
+                  List[AlphaNumHyphen](alphabet("xyz"))
                 )
               )
             )
@@ -441,26 +432,26 @@ object SemVerSpec extends Properties {
           , Patch(5)
           , Option(
             AdditionalInfo.PreRelease(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("a"), hyphen, alphabet("b"))
                 )
               , AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("xyz"))
                 )
-              ))
+              )
             )
           )
           , Option(
             AdditionalInfo.BuildMetaInfo(
-              Identifier(List(
+              List(
                 AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("a"), hyphen, alphabet("b"))
                 )
               , AlphaNumHyphenGroup(
                   List[AlphaNumHyphen](alphabet("xyz"))
                 )
-              ))
+              )
             )
           )
         )

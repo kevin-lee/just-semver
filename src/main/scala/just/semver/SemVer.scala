@@ -1,7 +1,10 @@
 package just.semver
 
+import just.Common
+
 import just.fp.syntax._
-import just.semver.AdditionalInfo.{BuildMetaInfo, Identifier, PreRelease}
+
+import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
 
 import scala.util.matching.Regex
@@ -27,7 +30,7 @@ final case class SemVer(
         if (pt === 0) {
           (this.pre, that.pre) match {
             case (Some(thisPre), Some(thatPre)) =>
-              Identifier.compare(thisPre.identifier, thatPre.identifier)
+              Common.compareElems(thisPre.identifier, thatPre.identifier)
             case (Some(_), None) =>
               -1
             case (None, Some(_)) =>
@@ -50,11 +53,11 @@ final case class SemVer(
     s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}" + (
       (pre, buildMetadata) match {
         case (Some(p), Some(m)) =>
-          s"-${Identifier.render(p.identifier)}+${Identifier.render(m.identifier)}"
+          s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
         case (Some(p), None) =>
-          s"-${Identifier.render(p.identifier)}"
+          s"-${PreRelease.render(p)}"
         case (None, Some(m)) =>
-          s"+${Identifier.render(m.identifier)}"
+          s"+${BuildMetaInfo.render(m)}"
         case (None, None) =>
           ""
       }
