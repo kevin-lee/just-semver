@@ -5,12 +5,18 @@ import kevinlee.semver.{Major, Minor, SemanticVersion}
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 ThisBuild / scalaVersion := ProjectScalaVersion
-ThisBuild / organization := "kevinlee"
+ThisBuild / organization := "io.kevinlee"
 ThisBuild / version      := ProjectVersion
 ThisBuild / crossScalaVersions := CrossScalaVersions
 ThisBuild / developers   := List(
     Developer("Kevin-Lee", "Kevin Lee", "kevin.code@kevinlee.io", url("https://github.com/Kevin-Lee"))
   )
+ThisBuild / homepage := Some(url("https://github.com/Kevin-Lee/just-semver"))
+ThisBuild / scmInfo :=
+    Some(ScmInfo(
+      url("https://github.com/Kevin-Lee/just-semver")
+      , "git@github.com:Kevin-Lee/just-semver.git"
+    ))
 
 lazy val justSemVer = (project in file("."))
   .settings(
