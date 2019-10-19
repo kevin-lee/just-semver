@@ -30,20 +30,16 @@ lazy val justSemVer = (project in file("."))
       else
         Seq(sharedSourceDir / "scala-2.10_2.11")
     }
-  , wartremoverErrors in (Compile, compile) ++= commonWarts
-  , wartremoverErrors in (Test, compile) ++= commonWarts
   , resolvers += hedgehogRepo
-  , libraryDependencies ++= hedgehogLibs
-  , dependencyOverrides ++=
-    crossVersionProps(
-        Seq.empty[ModuleID]
-      , SemanticVersion.parseUnsafe(scalaVersion.value)
-      ) {
+  , libraryDependencies := hedgehogLibs ++ Seq(justFp) ++
+      crossVersionProps(Seq.empty[ModuleID], SemanticVersion.parseUnsafe(scalaVersion.value)) {
         case (Major(2), Minor(10)) =>
-          Seq("org.wartremover" %% "wartremover" % "2.3.7")
+          libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x =>
-          Seq.empty
+          libraryDependencies.value
       }
+  , wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value)
+  , wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value)
   , testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
 
   /* Bintray { */

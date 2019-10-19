@@ -1,9 +1,9 @@
 package just.semver
 
 import hedgehog._
-
-import just.CommonPredef._
 import just.GenPlus
+
+import just.fp.syntax._
 
 import AdditionalInfo.{BuildMetaInfo, PreRelease}
 import AlphaNumHyphen._

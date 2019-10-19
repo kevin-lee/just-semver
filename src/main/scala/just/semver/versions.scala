@@ -1,11 +1,10 @@
 package just.semver
 
-import just.Common._
-import just.CommonPredef._
-
 import AdditionalInfo.{BuildMetaInfo, PreRelease}
+import just.Common._
 
-import just.EitherCompat
+import just.fp.compat.EitherCompat
+import just.fp.syntax._
 
 import scala.annotation.tailrec
 import scala.util.matching.Regex

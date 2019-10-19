@@ -1,7 +1,8 @@
 package just
 
 import scala.annotation.tailrec
-import CommonPredef._
+
+import just.fp.syntax._
 
 /**
   * @author Kevin Lee
