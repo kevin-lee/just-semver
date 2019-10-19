@@ -1,327 +1,17 @@
 package just.semver
 
+import AlphaNumHyphen.{alphabet, hyphen, num, numFromStringUnsafe}
+
 import hedgehog._
 import hedgehog.runner._
-import AlphaNumHyphen.{alphabet, hyphen, num, numFromStringUnsafe}
-import Gens._
+
+import just.semver.AdditionalInfo.Identifier
+import just.semver.SemVer.{Major, Minor, Patch}
 
 /**
   * @author Kevin Lee
   * @since 2018-11-04
   */
-object SemVerMajorSpec extends Properties {
-
-  override def tests: List[Test] = List(
-    property("Two SemVers with the same Major and the rest are equal then it should be equal", testSameMajors)
-  , property("Two SemVers with the different Majors and the rest are equal then it should be not equal", testDifferentMajors)
-  , property("Test SemVer(Major(less)) < SemVer(Major(greater)) is true", testMajorLessCase)
-  , property("Test SemVer(Major(greater)) > SemVer(Major(less)) is true", testMajorMoreCase)
-  , property("Test SemVer(same Major) <= SemVer(same Major) is true", testLeeThanEqualWithSameMajors)
-  , property("Test SemVer(Major(less)) <= SemVer(Major(greater)) is true", testLeeThanEqualWithLess)
-  , property("Test SemVer(same Major) >= SemVer(same Major) is true", testMoreThanEqualWithSameMajors)
-  , property("Test SemVer(Major(greater)) >= SemVer(Major(less)) is true", testMoreThanEqualWithGreater)
-  )
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testSameMajors: Property = for {
-    major <- genMajor.log("major")
-  } yield {
-    val v1 = SemVer.withMajor(major)
-    val v2 = SemVer.withMajor(major)
-    Result.assert(v1 == v2).log("major == major")
-  }
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testDifferentMajors: Property = for {
-    major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
-    (major1, major2) = major1AndMajor2
-  } yield {
-    val v1 = SemVer.withMajor(major1)
-    val v2 = SemVer.withMajor(major2)
-    Result.assert(v1 != v2).log("major1 != major2")
-  }
-
-  def testMajorLessCase: Property = for {
-    major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
-    (major1, major2) = major1AndMajor2
-  } yield {
-    val v1 = SemVer.withMajor(major1)
-    val v2 = SemVer.withMajor(major2)
-    Result.assert(v1 < v2).log("major1 < major2")
-  }
-
-  def testMajorMoreCase: Property = for {
-    major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
-    (major1, major2) = major1AndMajor2
-  } yield {
-    val v1 = SemVer.withMajor(major1)
-    val v2 = SemVer.withMajor(major2)
-    Result.assert(v2 > v1).log("major2 > major1")
-  }
-
-  def testLeeThanEqualWithSameMajors: Property = for {
-    major <- genMajor.log("major")
-  } yield {
-    val v1 = SemVer.withMajor(major)
-    val v2 = SemVer.withMajor(major)
-    Result.assert(v1 <= v2).log("major1 <= major2")
-  }
-
-  def testLeeThanEqualWithLess: Property = for {
-    major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
-    (major1, major2) = major1AndMajor2
-  } yield {
-    val v1 = SemVer.withMajor(major1)
-    val v2 = SemVer.withMajor(major2)
-    Result.assert(v1 <= v2).log("major1 <= major2")
-  }
-
-  def testMoreThanEqualWithSameMajors: Property = for {
-    major <- genMajor.log("major")
-  } yield {
-    val v1 = SemVer.withMajor(major)
-    val v2 = SemVer.withMajor(major)
-    Result.assert(v1 >= v2)
-  }
-
-  def testMoreThanEqualWithGreater: Property = for {
-    major1AndMajor2 <- genMinMaxMajors.log("(major1, major2)")
-    (major1, major2) = major1AndMajor2
-  } yield {
-    val v1 = SemVer.withMajor(major1)
-    val v2 = SemVer.withMajor(major2)
-    Result.assert(v2 >= v1).log("major2 >= major1")
-  }
-
-}
-
-object SemVerMinorSpec extends Properties {
-
-  override def tests: List[Test] = List(
-    property("Two SemVers with the same Minor and the rest are equal then it should be equal", testSameMinors)
-    , property("Two SemVers with the different Minors and the rest are equal then it should be not equal", testDifferentMinors)
-    , property("Test SemVer(Minor(less)) < SemVer(Minor(greater)) is true", testMinorLessCase)
-    , property("Test SemVer(Minor(greater)) > SemVer(Minor(less)) is true", testMinorMoreCase)
-    , property("Test SemVer(same Minor) <= SemVer(same Minor) is true", testLeeThanEqualWithSameMinors)
-    , property("Test SemVer(Minor(less)) <= SemVer(Minor(greater)) is true", testLeeThanEqualWithLess)
-    , property("Test SemVer(same Minor) >= SemVer(same Minor) is true", testMoreThanEqualWithSameMinors)
-    , property("Test SemVer(Minor(greater)) >= SemVer(Minor(less)) is true", testMoreThanEqualWithGreater)
-  )
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testSameMinors: Property = for {
-    minor <- genMinor.log("minor")
-  } yield {
-    val v1 = SemVer.withMinor(minor)
-    val v2 = SemVer.withMinor(minor)
-    Result.assert(v1 == v2).log("minor == minor")
-  }
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testDifferentMinors: Property = for {
-    minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
-    (minor1, minor2) = minor1AndMinor2
-  } yield {
-    val v1 = SemVer.withMinor(minor1)
-    val v2 = SemVer.withMinor(minor2)
-    Result.assert(v1 != v2).log("minor1 != minor2")
-  }
-
-  def testMinorLessCase: Property = for {
-    minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
-    (minor1, minor2) = minor1AndMinor2
-  } yield {
-    val v1 = SemVer.withMinor(minor1)
-    val v2 = SemVer.withMinor(minor2)
-    Result.assert(v1 < v2).log("minor1 < minor2")
-  }
-
-  def testMinorMoreCase: Property = for {
-    minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
-    (minor1, minor2) = minor1AndMinor2
-  } yield {
-    val v1 = SemVer.withMinor(minor1)
-    val v2 = SemVer.withMinor(minor2)
-    Result.assert(v2 > v1).log("minor2 > minor1")
-  }
-
-  def testLeeThanEqualWithSameMinors: Property = for {
-    minor <- genMinor.log("minor")
-  } yield {
-    val v1 = SemVer.withMinor(minor)
-    val v2 = SemVer.withMinor(minor)
-    Result.assert(v1 <= v2).log("minor1 <= minor2")
-  }
-
-  def testLeeThanEqualWithLess: Property = for {
-    minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
-    (minor1, minor2) = minor1AndMinor2
-  } yield {
-    val v1 = SemVer.withMinor(minor1)
-    val v2 = SemVer.withMinor(minor2)
-    Result.assert(v1 <= v2).log("minor1 <= minor2")
-  }
-
-  def testMoreThanEqualWithSameMinors: Property = for {
-    minor <- genMinor.log("minor")
-  } yield {
-    val v1 = SemVer.withMinor(minor)
-    val v2 = SemVer.withMinor(minor)
-    Result.assert(v1 >= v2)
-  }
-
-  def testMoreThanEqualWithGreater: Property = for {
-    minor1AndMinor2 <- genMinMaxMinors.log("(minor1, minor2)")
-    (minor1, minor2) = minor1AndMinor2
-  } yield {
-    val v1 = SemVer.withMinor(minor1)
-    val v2 = SemVer.withMinor(minor2)
-    Result.assert(v2 >= v1).log("minor2 >= minor1")
-  }
-
-}
-
-object SemVerPatchSpec extends Properties {
-
-  override def tests: List[Test] = List(
-    property("Two SemVers with the same Patch and the rest are equal then it should be equal", testSamePatchs)
-    , property("Two SemVers with the different Patchs and the rest are equal then it should be not equal", testDifferentPatchs)
-    , property("Test SemVer(Patch(less)) < SemVer(Patch(greater)) is true", testPatchLessCase)
-    , property("Test SemVer(Patch(greater)) > SemVer(Patch(less)) is true", testPatchMoreCase)
-    , property("Test SemVer(same Patch) <= SemVer(same Patch) is true", testLeeThanEqualWithSamePatchs)
-    , property("Test SemVer(Patch(less)) <= SemVer(Patch(greater)) is true", testLeeThanEqualWithLess)
-    , property("Test SemVer(same Patch) >= SemVer(same Patch) is true", testMoreThanEqualWithSamePatchs)
-    , property("Test SemVer(Patch(greater)) >= SemVer(Patch(less)) is true", testMoreThanEqualWithGreater)
-  )
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testSamePatchs: Property = for {
-    patch <- genPatch.log("patch")
-  } yield {
-    val v1 = SemVer.withPatch(patch)
-    val v2 = SemVer.withPatch(patch)
-    Result.assert(v1 == v2).log("patch == patch")
-  }
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testDifferentPatchs: Property = for {
-    patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
-    (patch1, patch2) = patch1AndPatch2
-  } yield {
-    val v1 = SemVer.withPatch(patch1)
-    val v2 = SemVer.withPatch(patch2)
-    Result.assert(v1 != v2).log("patch1 != patch2")
-  }
-
-  def testPatchLessCase: Property = for {
-    patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
-    (patch1, patch2) = patch1AndPatch2
-  } yield {
-    val v1 = SemVer.withPatch(patch1)
-    val v2 = SemVer.withPatch(patch2)
-    Result.assert(v1 < v2).log("patch1 < patch2")
-  }
-
-  def testPatchMoreCase: Property = for {
-    patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
-    (patch1, patch2) = patch1AndPatch2
-  } yield {
-    val v1 = SemVer.withPatch(patch1)
-    val v2 = SemVer.withPatch(patch2)
-    Result.assert(v2 > v1).log("patch2 > patch1")
-  }
-
-  def testLeeThanEqualWithSamePatchs: Property = for {
-    patch <- genPatch.log("patch")
-  } yield {
-    val v1 = SemVer.withPatch(patch)
-    val v2 = SemVer.withPatch(patch)
-    Result.assert(v1 <= v2).log("patch1 <= patch2")
-  }
-
-  def testLeeThanEqualWithLess: Property = for {
-    patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
-    (patch1, patch2) = patch1AndPatch2
-  } yield {
-    val v1 = SemVer.withPatch(patch1)
-    val v2 = SemVer.withPatch(patch2)
-    Result.assert(v1 <= v2).log("patch1 <= patch2")
-  }
-
-  def testMoreThanEqualWithSamePatchs: Property = for {
-    patch <- genPatch.log("patch")
-  } yield {
-    val v1 = SemVer.withPatch(patch)
-    val v2 = SemVer.withPatch(patch)
-    Result.assert(v1 >= v2)
-  }
-
-  def testMoreThanEqualWithGreater: Property = for {
-    patch1AndPatch2 <- genMinMaxPatches.log("(patch1, patch2)")
-    (patch1, patch2) = patch1AndPatch2
-  } yield {
-    val v1 = SemVer.withPatch(patch1)
-    val v2 = SemVer.withPatch(patch2)
-    Result.assert(v2 >= v1).log("patch2 >= patch1")
-  }
-
-}
-
-object AlphaNumHyphenSpec extends Properties {
-
-  override def tests: List[Test] = List(
-    property("Num(same).compare(Num(same)) should return 0", testNumEqual)
-  , property("Num(less).compare(Num(greater)) should return -1", testNumLess)
-  , property("Num(greater).compare(Num(less)) should return 1", testNumMore)
-  , property("AlphaHyphen(same).compare(AlphaHyphen(same)) should return 0", testAlphaHyphenEqual)
-  , property("AlphaHyphen(less).compare(AlphaHyphen(greater)) should return the Int < 0", testAlphaHyphenLess)
-  , property("AlphaHyphen(greater).compare(AlphaHyphen(less)) should return the Int > 0", testAlphaHyphenMore)
-  )
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testNumEqual: Property = for {
-    num <- genNum.log("num")
-  } yield {
-    num.compare(num) ==== 0 and Result.assert(num == num)
-  }
-
-  def testNumLess: Property = for {
-    minMax <- genMinMaxNum.log("(num1, num2)")
-    (num1, num2) = minMax
-  } yield {
-    num1.compare(num2) ==== -1
-  }
-
-  def testNumMore: Property = for {
-    minMax <- genMinMaxNum.log("(num1, num2)")
-    (num1, num2) = minMax
-  } yield {
-    num2.compare(num1) ==== 1
-  }
-
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  def testAlphaHyphenEqual: Property = for {
-    alphaHyphen <- genAlphabet(10).log("alphaHyphen")
-  } yield {
-    alphaHyphen.compare(alphaHyphen) ==== 0 and Result.assert(alphaHyphen == alphaHyphen)
-  }
-
-  def testAlphaHyphenLess: Property = for {
-    alphaHyphenPair <- genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
-    (alphaHyphen1, alphaHyphen2) = alphaHyphenPair
-  } yield {
-    Result.assert(alphaHyphen1.compare(alphaHyphen2) < 0)
-  }
-
-  def testAlphaHyphenMore: Property = for {
-    alphaHyphenPair <- genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
-    (alphaHyphen1, alphaHyphen2) = alphaHyphenPair
-  } yield {
-    Result.assert(alphaHyphen2.compare(alphaHyphen1) > 0)
-  }
-
-}
-
 object SemVerSpec extends Properties {
   override def tests: List[Test] = List(
       example("""SemVer.parse("1.0.5") should return SementicVersion(Major(1), Minor(0), Patch(5), None, None)""", parseExample1)
@@ -782,27 +472,27 @@ object SemVerSpec extends Properties {
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
   def testSemVerEqual: Property = for {
-    v <- genSemVer.log("v")
+    v <- Gens.genSemVer.log("v")
   } yield {
     Result.assert(v == v).log("v == v")
   }
 
   def testSemVerLess: Property = for {
-    v1AndV2 <- genMinMaxSemVers.log("(v1, v2)")
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v1.compare(v2) < 0)
   }
 
   def testSemVerGreater: Property = for {
-    v1AndV2 <- genMinMaxSemVers.log("(v1, v2)")
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v2.compare(v1) > 0)
   }
 
   def roundTripSemVer: Property = for {
-    semVer <- genSemVer.log("semVer")
+    semVer <- Gens.genSemVer.log("semVer")
   } yield {
     val rendered = semVer.render
     val actual = SemVer.parse(rendered)
