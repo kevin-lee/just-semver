@@ -1,8 +1,12 @@
 package just.semver
 
 import hedgehog._
+
 import just.GenPlus
+
 import just.fp.syntax._
+
+import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
 
 import scala.annotation.tailrec
@@ -136,9 +140,6 @@ object Gens {
     combined = combineAlphaNumHyphen(values)
   } yield AlphaNumHyphenGroup(combined)
 
-  def genIdentifier(alphaNumHyphenGroupGen: Gen[AlphaNumHyphenGroup]): Gen[AdditionalInfo.Identifier] =
-    alphaNumHyphenGroupGen.list(Range.linear(1, 5)).map(AdditionalInfo.Identifier(_))
-
   def toValidNum(alps: List[AlphaNumHyphen]): List[AlphaNumHyphen] = alps match {
     case AlphaNumHyphen.Num(n) :: Nil =>
       if (n === "0" || n.takeWhile(_ === '0').length === 0)
@@ -149,17 +150,19 @@ object Gens {
       alps
   }
 
-  def genPreRelease: Gen[AdditionalInfo.PreRelease] = genIdentifier(
-    for {
+  def genPreRelease: Gen[AdditionalInfo.PreRelease] =
+    (for {
       alpnhGroup <-genAlphaNumHyphenGroup
       AlphaNumHyphenGroup(alps) = alpnhGroup
       newAlps = toValidNum(alps)
-    } yield AlphaNumHyphenGroup(newAlps)
-  ).map(AdditionalInfo.PreRelease)
+    } yield AlphaNumHyphenGroup(newAlps))
+    .list(Range.linear(1, 5))
+    .map(PreRelease.apply)
 
   def genBuildMetaInfo: Gen[AdditionalInfo.BuildMetaInfo] =
-    genIdentifier(genAlphaNumHyphenGroup)
-      .map(AdditionalInfo.BuildMetaInfo)
+    genAlphaNumHyphenGroup
+      .list(Range.linear(1, 5))
+      .map(BuildMetaInfo.apply)
 
   def genMinMaxAlphaNumHyphenGroup: Gen[(AlphaNumHyphenGroup, AlphaNumHyphenGroup)] = for {
     minMaxAlps <- Gen.frequency1(
@@ -172,9 +175,9 @@ object Gens {
       }
   } yield (AlphaNumHyphenGroup(minAlps), AlphaNumHyphenGroup(maxAlps))
 
-  def genMinMaxIdentifier(
+  def genMinMaxAlphaNumHyphenGroupList(
     minMaxAlphaNumHyphenGroupGen: Gen[(AlphaNumHyphenGroup, AlphaNumHyphenGroup)]
-  ): Gen[(AdditionalInfo.Identifier, AdditionalInfo.Identifier)] = for {
+  ): Gen[(List[AlphaNumHyphenGroup], List[AlphaNumHyphenGroup])] = for {
     minMaxIds <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
     (minIds, maxIds) =
       minMaxIds.foldLeft(
@@ -183,7 +186,7 @@ object Gens {
         case ((ids1, ids2), (id1, id2)) =>
           (ids1 :+ id1, ids2 :+ id2)
       }
-  } yield (AdditionalInfo.Identifier(minIds), AdditionalInfo.Identifier(maxIds))
+  } yield (minIds, maxIds)
 
   def toValidMinMaxNum(minAlps: List[AlphaNumHyphen], maxAlps: List[AlphaNumHyphen]): (List[AlphaNumHyphen], List[AlphaNumHyphen]) =
     (minAlps, maxAlps) match {
@@ -214,7 +217,7 @@ object Gens {
         (minAlps, maxAlps)
     }
 
-  def genMinMaxPreRelease: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.PreRelease)] = genMinMaxIdentifier(
+  def genMinMaxPreRelease: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.PreRelease)] = genMinMaxAlphaNumHyphenGroupList(
     for {
       minMaxAlpGroup <- genMinMaxAlphaNumHyphenGroup
       (AlphaNumHyphenGroup(minAlps), AlphaNumHyphenGroup(maxAlps)) = minMaxAlpGroup
@@ -223,7 +226,7 @@ object Gens {
   ).map { case (min, max) => (AdditionalInfo.PreRelease(min), AdditionalInfo.PreRelease(max)) }
 
   def genMinMaxBuildMetaInfo: Gen[(AdditionalInfo.BuildMetaInfo, AdditionalInfo.BuildMetaInfo)] =
-    genMinMaxIdentifier(genMinMaxAlphaNumHyphenGroup)
+    genMinMaxAlphaNumHyphenGroupList(genMinMaxAlphaNumHyphenGroup)
       .map { case (min, max) => (AdditionalInfo.BuildMetaInfo(min), AdditionalInfo.BuildMetaInfo(max)) }
 
   def genSemVer: Gen[SemVer] = for {

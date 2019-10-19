@@ -1,7 +1,5 @@
 package just.semver
 
-import just.Common.compareElems
-
 import just.fp.compat.EitherCompat
 import just.fp.syntax._
 
@@ -13,20 +11,17 @@ object AdditionalInfo {
 
   import AlphaNumHyphen._
 
-  final case class Identifier(values: List[AlphaNumHyphenGroup]) extends AnyVal
-
-  object Identifier {
-
-    def compare(a: Identifier, b: Identifier): Int =
-      compareElems(a.values, b.values)
-
-    def render(identifier: Identifier): String =
-      identifier.values.map(AlphaNumHyphenGroup.render).mkString(".")
-
+  final case class PreRelease(identifier: List[AlphaNumHyphenGroup])
+  object PreRelease {
+    def render(preRelease: PreRelease): String =
+      preRelease.identifier.map(AlphaNumHyphenGroup.render).mkString(".")
   }
 
-  final case class PreRelease(identifier: Identifier)
-  final case class BuildMetaInfo(identifier: Identifier)
+  final case class BuildMetaInfo(identifier: List[AlphaNumHyphenGroup])
+  object BuildMetaInfo {
+    def render(buildMetaInfo: BuildMetaInfo): String =
+      buildMetaInfo.identifier.map(AlphaNumHyphenGroup.render).mkString(".")
+  }
 
   def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
     EitherCompat.map(parse(value, {
@@ -37,37 +32,37 @@ object AdditionalInfo {
           Left(ParseError.leadingZeroNumError(n))
       case a @ AlphaNumHyphenGroup(_) =>
         Right(a)
-    }))(_.map(PreRelease))
+    }))(_.map(PreRelease.apply))
 
   def parseBuildMetaInfo(value: String): Either[ParseError, Option[BuildMetaInfo]] =
-    EitherCompat.map(parse(value, Right.apply))(_.map(BuildMetaInfo))
+    EitherCompat.map(parse(value, Right.apply))(_.map(BuildMetaInfo.apply))
 
   def parse(
       value: String
     , validator: AlphaNumHyphenGroup => Either[ParseError, AlphaNumHyphenGroup]
-    ): Either[ParseError, Option[Identifier]] = {
+    ): Either[ParseError, Option[List[AlphaNumHyphenGroup]]] = {
     val alphaNumHyphens: Either[ParseError, List[AlphaNumHyphenGroup]] =
       Option(value)
         .map(_.split("\\."))
         .map(_.map(AlphaNumHyphenGroup.parse)) match {
         case Some(preRelease) =>
-          preRelease.foldRight[Either[ParseError, List[AlphaNumHyphenGroup]]](Right(List.empty)){
+          preRelease.foldRight[Either[ParseError, List[AlphaNumHyphenGroup]]](List.empty.right) {
             (x, acc) =>
               EitherCompat.flatMap(x)(validator) match {
                 case Right(alp) =>
                   EitherCompat.map(acc)(alps => alp :: alps)
                 case Left(error) =>
-                  Left(error)
+                  error.left
               }
           }
         case None =>
-          Right(List.empty)
+          List.empty.right
       }
     EitherCompat.map(alphaNumHyphens) {
       case Nil =>
-        None
+        none
       case xs =>
-        Some(Identifier(xs))
+        xs.some
     }
   }
 }

@@ -54,7 +54,7 @@ lazy val justSemVer = (project in file("."))
   , licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
   /* } Bintray */
 
-  , initialCommands in console := """import just.semver._"""
+  , initialCommands in console := """import just.semver.SemVer"""
 
   /* Coveralls { */
   , coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
