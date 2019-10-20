@@ -17,7 +17,7 @@ final case class SemVer(
   , patch: Patch
   , pre: Option[PreRelease]
   , buildMetadata: Option[BuildMetaInfo]
-  ) extends SequenceBasedVersion[SemVer] {
+  ) extends Ordered[SemVer] {
 
   override def compare(that: SemVer): Int = {
     ( this.major.major.compareTo(that.major.major)
