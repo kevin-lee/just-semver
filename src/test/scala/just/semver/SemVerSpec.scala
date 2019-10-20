@@ -485,7 +485,7 @@ object SemVerSpec extends Properties {
   def roundTripSemVer: Property = for {
     semVer <- Gens.genSemVer.log("semVer")
   } yield {
-    val rendered = semVer.render
+    val rendered = SemVer.render(semVer)
     val actual = SemVer.parse(rendered)
     actual ==== Right(semVer)
   }
