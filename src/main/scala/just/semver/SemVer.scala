@@ -2,8 +2,6 @@ package just.semver
 
 import just.Common
 
-import just.fp.syntax._
-
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
 
@@ -22,30 +20,26 @@ final case class SemVer(
   ) extends SequenceBasedVersion[SemVer] {
 
   override def compare(that: SemVer): Int = {
-    val mj = this.major.major.compareTo(that.major.major)
-    if (mj === 0) {
-      val mn = this.minor.minor.compareTo(that.minor.minor)
-      if (mn === 0) {
-        val pt = this.patch.patch.compareTo(that.patch.patch)
-        if (pt === 0) {
-          (this.pre, that.pre) match {
-            case (Some(thisPre), Some(thatPre)) =>
-              Common.compareElems(thisPre.identifier, thatPre.identifier)
-            case (Some(_), None) =>
-              -1
-            case (None, Some(_)) =>
-              1
-            case (None, None) =>
-              0
-          }
-        } else {
-          pt
+    ( this.major.major.compareTo(that.major.major)
+    , this.minor.minor.compareTo(that.minor.minor)
+    , this.patch.patch.compareTo(that.patch.patch) ) match {
+      case (0, 0, 0) =>
+        (this.pre, that.pre) match {
+          case (Some(thisPre), Some(thatPre)) =>
+            Common.compareElems(thisPre.identifier, thatPre.identifier)
+          case (Some(_), None) =>
+            -1
+          case (None, Some(_)) =>
+            1
+          case (None, None) =>
+            0
         }
-      } else {
+      case (0, 0, pt) =>
+        pt
+      case (0, mn, _) =>
         mn
-      }
-    } else {
-      mj
+      case (mj, _, _) =>
+        mj
     }
   }
 
