@@ -9,28 +9,28 @@ import just.fp.syntax._
  */
 object AdditionalInfo {
 
-  import AlphaNumHyphen._
+  import Anh._
 
-  final case class PreRelease(identifier: List[AlphaNumHyphenGroup])
+  final case class PreRelease(identifier: List[Dsv])
   object PreRelease {
     def render(preRelease: PreRelease): String =
-      preRelease.identifier.map(AlphaNumHyphenGroup.render).mkString(".")
+      preRelease.identifier.map(Dsv.render).mkString(".")
   }
 
-  final case class BuildMetaInfo(identifier: List[AlphaNumHyphenGroup])
+  final case class BuildMetaInfo(identifier: List[Dsv])
   object BuildMetaInfo {
     def render(buildMetaInfo: BuildMetaInfo): String =
-      buildMetaInfo.identifier.map(AlphaNumHyphenGroup.render).mkString(".")
+      buildMetaInfo.identifier.map(Dsv.render).mkString(".")
   }
 
   def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
     EitherCompat.map(parse(value, {
-      case a @ AlphaNumHyphenGroup(Num(n) :: Nil) =>
+      case a @ Dsv(Num(n) :: Nil) =>
         if ((n === "0") || n.takeWhile(_ === '0').length === 0)
           Right(a)
         else
           Left(ParseError.leadingZeroNumError(n))
-      case a @ AlphaNumHyphenGroup(_) =>
+      case a @ Dsv(_) =>
         Right(a)
     }))(_.map(PreRelease.apply))
 
@@ -39,14 +39,14 @@ object AdditionalInfo {
 
   def parse(
       value: String
-    , validator: AlphaNumHyphenGroup => Either[ParseError, AlphaNumHyphenGroup]
-    ): Either[ParseError, Option[List[AlphaNumHyphenGroup]]] = {
-    val alphaNumHyphens: Either[ParseError, List[AlphaNumHyphenGroup]] =
+    , validator: Dsv => Either[ParseError, Dsv]
+    ): Either[ParseError, Option[List[Dsv]]] = {
+    val alphaNumHyphens: Either[ParseError, List[Dsv]] =
       Option(value)
         .map(_.split("\\."))
-        .map(_.map(AlphaNumHyphenGroup.parse)) match {
+        .map(_.map(Dsv.parse)) match {
         case Some(preRelease) =>
-          preRelease.foldRight[Either[ParseError, List[AlphaNumHyphenGroup]]](List.empty.right) {
+          preRelease.foldRight[Either[ParseError, List[Dsv]]](List.empty.right) {
             (x, acc) =>
               EitherCompat.flatMap(x)(validator) match {
                 case Right(alp) =>

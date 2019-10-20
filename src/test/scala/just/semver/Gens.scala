@@ -25,8 +25,8 @@ object Gens {
   def genDigitChar: Gen[Char] =
     Gen.char('0', '9')
 
-  def genHyphen: Gen[AlphaNumHyphen] =
-    Gen.constant(AlphaNumHyphen.Hyphen)
+  def genHyphen: Gen[Anh] =
+    Gen.constant(Anh.Hyphen)
 
   def genMinMax[T : Ordering](genOrderedPair: Gen[(T, T)]): Gen[(T, T)] =
     genOrderedPair.map { case (x, y) =>
@@ -75,55 +75,55 @@ object Gens {
   def genMinMaxPatches: Gen[(Patch, Patch)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Patch))
 
-  def genNum: Gen[AlphaNumHyphen] =
-    genInt(0, 999).map(AlphaNumHyphen.num)
+  def genNum: Gen[Anh] =
+    genInt(0, 999).map(Anh.num)
 
-  def genMinMaxNum: Gen[(AlphaNumHyphen, AlphaNumHyphen)] =
-    genMinMaxNonNegInts.map(pairFromIntsTo(AlphaNumHyphen.num))
+  def genMinMaxNum: Gen[(Anh, Anh)] =
+    genMinMaxNonNegInts.map(pairFromIntsTo(Anh.num))
 
   def genAlphabetString(max: Int): Gen[String] =
     Gen.string(genAlphabetChar, Range.linear(1, max))
 
-  def genAlphabet(max: Int): Gen[AlphaNumHyphen] =
-    genAlphabetString(max).map(AlphaNumHyphen.alphabet)
+  def genAlphabet(max: Int): Gen[Anh] =
+    genAlphabetString(max).map(Anh.alphabet)
 
-  def genDifferentAlphabetPair(max: Int): Gen[(AlphaNumHyphen, AlphaNumHyphen)] =
+  def genDifferentAlphabetPair(max: Int): Gen[(Anh, Anh)] =
     for {
       x <- genAlphabetString(max)
       y <- genAlphabetString(max)
       z <- genAlphabetChar
     } yield {
       if (x === y)
-        (AlphaNumHyphen.alphabet(x), AlphaNumHyphen.alphabet(y + String.valueOf(z)))
+        (Anh.alphabet(x), Anh.alphabet(y + String.valueOf(z)))
       else
-        (AlphaNumHyphen.alphabet(x), AlphaNumHyphen.alphabet(y))
+        (Anh.alphabet(x), Anh.alphabet(y))
     }
 
-  def genMinMaxAlphabet(max: Int): Gen[(AlphaNumHyphen, AlphaNumHyphen)] =
+  def genMinMaxAlphabet(max: Int): Gen[(Anh, Anh)] =
     genMinMax(genDifferentAlphabetPair(max))
 
-  def combineAlphaNumHyphen(alps: List[AlphaNumHyphen]): List[AlphaNumHyphen] = {
+  def combineAlphaNumHyphen(alps: List[Anh]): List[Anh] = {
     @tailrec
-    def combine(x: AlphaNumHyphen, xs: List[AlphaNumHyphen], acc: List[AlphaNumHyphen]): List[AlphaNumHyphen] =
+    def combine(x: Anh, xs: List[Anh], acc: List[Anh]): List[Anh] =
       (x, xs) match {
-        case (AlphaNumHyphen.Alphabet(a1), AlphaNumHyphen.Alphabet(a2) :: rest) =>
-          combine(AlphaNumHyphen.Alphabet(a1 + a2), rest, acc)
-        case (a@AlphaNumHyphen.Alphabet(_), AlphaNumHyphen.Num(n) :: rest) =>
-          combine(AlphaNumHyphen.Num(n), rest, a :: acc)
-        case (a@AlphaNumHyphen.Alphabet(_), AlphaNumHyphen.Hyphen :: rest) =>
-          combine(AlphaNumHyphen.Hyphen, rest, a :: acc)
-        case (AlphaNumHyphen.Num(n1), AlphaNumHyphen.Num(n2) :: rest) =>
-          combine(AlphaNumHyphen.Num(n1 + n2), rest, acc)
-        case (n@AlphaNumHyphen.Num(_), (a@AlphaNumHyphen.Alphabet(_)) :: rest) =>
+        case (Anh.Alphabet(a1), Anh.Alphabet(a2) :: rest) =>
+          combine(Anh.Alphabet(a1 + a2), rest, acc)
+        case (a@Anh.Alphabet(_), Anh.Num(n) :: rest) =>
+          combine(Anh.Num(n), rest, a :: acc)
+        case (a@Anh.Alphabet(_), Anh.Hyphen :: rest) =>
+          combine(Anh.Hyphen, rest, a :: acc)
+        case (Anh.Num(n1), Anh.Num(n2) :: rest) =>
+          combine(Anh.Num(n1 + n2), rest, acc)
+        case (n@Anh.Num(_), (a@Anh.Alphabet(_)) :: rest) =>
           combine(a, rest, n :: acc)
-        case (n@AlphaNumHyphen.Num(_), AlphaNumHyphen.Hyphen :: rest) =>
-          combine(AlphaNumHyphen.Hyphen, rest, n :: acc)
-        case (AlphaNumHyphen.Hyphen, AlphaNumHyphen.Hyphen :: rest) =>
-          combine(AlphaNumHyphen.Hyphen, rest, AlphaNumHyphen.Hyphen :: acc)
-        case (AlphaNumHyphen.Hyphen, (a@AlphaNumHyphen.Alphabet(_)) :: rest) =>
-          combine(a, rest, AlphaNumHyphen.Hyphen :: acc)
-        case (AlphaNumHyphen.Hyphen, (n@AlphaNumHyphen.Num(_)) :: rest) =>
-          combine(n, rest, AlphaNumHyphen.Hyphen :: acc)
+        case (n@Anh.Num(_), Anh.Hyphen :: rest) =>
+          combine(Anh.Hyphen, rest, n :: acc)
+        case (Anh.Hyphen, Anh.Hyphen :: rest) =>
+          combine(Anh.Hyphen, rest, Anh.Hyphen :: acc)
+        case (Anh.Hyphen, (a@Anh.Alphabet(_)) :: rest) =>
+          combine(a, rest, Anh.Hyphen :: acc)
+        case (Anh.Hyphen, (n@Anh.Num(_)) :: rest) =>
+          combine(n, rest, Anh.Hyphen :: acc)
         case (_, Nil) =>
           (x :: acc).reverse
       }
@@ -135,17 +135,17 @@ object Gens {
     }
   }
 
-  def genAlphaNumHyphenGroup: Gen[AlphaNumHyphenGroup] = for {
-    values <- Gen.choice1[AlphaNumHyphen](genNum, genAlphabet(10), genHyphen).list(Range.linear(1, 3))
+  def genAlphaNumHyphenGroup: Gen[Dsv] = for {
+    values <- Gen.choice1[Anh](genNum, genAlphabet(10), genHyphen).list(Range.linear(1, 3))
     combined = combineAlphaNumHyphen(values)
-  } yield AlphaNumHyphenGroup(combined)
+  } yield Dsv(combined)
 
-  def toValidNum(alps: List[AlphaNumHyphen]): List[AlphaNumHyphen] = alps match {
-    case AlphaNumHyphen.Num(n) :: Nil =>
+  def toValidNum(alps: List[Anh]): List[Anh] = alps match {
+    case Anh.Num(n) :: Nil =>
       if (n === "0" || n.takeWhile(_ === '0').length === 0)
         alps
       else
-        AlphaNumHyphen.Num(n.toInt.toString) :: Nil
+        Anh.Num(n.toInt.toString) :: Nil
     case _ =>
       alps
   }
@@ -153,9 +153,9 @@ object Gens {
   def genPreRelease: Gen[AdditionalInfo.PreRelease] =
     (for {
       alpnhGroup <-genAlphaNumHyphenGroup
-      AlphaNumHyphenGroup(alps) = alpnhGroup
+      Dsv(alps) = alpnhGroup
       newAlps = toValidNum(alps)
-    } yield AlphaNumHyphenGroup(newAlps))
+    } yield Dsv(newAlps))
     .list(Range.linear(1, 5))
     .map(PreRelease.apply)
 
@@ -164,54 +164,54 @@ object Gens {
       .list(Range.linear(1, 5))
       .map(BuildMetaInfo.apply)
 
-  def genMinMaxAlphaNumHyphenGroup: Gen[(AlphaNumHyphenGroup, AlphaNumHyphenGroup)] = for {
+  def genMinMaxAlphaNumHyphenGroup: Gen[(Dsv, Dsv)] = for {
     minMaxAlps <- Gen.frequency1(
         5 -> genMinMaxNum, 3 -> genMinMaxAlphabet(10), 1 -> genHyphen.map(x => (x, x))
       ).list(Range.linear(1, 3))
     (minAlps, maxAlps) = minMaxAlps.foldLeft(
-        (List.empty[AlphaNumHyphen], List.empty[AlphaNumHyphen])
+        (List.empty[Anh], List.empty[Anh])
       ) { case ((ids1, ids2), (id1, id2)) =>
         (ids1 :+ id1, ids2 :+ id2)
       }
-  } yield (AlphaNumHyphenGroup(minAlps), AlphaNumHyphenGroup(maxAlps))
+  } yield (Dsv(minAlps), Dsv(maxAlps))
 
   def genMinMaxAlphaNumHyphenGroupList(
-    minMaxAlphaNumHyphenGroupGen: Gen[(AlphaNumHyphenGroup, AlphaNumHyphenGroup)]
-  ): Gen[(List[AlphaNumHyphenGroup], List[AlphaNumHyphenGroup])] = for {
+    minMaxAlphaNumHyphenGroupGen: Gen[(Dsv, Dsv)]
+  ): Gen[(List[Dsv], List[Dsv])] = for {
     minMaxIds <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
     (minIds, maxIds) =
       minMaxIds.foldLeft(
-        (List.empty[AlphaNumHyphenGroup], List.empty[AlphaNumHyphenGroup])
+        (List.empty[Dsv], List.empty[Dsv])
       ) {
         case ((ids1, ids2), (id1, id2)) =>
           (ids1 :+ id1, ids2 :+ id2)
       }
   } yield (minIds, maxIds)
 
-  def toValidMinMaxNum(minAlps: List[AlphaNumHyphen], maxAlps: List[AlphaNumHyphen]): (List[AlphaNumHyphen], List[AlphaNumHyphen]) =
+  def toValidMinMaxNum(minAlps: List[Anh], maxAlps: List[Anh]): (List[Anh], List[Anh]) =
     (minAlps, maxAlps) match {
-      case (AlphaNumHyphen.Num(_) :: Nil, AlphaNumHyphen.Num(_) :: Nil) =>
+      case (Anh.Num(_) :: Nil, Anh.Num(_) :: Nil) =>
         val newMinAlps = toValidNum(minAlps)
         val newMaxAlps = toValidNum(maxAlps)
         (newMinAlps, newMaxAlps) match {
-          case (AlphaNumHyphen.Num(n1) :: Nil, AlphaNumHyphen.Num(n2) :: Nil) =>
+          case (Anh.Num(n1) :: Nil, Anh.Num(n2) :: Nil) =>
             val i1 = n1.toInt
             val i2 = n2.toInt
             if (i1 === i2) {
               val i2a = i2 + 1
               if (i2a < 0)
-                (AlphaNumHyphen.num(i1 - 1) :: Nil, AlphaNumHyphen.num(i2) :: Nil)
+                (Anh.num(i1 - 1) :: Nil, Anh.num(i2) :: Nil)
               else
-                (AlphaNumHyphen.num(i1) :: Nil, AlphaNumHyphen.num(i2a) :: Nil)
+                (Anh.num(i1) :: Nil, Anh.num(i2a) :: Nil)
             } else {
               (newMinAlps, newMaxAlps)
             }
           case (_, _) =>
             (newMinAlps, newMaxAlps)
         }
-      case (AlphaNumHyphen.Num(_) :: Nil, _) =>
+      case (Anh.Num(_) :: Nil, _) =>
         (toValidNum(minAlps), maxAlps)
-      case (_, AlphaNumHyphen.Num(_) :: Nil) =>
+      case (_, Anh.Num(_) :: Nil) =>
         (minAlps, toValidNum(maxAlps))
       case (_, _) =>
         (minAlps, maxAlps)
@@ -220,9 +220,9 @@ object Gens {
   def genMinMaxPreRelease: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.PreRelease)] = genMinMaxAlphaNumHyphenGroupList(
     for {
       minMaxAlpGroup <- genMinMaxAlphaNumHyphenGroup
-      (AlphaNumHyphenGroup(minAlps), AlphaNumHyphenGroup(maxAlps)) = minMaxAlpGroup
+      (Dsv(minAlps), Dsv(maxAlps)) = minMaxAlpGroup
       (newMinAlps, newMaxAlps) = toValidMinMaxNum(minAlps, maxAlps)
-    } yield (AlphaNumHyphenGroup(newMinAlps), AlphaNumHyphenGroup(newMaxAlps))
+    } yield (Dsv(newMinAlps), Dsv(newMaxAlps))
   ).map { case (min, max) => (AdditionalInfo.PreRelease(min), AdditionalInfo.PreRelease(max)) }
 
   def genMinMaxBuildMetaInfo: Gen[(AdditionalInfo.BuildMetaInfo, AdditionalInfo.BuildMetaInfo)] =

@@ -11,22 +11,22 @@ import scala.annotation.tailrec
  * @author Kevin Lee
  * @since 2018-10-21
  */
-final case class AlphaNumHyphenGroup(values: List[AlphaNumHyphen]) extends Ordered[AlphaNumHyphenGroup] {
-  override def compare(that: AlphaNumHyphenGroup): Int =
+final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
+  override def compare(that: Dsv): Int =
     compareElems(this.values, that.values)
 }
 
-object AlphaNumHyphenGroup {
+object Dsv {
 
-  import AlphaNumHyphen._
+  import Anh._
 
-  def render(alphaNumHyphenGroup: AlphaNumHyphenGroup): String =
-    alphaNumHyphenGroup.values.map(AlphaNumHyphen.render).mkString
+  def render(alphaNumHyphenGroup: Dsv): String =
+    alphaNumHyphenGroup.values.map(Anh.render).mkString
 
-  def parse(value: String): Either[ParseError, AlphaNumHyphenGroup] = {
+  def parse(value: String): Either[ParseError, Dsv] = {
 
     @tailrec
-    def accumulate(cs: List[Char], chars: AlphaNumHyphen, acc: Vector[AlphaNumHyphen]): Either[ParseError, Vector[AlphaNumHyphen]] =
+    def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[ParseError, Vector[Anh]] =
       cs match {
         case x :: xs =>
 
@@ -72,7 +72,7 @@ object AlphaNumHyphenGroup {
               ParseError.invalidAlphaNumHyphenError(x, xs)
             )
 
-        EitherCompat.map(result)(groups => AlphaNumHyphenGroup(groups.toList))
+        EitherCompat.map(result)(groups => Dsv(groups.toList))
 
       case Nil =>
         Left(ParseError.emptyAlphaNumHyphenError)
