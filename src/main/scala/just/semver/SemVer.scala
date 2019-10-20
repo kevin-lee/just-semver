@@ -43,19 +43,6 @@ final case class SemVer(
     }
   }
 
-  def render: String =
-    s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}" + (
-      (pre, buildMetadata) match {
-        case (Some(p), Some(m)) =>
-          s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
-        case (Some(p), None) =>
-          s"-${PreRelease.render(p)}"
-        case (None, Some(m)) =>
-          s"+${BuildMetaInfo.render(m)}"
-        case (None, None) =>
-          ""
-      }
-      ).toString
 }
 
 object SemVer {
@@ -70,6 +57,23 @@ object SemVer {
 
   val semVerRegex: Regex =
     """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
+
+  def render(semVer: SemVer): String = semVer match {
+    case SemVer(major, minor, patch, pre, buildMetadata) =>
+      val versionString = s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}"
+      val additionalInfoString =
+        (pre, buildMetadata) match {
+          case (Some(p), Some(m)) =>
+            s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
+          case (Some(p), None) =>
+            s"-${PreRelease.render(p)}"
+          case (None, Some(m)) =>
+            s"+${BuildMetaInfo.render(m)}"
+          case (None, None) =>
+            ""
+        }
+      versionString + additionalInfoString
+  }
 
   def parseUnsafe(version: String): SemVer =
     parse(version) match {

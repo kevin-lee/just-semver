@@ -9,5 +9,4 @@ import just.semver.SemVer.{Major, Minor}
 trait SequenceBasedVersion[T] extends Ordered[T] {
   def major: Major
   def minor: Minor
-  def render: String
 }
