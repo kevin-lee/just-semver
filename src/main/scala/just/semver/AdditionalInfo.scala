@@ -1,6 +1,5 @@
 package just.semver
 
-import just.fp.compat.EitherCompat
 import just.fp.syntax._
 
 /**
@@ -24,7 +23,7 @@ object AdditionalInfo {
   }
 
   def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
-    EitherCompat.map(parse(value, {
+    parse(value, {
       case a @ Dsv(Num(n) :: Nil) =>
         if ((n === "0") || n.takeWhile(_ === '0').length === 0)
           Right(a)
@@ -32,10 +31,10 @@ object AdditionalInfo {
           Left(ParseError.leadingZeroNumError(n))
       case a @ Dsv(_) =>
         Right(a)
-    }))(_.map(PreRelease.apply))
+    }).map(_.map(PreRelease.apply))
 
   def parseBuildMetaInfo(value: String): Either[ParseError, Option[BuildMetaInfo]] =
-    EitherCompat.map(parse(value, Right.apply))(_.map(BuildMetaInfo.apply))
+    parse(value, Right.apply).map(_.map(BuildMetaInfo.apply))
 
   def parse(
       value: String
@@ -48,9 +47,9 @@ object AdditionalInfo {
         case Some(preRelease) =>
           preRelease.foldRight[Either[ParseError, List[Dsv]]](List.empty.right) {
             (x, acc) =>
-              EitherCompat.flatMap(x)(validator) match {
+              x.flatMap(validator) match {
                 case Right(alp) =>
-                  EitherCompat.map(acc)(alps => alp :: alps)
+                  acc.map(alps => alp :: alps)
                 case Left(error) =>
                   error.left
               }
@@ -58,7 +57,7 @@ object AdditionalInfo {
         case None =>
           List.empty.right
       }
-    EitherCompat.map(alphaNumHyphens) {
+    alphaNumHyphens.map {
       case Nil =>
         none
       case xs =>

@@ -2,7 +2,6 @@ package just.semver
 
 import just.Common.compareElems
 
-import just.fp.compat.EitherCompat
 import just.fp.syntax._
 
 import scala.annotation.tailrec
@@ -72,7 +71,7 @@ object Dsv {
               ParseError.invalidAlphaNumHyphenError(x, xs)
             )
 
-        EitherCompat.map(result)(groups => Dsv(groups.toList))
+        result.map(groups => Dsv(groups.toList))
 
       case Nil =>
         Left(ParseError.emptyAlphaNumHyphenError)
