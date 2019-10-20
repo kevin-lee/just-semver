@@ -4,11 +4,11 @@ package just.semver
  * @author Kevin Lee
  * @since 2018-10-21
  */
-sealed trait AlphaNumHyphen extends Ordered[AlphaNumHyphen] {
+sealed trait Anh extends Ordered[Anh] {
 
-  import AlphaNumHyphen._
+  import Anh._
 
-  override def compare(that: AlphaNumHyphen): Int =
+  override def compare(that: Anh): Int =
     (this, that) match {
       case (Num(thisValue), Num(thatValue)) =>
         Ordering[Int].compare(thisValue.toInt, thatValue.toInt)
@@ -31,28 +31,28 @@ sealed trait AlphaNumHyphen extends Ordered[AlphaNumHyphen] {
     }
 }
 
-object AlphaNumHyphen {
+object Anh {
 
-  final case class Alphabet(value: String) extends AlphaNumHyphen
-  final case class Num(value: String) extends AlphaNumHyphen
-  case object Hyphen extends AlphaNumHyphen
+  final case class Alphabet(value: String) extends Anh
+  final case class Num(value: String) extends Anh
+  case object Hyphen extends Anh
 
-  def alphabet(value: String): AlphaNumHyphen =
+  def alphabet(value: String): Anh =
     Alphabet(value)
 
-  def num(value: Int): AlphaNumHyphen =
+  def num(value: Int): Anh =
     Num(value.toString)
 
-  def numFromStringUnsafe(value: String): AlphaNumHyphen =
+  def numFromStringUnsafe(value: String): Anh =
     if (value.forall(_.isDigit))
       Num(value)
     else
       sys.error(s"The Num value cannot contain any non-digit. value: $value")
 
-  def hyphen: AlphaNumHyphen =
+  def hyphen: Anh =
     Hyphen
 
-  def render(alphaNumHyphen: AlphaNumHyphen): String = alphaNumHyphen match {
+  def render(alphaNumHyphen: Anh): String = alphaNumHyphen match {
     case Num(value) => value
     case Alphabet(value) => value
     case Hyphen => "-"
