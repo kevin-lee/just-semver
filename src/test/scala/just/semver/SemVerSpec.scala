@@ -30,8 +30,24 @@ object SemVerSpec extends Properties {
     , example("""SemVer.parse("1.0.5-a.3.7.xyz+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta2)
     , example("""SemVer.parse("1.0.5-a-b.xyz+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta3)
     , property("SemVer(same) == SemVer(same) should be true", testSemVerEqual)
-    , property("SemVer(less).compare(SemVer(greater)) should the value less than 0", testSemVerLess)
-    , property("SemVer(greater).compare(SemVer(less)) should the value more than 0", testSemVerGreater)
+    , property("SemVer(different) == SemVer(different) should be false", testSemVerEqualDiffCase)
+    , property("SemVer(same) != SemVer(same) should be false", testSemVerNotEqualSameCase)
+    , property("SemVer(different) != SemVer(different) should be true", testSemVerNotEqualDiffCase)
+    , property("SemVer(same).compare(SemVer(same)) should be 0", testSemVerCompareEqualCase)
+    , property("SemVer(less).compare(SemVer(greater)) should the value less than 0", testSemVerCompareLess)
+    , property("SemVer(greater).compare(SemVer(less)) should the value more than 0", testSemVerCompareGreater)
+    , property("SemVer(less) < SemVer(greater) should be true", testSemVerLessTrue)
+    , property("SemVer(same) < SemVer(same) should be false", testSemVerLessFalseForSame)
+    , property("SemVer(greater) < SemVer(less) should be false", testSemVerLessFalse)
+    , property("SemVer(less) <= SemVer(greater) should be true", testSemVerLessOrEqualTrue)
+    , property("SemVer(same) <= SemVer(same) should be true", testSemVerLessOrEqualTrueForSame)
+    , property("SemVer(greater) <= SemVer(less) should be false", testSemVerLessOrEqualFalse)
+    , property("SemVer(greater) > SemVer(less) should be true", testSemVerGreaterTrue)
+    , property("SemVer(same) > SemVer(same) should be false", testSemVerGreaterFalseForSame)
+    , property("SemVer(less) > SemVer(greater) should be false", testSemVerGreaterFalse)
+    , property("SemVer(greater) >= SemVer(less) should be true", testSemVerGreaterOrEqualTrue)
+    , property("SemVer(same) >= SemVer(same) should be true", testSemVerGreaterOrEqualTrueForSame)
+    , property("SemVer(less) >= SemVer(greater) should be false", testSemVerGreaterOrEqualFalse)
     , property("SemVer round trip", roundTripSemVer)
     )
 
@@ -465,21 +481,161 @@ object SemVerSpec extends Properties {
   def testSemVerEqual: Property = for {
     v <- Gens.genSemVer.log("v")
   } yield {
-    Result.assert(v == v).log("v == v")
+    Result.diffNamed("Failed: v == v is not true", v, v)(_ == _)
   }
 
-  def testSemVerLess: Property = for {
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
+  def testSemVerEqualDiffCase: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "Failed: v1(diff) == v2(dff) is not false"
+      , v1, v2)((x, y) => !(x == y))
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
+  def testSemVerNotEqualSameCase: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed(
+        "Failed: v != v is not false"
+      , v, v)((x, y) => !(x != y))
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
+  def testSemVerNotEqualDiffCase: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "Failed: v1(diff) != v2(dff) is not true"
+      , v1, v2)(_ != _)
+  }
+
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
+  def testSemVerCompareEqualCase: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed("Failed: v == v is not true", v, v)(_.compare(_) == 0)
+  }
+
+  def testSemVerCompareLess: Property = for {
     v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v1.compare(v2) < 0)
   }
 
-  def testSemVerGreater: Property = for {
+  def testSemVerCompareGreater: Property = for {
     v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
     (v1, v2) = v1AndV2
   } yield {
     Result.assert(v2.compare(v1) > 0)
+  }
+
+  def testSemVerLessTrue: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v1(less) < v2(greater) is not true ==="
+      , v1, v2)(_ < _)
+  }
+
+  def testSemVerLessFalseForSame: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v(same) < v(same) is not false ==="
+      , v, v)((x, y) => !(x < y))
+  }
+
+  def testSemVerLessFalse: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v2(greater) < v1(less) is not false ==="
+      , v2, v1)((x, y) => !(x < y))
+  }
+
+  def testSemVerLessOrEqualTrue: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v1(less) <= v2(greater) is not true ==="
+      , v1, v2)(_ <= _)
+  }
+
+  def testSemVerLessOrEqualTrueForSame: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v(same) <= v(same) is not true ==="
+      , v, v)(_ <= _)
+  }
+
+  def testSemVerLessOrEqualFalse: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v2(greater) <= v1(less) is not false ==="
+      , v2, v1)((x, y) => !(x <= y))
+  }
+
+  def testSemVerGreaterTrue: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v2(greater) > v1(less) is not true ==="
+      , v2, v1)(_ > _)
+  }
+
+  def testSemVerGreaterFalseForSame: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed(
+      "=== Failed: v(same) > v(same) is not false ==="
+      , v, v)((x, y) => !(x > y))
+  }
+
+  def testSemVerGreaterFalse: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v1(less) > v2(greater) is not false ==="
+      , v1, v2)((x, y) => !(x > y))
+  }
+
+  def testSemVerGreaterOrEqualTrue: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v2(greater) >= v1(less) is not true ==="
+      , v2, v1)(_ >= _)
+  }
+
+  def testSemVerGreaterOrEqualTrueForSame: Property = for {
+    v <- Gens.genSemVer.log("v")
+  } yield {
+    Result.diffNamed(
+      "=== Failed: v(same) >= v(same) is not true ==="
+      , v, v)(_ >= _)
+  }
+
+  def testSemVerGreaterOrEqualFalse: Property = for {
+    v1AndV2 <- Gens.genMinMaxSemVers.log("(v1, v2)")
+    (v1, v2) = v1AndV2
+  } yield {
+    Result.diffNamed(
+        "=== Failed: v1(less) >= v2(greater) is not false ==="
+      , v1, v2)((x, y) => !(x >= y))
   }
 
   def roundTripSemVer: Property = for {
