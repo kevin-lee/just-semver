@@ -44,6 +44,28 @@ lazy val justSemVer = (project in file("."))
         case x =>
           libraryDependencies.value
       }
+  /* Ammonite-REPL { */
+  , libraryDependencies ++=
+      (scalaBinaryVersion.value match {
+        case "2.10" =>
+          Seq.empty[ModuleID]
+        case "2.11" =>
+          Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
+        case _ =>
+          Seq("com.lihaoyi" % "ammonite" % "1.7.4" % Test cross CrossVersion.full)
+      })
+  , sourceGenerators in Test +=
+      (scalaBinaryVersion.value match {
+        case "2.10" =>
+          task(Seq.empty[File])
+        case _ =>
+          task {
+            val file = (sourceManaged in Test).value / "amm.scala"
+            IO.write(file, """object amm extends App { ammonite.Main.main(args) }""")
+            Seq(file)
+          }
+      })
+  /* } Ammonite-REPL */
   , wartremoverErrors in (Compile, compile) ++= commonWarts((scalaBinaryVersion in update).value)
   , wartremoverErrors in (Test, compile) ++= commonWarts((scalaBinaryVersion in update).value)
   , testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework"))
