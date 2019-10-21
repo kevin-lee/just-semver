@@ -1,6 +1,8 @@
 package just.semver
 
 /**
+ * Alphabet / Number / Hyphen (Anh)
+ *
  * @author Kevin Lee
  * @since 2018-10-21
  */
