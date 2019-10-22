@@ -107,7 +107,7 @@ object SemVer {
       Left(ParseError.invalidVersionStringError(version))
   }
 
-  def noIdentifier(major: Major, minor: Minor, patch: Patch): SemVer =
+  def semVer(major: Major, minor: Minor, patch: Patch): SemVer =
     SemVer(major, minor, patch, None, None)
 
   def withMajor(major: Major): SemVer =

@@ -7,6 +7,8 @@ import hedgehog.runner._
 
 import just.semver.SemVer.{Major, Minor, Patch}
 
+import just.fp._, syntax._
+
 /**
   * @author Kevin Lee
   * @since 2018-11-04
@@ -29,6 +31,7 @@ object SemVerSpec extends Properties {
     , example("""SemVer.parse("1.0.5-beta+1234") should return SementicVersion(Major(1), Minor(0), Patch(5), None, Some(build meta info)""", parseExamplePreMeta1)
     , example("""SemVer.parse("1.0.5-a.3.7.xyz+a.3.7.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta2)
     , example("""SemVer.parse("1.0.5-a-b.xyz+a-b.xyz") should return SementicVersion(Major(1), Minor(0), Patch(5), Some(with pre-release info), None)""", parseExamplePreMeta3)
+    , property(s"""test SemVer.semVer(major, minor, patch) should be equal to SemVer.parse(s"$${major.major}.$${minor.minor}.$${patch.patch}")""", testSemVerSemVer)
     , property("SemVer(same) == SemVer(same) should be true", testSemVerEqual)
     , property("SemVer(different) == SemVer(different) should be false", testSemVerEqualDiffCase)
     , property("SemVer(same) != SemVer(same) should be false", testSemVerNotEqualSameCase)
@@ -475,6 +478,15 @@ object SemVerSpec extends Properties {
 
     val actual = SemVer.parse(input)
     actual ==== expected
+  }
+
+  def testSemVerSemVer: Property = for {
+    major <- Gens.genMajor.log("major")
+    minor <- Gens.genMinor.log("major")
+    patch <- Gens.genPatch.log("major")
+  } yield {
+    SemVer.semVer(major, minor, patch).right[ParseError] ====
+      SemVer.parse(s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}")
   }
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
