@@ -57,21 +57,87 @@ SemVer.parse("1.0.0-beta1")
 //     )
 //   )
 
-SemVer.parse("1.0.0-3.123.9a")
+val v = SemVer.parse("1.0.0-3.123.9a")
 // Either[ParseError, SemVer] = 
-//    Right(
-//      SemVer(
-//        Major(1), Minor(0), Patch(0)
-//      , Some(
+// Right(
+//   SemVer(
+//       Major(1), Minor(0), Patch(0)
+//     , Some(
+//         PreRelease(List(
+//             Dsv(List(Num("3")))
+//           , Dsv(List(Num("123")))
+//           , Dsv(List(Num("9"), Alphabet("a")))
+//         ))
+//       )
+//     , None
+//   )
+// )
+
+v.map(SemVer.render)
+// v: [ParseError, String] = Right("1.0.0-3.123.9a")
+```
+
+* SemVer with build meta-info
+```scala
+import just.semver.SemVer
+
+val v = SemVer.parse("1.0.0+100.0.12abc")
+// v: Either[ParseError, SemVer] = 
+// Right(
+//   SemVer(
+//      Major(1),Minor(0),Patch(0)
+//    , None
+//    , Some(
+//        BuildMetaInfo(
+//          List(Dsv(List(Num(100))), Dsv(List(Num(0))), Dsv(List(Num(12), Alphabet(abc))))
+//        )
+//      )
+//   )
+// )
+
+v.map(SemVer.render)
+// Either[ParseError, String] = Right("1.0.0+100.0.12abc")
+```
+
+* SemVer with pre-release info and build meta-info
+```scala
+import just.semver.SemVer
+
+SemVer.parse("1.0.0-beta1")
+// Either[ParseError, SemVer] = Right(
+//   SemVer(
+//       Major(1), Minor(0), Patch(0)
+//     , Some(PreRelease(List(Dsv(List(Alphabet("beta"), Num("1"))))))
+//     , None
+//     )
+//   )
+
+val v = SemVer.parse("1.0.0-3.123.9a+100.0.12abc")
+// Either[ParseError, SemVer] = 
+// Right(
+//   SemVer(
+//       Major(1), Minor(0), Patch(0)
+//     , Some(
 //          PreRelease(List(
 //              Dsv(List(Num("3")))
 //            , Dsv(List(Num("123")))
 //            , Dsv(List(Num("9"), Alphabet("a")))
-//            ))
-//        )
-//      , None
-//      )
-//    )
+//          ))
+//       )
+//     , Some(
+//         BuildMetaInfo(
+//           List(
+//               Dsv(List(Num(100)))
+//             , Dsv(List(Num(0)))
+//             , Dsv(List(Num(12), Alphabet(abc)))
+//           )
+//         )
+//       )
+//   )
+// )
+
+v.map(SemVer.render)
+// v: [ParseError, String] = Right("1.0.0-3.123.9a+100.0.12abc")
 ```
 
 ## Compare `SamVer`
@@ -82,5 +148,59 @@ for {
  a <- SemVer.parse("1.0.0")
  b <- SemVer.parse("1.0.1")
 } yield a < b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.1")
+ b <- SemVer.parse("1.0.0")
+} yield a < b
+// Either[ParseError, Boolean] = Right(false)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.1")
+} yield a <= b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.0")
+} yield a <= b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.0")
+} yield a == b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.1")
+ b <- SemVer.parse("1.0.0")
+} yield a > b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.1")
+} yield a > b
+// Either[ParseError, Boolean] = Right(false)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.1")
+} yield a >= b
+// Either[ParseError, Boolean] = Right(false)
+
+for {
+ a <- SemVer.parse("1.0.0")
+ b <- SemVer.parse("1.0.0")
+} yield a >= b
+// Either[ParseError, Boolean] = Right(true)
+
+for {
+ a <- SemVer.parse("1.0.1")
+ b <- SemVer.parse("1.0.0")
+} yield a >= b
 // Either[ParseError, Boolean] = Right(true)
 ```
