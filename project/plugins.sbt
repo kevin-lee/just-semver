@@ -8,4 +8,4 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.0")
 
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.7")
 
-addSbtPlugin("io.kevinlee" % "sbt-devoops" % "1.0.1")
+addSbtPlugin("io.kevinlee" % "sbt-devoops" % "1.0.2")
