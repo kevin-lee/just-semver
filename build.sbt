@@ -22,13 +22,6 @@ lazy val justSemVer = (project in file("."))
   .settings(
     name         := "just-semver"
   , description  := "Semantic Versioning (SemVer) for Scala"
-  , scalacOptions :=
-      crossVersionProps(Seq.empty, SemanticVersion.parseUnsafe(scalaVersion.value)) {
-        case (Major(2), Minor(10)) =>
-          scalacOptions.value.filter(option => option != "-Ywarn-numeric-widen")
-        case _ =>
-          scalacOptions.value
-      }.distinct
   , unmanagedSourceDirectories in Compile ++= {
       val sharedSourceDir = (baseDirectory in ThisBuild).value / "src/main"
       if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
