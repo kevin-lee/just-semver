@@ -19,6 +19,7 @@ ThisBuild / scmInfo :=
     ))
 
 lazy val justSemVer = (project in file("."))
+  .enablePlugins(DevOopsGitReleasePlugin)
   .settings(
     name         := "just-semver"
   , description  := "Semantic Versioning (SemVer) for Scala"
