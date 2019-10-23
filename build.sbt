@@ -14,7 +14,7 @@ ThisBuild / developers   := List(
 ThisBuild / homepage := Some(url("https://github.com/Kevin-Lee/just-semver"))
 ThisBuild / scmInfo :=
     Some(ScmInfo(
-      url("https://github.com/Kevin-Lee/just-semver")
+        url("https://github.com/Kevin-Lee/just-semver")
       , "git@github.com:Kevin-Lee/just-semver.git"
     ))
 

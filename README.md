@@ -2,13 +2,18 @@
 
 [![Build Status](https://github.com/Kevin-Lee/just-semver/workflows/Build%20All/badge.svg)](https://github.com/Kevin-Lee/just-semver/actions?workflow=Build+All)
 [![Release Status](https://github.com/Kevin-Lee/just-semver/workflows/Release/badge.svg)](https://github.com/Kevin-Lee/just-semver/actions?workflow=Release)
+[![Download](https://api.bintray.com/packages/kevinlee/maven/just-semver/images/download.svg)](https://bintray.com/kevinlee/maven/just-semver/_latestVersion)
 
 [![Coverage Status](https://coveralls.io/repos/github/Kevin-Lee/just-semver/badge.svg?branch=master)](https://coveralls.io/github/Kevin-Lee/just-semver?branch=master)
 
 Semantic Versioning (SemVer) for Scala
 
 # Get just-semver
-**It's not released yet.**
+```scala
+resolvers += "Just Repo" at "https://dl.bintray.com/kevinlee/maven"
+
+libraryDependencies += "io.kevinlee" %% "just-semver" % "0.1.0"
+```
 
 # How to Use
 ```scala
