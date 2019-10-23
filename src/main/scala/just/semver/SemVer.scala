@@ -119,4 +119,13 @@ object SemVer {
   def withPatch(patch: Patch): SemVer =
     SemVer(major0, minor0, patch, None, None)
 
+  def increaseMajor(semVer: SemVer): SemVer =
+    semVer.copy(major = Major(semVer.major.major + 1))
+
+  def increaseMinor(semVer: SemVer): SemVer =
+    semVer.copy(minor = Minor(semVer.minor.minor + 1))
+
+  def increasePatch(semVer: SemVer): SemVer =
+    semVer.copy(patch = Patch(semVer.patch.patch + 1))
+
 }
