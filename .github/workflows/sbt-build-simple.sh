@@ -6,6 +6,7 @@ if [ -z "$1" ]
   then
     echo "Scala version is missing. Please enter the Scala version."
     echo "sbt-build-simple.sh 2.11.12"
+    exit 1
 else
   scala_version=$1
   echo "============================================"
