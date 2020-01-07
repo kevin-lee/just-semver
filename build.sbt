@@ -1,6 +1,6 @@
 import ProjectInfo._
 import kevinlee.sbt.SbtCommon.crossVersionProps
-import kevinlee.semver.{Major, Minor, SemanticVersion}
+import just.semver.SemVer, SemVer.{Major, Minor}
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 ThisBuild / scalaVersion := ProjectScalaVersion
@@ -43,7 +43,7 @@ lazy val justSemVer = (project in file("."))
     }
   , resolvers += hedgehogRepo
   , libraryDependencies := hedgehogLibs ++ Seq(justFp) ++
-      crossVersionProps(Seq.empty[ModuleID], SemanticVersion.parseUnsafe(scalaVersion.value)) {
+      crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(2), Minor(10)) =>
           libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x =>
