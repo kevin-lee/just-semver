@@ -3,6 +3,9 @@ import kevinlee.sbt.SbtCommon.crossVersionProps
 import just.semver.SemVer, SemVer.{Major, Minor}
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
+val ProjectScalaVersion: String = "2.13.1"
+val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.11", ProjectScalaVersion)
+
 ThisBuild / scalaVersion := ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
 ThisBuild / version      := ProjectVersion
@@ -53,9 +56,12 @@ lazy val justSemVer = (project in file("."))
   , libraryDependencies ++=
       (scalaBinaryVersion.value match {
         case "2.10" =>
+          Seq("com.lihaoyi" % "ammonite" % "1.0.3" % Test cross CrossVersion.full)
           Seq.empty[ModuleID]
         case "2.11" =>
           Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
+        case "2.12" =>
+          Seq.empty[ModuleID] // TODO: add ammonite when it supports Scala 2.12.11
         case _ =>
           Seq("com.lihaoyi" % "ammonite" % "1.7.4" % Test cross CrossVersion.full)
       })
@@ -63,6 +69,8 @@ lazy val justSemVer = (project in file("."))
       (scalaBinaryVersion.value match {
         case "2.10" =>
           task(Seq.empty[File])
+        case "2.12" =>
+          task(Seq.empty[File]) // TODO: add ammonite when it supports Scala 2.12.11
         case _ =>
           task {
             val file = (sourceManaged in Test).value / "amm.scala"
