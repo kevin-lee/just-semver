@@ -14,7 +14,7 @@ else
   echo "--------------------------------------------"
   echo ""
   CURRENT_BRANCH_NAME="${GITHUB_REF#refs/heads/}"
-  if [[ "$CURRENT_BRANCH_NAME" == "master" || "$CURRENT_BRANCH_NAME" == "release" ]]
+  if [[ "$CURRENT_BRANCH_NAME" == "main" || "$CURRENT_BRANCH_NAME" == "release" ]]
   then
     sbt -J-Xmx2048m "; ++ ${scala_version}!; clean; test; packagedArtifacts"
   else
