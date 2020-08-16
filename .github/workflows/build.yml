@@ -10,12 +10,17 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { version: "2.10.7", binary-version: "2.10" }
-          - { version: "2.11.12", binary-version: "2.11" }
-          - { version: "2.12.10", binary-version: "2.12" }
+          - { name: 'Scala', version: "2.10.7", binary-version: "2.10", java-version: "8" }
+          - { name: 'Scala', version: "2.11.12", binary-version: "2.11", java-version: "8" }
+          - { name: 'Scala', version: "2.12.12", binary-version: "2.12", java-version: "11" }
+          - { name: 'Scala', version: "2.13.3",  binary-version: "2.13", java-version: "11" }
+          - { name: 'Dotty', version: "0.26.0-RC1", binary-version: "0.26", java-version: "11" }
 
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.scala.java-version }}
 
       - name: Cache Coursier
         uses: actions/cache@v1
@@ -33,11 +38,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ivy-scala-${{ matrix.scala.binary-version }}-
 
-      - name: Build for Scala ${{ matrix.scala.version }}
-        run: .github/workflows/sbt-build-simple.sh ${{ matrix.scala.version }}
+      - name: "[Push] Build All for Scala ${{ matrix.scala.version }}"
+          if: github.event_name == 'push'
+          env:
+            CURRENT_BRANCH_NAME: ${{ github.ref }}
+          run: |
+            echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+            export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
+            echo " [AFTER]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+            java -version
+            .github/workflows/sbt-build-all.sh ${{ matrix.scala.version }}
+
+      - name: "[PR] Build All for Scala ${{ matrix.scala.version }}"
+        if: github.event_name == 'pull_request'
+        env:
+          CURRENT_BRANCH_NAME: ${{ github.base_ref }}
+        run: |
+          echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
+          java -version
+          .github/workflows/sbt-build-all.sh ${{ matrix.scala.version }}
 
 
-  build_scala2_13:
+  build_with_test_coverage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -58,7 +80,34 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ivy-scala-2_13-
 
-      - name: Build for Scala 2.13
+      - name: "[Push] Build with Test Coverage - ${{ github.run_number }}"
+        if: github.event_name == 'push'
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-        run: .github/workflows/sbt-build.sh 2.13.0
+          CURRENT_BRANCH_NAME: ${{ github.ref }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+          echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+          export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
+          echo " [AFTER]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          export CI_BRANCH=$CURRENT_BRANCH_NAME
+          .github/workflows/sbt-build.sh core 2.13.3
+
+      - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
+        if: github.event_name == 'pull_request'
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          CURRENT_BRANCH_NAME: ${{ github.base_ref }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          export CI_BRANCH="PR-$CURRENT_BRANCH_NAME"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          echo "PR #${PR_NUMBER}"
+          echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
+          .github/workflows/sbt-build.sh core 2.13.3
