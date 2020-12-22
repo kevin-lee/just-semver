@@ -20,14 +20,15 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_AUTH_TOKEN }}
       run: |
         echo "Run] sbt GitHub release"
-        echo 'sbt -J-Xmx2048m clean +test +packagedArtifacts'
+        echo "mkdir -p dotty-docs"
+        mkdir -p dotty-docs
+        export SOURCE_DATE_EPOCH=$(date +%s)
+        echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+        echo 'sbt -J-Xmx2048m clean +test +packagedArtifacts gitHubRelease'
         sbt -J-Xmx2048m \
           clean \
           +test \
-          +packagedArtifacts
-        echo "====================="
-        echo 'sbt -J-Xmx2048m gitHubRelease"'
-        sbt -J-Xmx2048m \
+          +packagedArtifacts \
           gitHubRelease
 
 
@@ -73,8 +74,13 @@ jobs:
           BINTRAY_PASS: ${{ secrets.BINTRAY_PASS }}
         run: |
           echo "Run] sbt publish for Scala ${{ matrix.scala.version }}"
+          echo "mkdir -p dotty-docs"
+          mkdir -p dotty-docs
+          export SOURCE_DATE_EPOCH=$(date +%s)
+          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
           echo 'sbt -J-Xmx2048m ++${{ matrix.scala.version }}! -v clean publish'
-          sbt -J-Xmx2048m \
+          sbt \
+            -J-Xmx2048m \
             ++${{ matrix.scala.version }}! \
             -v \
             clean \
