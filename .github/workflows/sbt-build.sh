@@ -15,6 +15,9 @@ else
   echo ""
   : ${CURRENT_BRANCH_NAME:?"CURRENT_BRANCH_NAME is missing."}
   : ${CI_BRANCH:?"CI_BRANCH is missing."}
+  export SOURCE_DATE_EPOCH=$(date +%s)
+  echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+
   if [[ "$CURRENT_BRANCH_NAME" == "main" || "$CURRENT_BRANCH_NAME" == "release" ]]
   then
     sbt -J-Xmx2048m "; ++ ${scala_version}!; clean; coverage; test; coverageReport; coverageAggregate"
