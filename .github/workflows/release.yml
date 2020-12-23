@@ -15,21 +15,21 @@ jobs:
         with:
           java-version: "11"
 
-    - name: sbt GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_AUTH_TOKEN }}
-      run: |
-        echo "Run] sbt GitHub release"
-        echo "mkdir -p dotty-docs"
-        mkdir -p dotty-docs
-        export SOURCE_DATE_EPOCH=$(date +%s)
-        echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-        echo 'sbt -J-Xmx2048m clean +test +packagedArtifacts gitHubRelease'
-        sbt -J-Xmx2048m \
-          clean \
-          +test \
-          +packagedArtifacts \
-          gitHubRelease
+      - name: sbt GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_AUTH_TOKEN }}
+        run: |
+          echo "Run] sbt GitHub release"
+          echo "mkdir -p dotty-docs"
+          mkdir -p dotty-docs
+          export SOURCE_DATE_EPOCH=$(date +%s)
+          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+          echo 'sbt -J-Xmx2048m clean +test +packagedArtifacts gitHubRelease'
+          sbt -J-Xmx2048m \
+            clean \
+            +test \
+            +packagedArtifacts \
+            gitHubRelease
 
 
   publish:
@@ -40,11 +40,11 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: 'Scala', version: "2.10.7", binary-version: "2.10", java-version: "8" }
-          - { name: 'Scala', version: "2.11.12", binary-version: "2.11", java-version: "8" }
-          - { name: 'Scala', version: "2.12.12", binary-version: "2.12", java-version: "11" }
-          - { name: 'Scala', version: "2.13.3",  binary-version: "2.13", java-version: "11" }
-          - { name: 'Dotty', version: "0.26.0-RC1", binary-version: "0.26", java-version: "11" }
+          - { name: "Scala", version: "2.10.7", binary-version: "2.10", java-version: "8" }
+          - { name: "Scala", version: "2.11.12", binary-version: "2.11", java-version: "8" }
+          - { name: "Scala", version: "2.12.12", binary-version: "2.12", java-version: "11" }
+          - { name: "Scala", version: "2.13.3",  binary-version: "2.13", java-version: "11" }
+          - { name: "Dotty", version: "0.26.0-RC1", binary-version: "0.26", java-version: "11" }
 
     steps:
       - uses: actions/checkout@v2
