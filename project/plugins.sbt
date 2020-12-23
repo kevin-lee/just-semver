@@ -10,4 +10,4 @@ addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.7")
 
 addSbtPlugin("io.kevinlee" % "sbt-devoops" % "1.0.3")
 
-addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.4.1")
+addSbtPlugin("ch.epfl.lamp" % "sbt-dotty" % "0.5.1")

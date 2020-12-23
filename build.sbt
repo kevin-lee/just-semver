@@ -11,9 +11,8 @@ val removeDottyIncompatible: ModuleID => Boolean =
       m.name == "kind-projector" ||
       m.name == "mdoc"
 
-val DottyVersion: String = "0.26.0-RC1"
-val ProjectScalaVersion: String = DottyVersion
-val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.12", "2.13.3", ProjectScalaVersion)
+val ProjectScalaVersion: String = "3.0.0-M2"
+val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.12", "2.13.3", "3.0.0-M1", "3.0.0-M2", ProjectScalaVersion).distinct
 
 ThisBuild / scalaVersion := ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
