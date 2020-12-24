@@ -11,7 +11,7 @@ val removeDottyIncompatible: ModuleID => Boolean =
       m.name == "kind-projector" ||
       m.name == "mdoc"
 
-val ProjectScalaVersion: String = "3.0.0-M2"
+val ProjectScalaVersion: String = "3.0.0-M3"
 val CrossScalaVersions: Seq[String] = Seq("2.10.7", "2.11.12", "2.12.12", "2.13.3", "3.0.0-M1", "3.0.0-M2", ProjectScalaVersion).distinct
 
 ThisBuild / scalaVersion := ProjectScalaVersion
@@ -29,7 +29,7 @@ ThisBuild / scmInfo :=
     ))
 
 val hedgehogVersionFor2_10 = "7bd29241fababd9a3e954fd38083ed280fc9e4e8"
-val hedgehogVersion = "0.4.2"
+lazy val hedgehogVersion = "f6139169375836149f2e3bfeef85c350c92bd01f"
 val hedgehogRepo: MavenRepository =
   "bintray-scala-hedgehog" at "https://dl.bintray.com/hedgehogqa/scala-hedgehog"
 

@@ -58,22 +58,22 @@ object Gens {
 
 
   def genMajor: Gen[Major] =
-    genNonNegativeInt.map(Major)
+    genNonNegativeInt.map(Major.apply)
 
   def genMinMaxMajors: Gen[(Major, Major)] =
-    genMinMaxNonNegInts.map(pairFromIntsTo(Major))
+    genMinMaxNonNegInts.map(pairFromIntsTo(Major.apply))
 
   def genMinor: Gen[Minor] =
-    genNonNegativeInt.map(Minor)
+    genNonNegativeInt.map(Minor.apply)
 
   def genMinMaxMinors: Gen[(Minor, Minor)] =
-    genMinMaxNonNegInts.map(pairFromIntsTo(Minor))
+    genMinMaxNonNegInts.map(pairFromIntsTo(Minor.apply))
 
   def genPatch: Gen[Patch] =
-    genNonNegativeInt.map(Patch)
+    genNonNegativeInt.map(Patch.apply)
 
   def genMinMaxPatches: Gen[(Patch, Patch)] =
-    genMinMaxNonNegInts.map(pairFromIntsTo(Patch))
+    genMinMaxNonNegInts.map(pairFromIntsTo(Patch.apply))
 
   def genNum: Gen[Anh] =
     genInt(0, 999).map(Anh.num)
