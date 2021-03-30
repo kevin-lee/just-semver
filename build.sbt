@@ -4,58 +4,31 @@ import just.semver.SemVer
 import SemVer.{Major, Minor}
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
-val removeDottyIncompatible: ModuleID => Boolean =
-  m =>
-    m.name == "wartremover" ||
-      m.name == "ammonite" ||
-      m.name == "kind-projector" ||
-      m.name == "mdoc"
-
-val ProjectScalaVersion: String = "3.0.0-RC1"
-val CrossScalaVersions: Seq[String] = Seq(
-  "2.10.7",
-  "2.11.12",
-  "2.12.12",
-  "2.13.3",
-  "3.0.0-M1",
-  "3.0.0-M2",
-  "3.0.0-M3",
-  ProjectScalaVersion,
-).distinct
-
-ThisBuild / scalaVersion := ProjectScalaVersion
+ThisBuild / scalaVersion := props.ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
 ThisBuild / version      := ProjectVersion
-ThisBuild / crossScalaVersions := CrossScalaVersions
+ThisBuild / crossScalaVersions := props.CrossScalaVersions
 ThisBuild / developers   := List(
-    Developer("Kevin-Lee", "Kevin Lee", "kevin.code@kevinlee.io", url("https://github.com/Kevin-Lee"))
+    Developer(
+      "Kevin-Lee",
+      "Kevin Lee",
+      "kevin.code@kevinlee.io",
+      url("https://github.com/Kevin-Lee"),
+    )
   )
-ThisBuild / homepage := Some(url("https://github.com/Kevin-Lee/just-semver"))
+ThisBuild / homepage := url("https://github.com/Kevin-Lee/just-semver").some
 ThisBuild / scmInfo :=
-    Some(ScmInfo(
+    ScmInfo(
         url("https://github.com/Kevin-Lee/just-semver")
       , "git@github.com:Kevin-Lee/just-semver.git"
-    ))
-
-val hedgehogVersionFor2_10 = "7bd29241fababd9a3e954fd38083ed280fc9e4e8"
-lazy val hedgehogVersion = "f6139169375836149f2e3bfeef85c350c92bd01f"
-val hedgehogRepo: MavenRepository =
-  "bintray-scala-hedgehog" at "https://dl.bintray.com/hedgehogqa/scala-hedgehog"
-
-def hedgehogLibs(hedgehogVersion: String): Seq[ModuleID] = Seq(
-  "qa.hedgehog" %% "hedgehog-core" % hedgehogVersion % Test
-, "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test
-, "qa.hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test
-)
-
-lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp" % "1.3.5"
+    ).some
 
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitReleasePlugin)
   .settings(
-    name         := "just-semver"
-  , description  := "Semantic Versioning (SemVer) for Scala"
-  , scalacOptions := (SemVer.parseUnsafe(scalaVersion.value) match {
+    name         := "just-semver",
+    description  := "Semantic Versioning (SemVer) for Scala",
+    scalacOptions := (SemVer.parseUnsafe(scalaVersion.value) match {
       case SemVer(SemVer.Major(2), SemVer.Minor(13), SemVer.Patch(patch), _, _) =>
         val options = scalacOptions.value
         if (patch >= 3)
@@ -64,17 +37,18 @@ lazy val justSemVer = (project in file("."))
           options
       case _: SemVer =>
         scalacOptions.value
-    })
-  , scalacOptions := (isDotty.value match {
+    }),
+    scalacOptions := (isDotty.value match {
       case true =>
         Seq(
           "-source:3.0-migration",
-          "-language:dynamics,existentials,higherKinds,reflectiveCalls,experimental.macros,implicitConversions", "-Ykind-projector"
+          props.scala3cLanguageOptions,
+          "-Ykind-projector",
         )
       case false =>
         scalacOptions.value
-    })
-  , unmanagedSourceDirectories in Compile ++= {
+    }),
+    unmanagedSourceDirectories in Compile ++= {
       val sharedSourceDir = (baseDirectory in ThisBuild).value / "src/main"
       if (isDotty.value)
         Seq(sharedSourceDir / "scala-3")
@@ -82,18 +56,18 @@ lazy val justSemVer = (project in file("."))
         Seq(sharedSourceDir / "scala-2.12_2.13")
       else
         Seq(sharedSourceDir / "scala-2.10_2.11")
-    }
-  , resolvers += hedgehogRepo
-  , libraryDependencies := Seq(justFp) ++
+    },
+    resolvers += props.hedgehogRepo,
+    libraryDependencies := Seq(libs.justFp) ++
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(2), Minor(10)) =>
-          hedgehogLibs(hedgehogVersionFor2_10) ++
+          libs.hedgehogLibs(props.hedgehogVersionFor2_10) ++
           libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x =>
-          hedgehogLibs(hedgehogVersion) ++ libraryDependencies.value
-      }
+          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+      },
   /* Ammonite-REPL { */
-  , libraryDependencies ++=
+    libraryDependencies ++=
       (scalaBinaryVersion.value match {
         case "2.12" | "2.13" =>
           Seq("com.lihaoyi" % "ammonite" % "2.2.0" % Test cross CrossVersion.full)
@@ -103,16 +77,16 @@ lazy val justSemVer = (project in file("."))
           Seq.empty[ModuleID]
         case _ =>
           Seq.empty[ModuleID]
-      })
-  , libraryDependencies := (
+      }),
+    libraryDependencies := (
       if (isDotty.value) {
         libraryDependencies.value
-          .filterNot(removeDottyIncompatible)
-      } else
-        (libraryDependencies).value
-      )
-  , libraryDependencies := libraryDependencies.value.map(_.withDottyCompat(scalaVersion.value))
-  , sourceGenerators in Test +=
+          .filterNot(props.removeDottyIncompatible)
+      } else {
+        libraryDependencies.value
+      }),
+    libraryDependencies := libraryDependencies.value.map(_.withDottyCompat(scalaVersion.value)),
+    sourceGenerators in Test +=
       (scalaBinaryVersion.value match {
         case "2.11" | "2.12" | "2.13" =>
           task {
@@ -150,11 +124,11 @@ lazy val justSemVer = (project in file("."))
 
   /* Bintray { */
   bintrayPackageLabels := Seq("Scala", "SemanticVersion", "SemVer"),
-  bintrayVcsUrl := Some("""git@github.com:Kevin-Lee/just-semver.git"""),
+  bintrayVcsUrl := """git@github.com:Kevin-Lee/just-semver.git""".some,
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   /* } Bintray */
 
-  initialCommands in console := """import just.semver.SemVer""",
+  console / initialCommands := """import just.semver.SemVer""",
 
   /* Coveralls { */
   coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
@@ -163,7 +137,57 @@ lazy val justSemVer = (project in file("."))
     case _ =>
       true
   }),
-  coverallsTokenFile := Option(s"""${Path.userHome.absolutePath}/.coveralls-credentials""")
+  coverallsTokenFile := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some,
   /* } Coveralls */
 
 )
+
+lazy val props = new {
+  val removeDottyIncompatible: ModuleID => Boolean =
+    m =>
+      m.name == "wartremover" ||
+        m.name == "ammonite" ||
+        m.name == "kind-projector" ||
+        m.name == "better-monadic-for" ||
+        m.name == "mdoc"
+
+  val ProjectScalaVersion: String = "3.0.0-RC1"
+  val CrossScalaVersions: Seq[String] = Seq(
+    "2.10.7",
+    "2.11.12",
+    "2.12.12",
+    "2.13.3",
+    "3.0.0-M1",
+    "3.0.0-M2",
+    "3.0.0-M3",
+    ProjectScalaVersion,
+  ).distinct
+
+  val hedgehogVersionFor2_10 = "7bd29241fababd9a3e954fd38083ed280fc9e4e8"
+  val hedgehogVersion = "0.6.5"
+
+  val hedgehogRepo: MavenRepository =
+    "bintray-scala-hedgehog" at "https://dl.bintray.com/hedgehogqa/scala-hedgehog"
+
+  lazy val scala3cLanguageOptions = "-language:" + List(
+    "dynamics",
+    "existentials",
+    "higherKinds",
+    "reflectiveCalls",
+    "experimental.macros",
+    "implicitConversions"
+  ).mkString(",")
+
+}
+
+lazy val libs = new {
+
+  def hedgehogLibs(hedgehogVersion: String): Seq[ModuleID] = Seq(
+    "qa.hedgehog" %% "hedgehog-core" % hedgehogVersion % Test,
+    "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
+    "qa.hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test,
+  )
+
+  lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp" % "1.3.5"
+
+}
