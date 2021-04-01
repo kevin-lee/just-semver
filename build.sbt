@@ -24,7 +24,7 @@ ThisBuild / scmInfo :=
     ).some
 
 lazy val justSemVer = (project in file("."))
-  .enablePlugins(DevOopsGitReleasePlugin)
+  .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
     name         := "just-semver",
     description  := "Semantic Versioning (SemVer) for Scala",
@@ -60,7 +60,7 @@ lazy val justSemVer = (project in file("."))
     resolvers += props.hedgehogRepo,
     libraryDependencies := Seq(libs.justFp) ++
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
-        case (Major(2), Minor(10)) =>
+        case (Major(2), Minor(10), _) =>
           libs.hedgehogLibs(props.hedgehogVersionFor2_10) ++
           libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x =>
