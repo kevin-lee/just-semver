@@ -64,13 +64,13 @@ lazy val justSemVer = (project in file("."))
           libs.hedgehogLibs(props.hedgehogVersionFor2_10) ++
           libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+          libs.hedgehogLibs(props.hedgehogVersion).map(_.withDottyCompat(scalaVersion.value)) ++ libraryDependencies.value
       },
   /* Ammonite-REPL { */
     libraryDependencies ++=
       (scalaBinaryVersion.value match {
         case "2.12" | "2.13" =>
-          Seq("com.lihaoyi" % "ammonite" % "2.2.0" % Test cross CrossVersion.full)
+          Seq("com.lihaoyi" % "ammonite" % "2.3.8-58-aa8b2ab1" % Test cross CrossVersion.full)
         case "2.11" =>
           Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
         case "2.10" =>
@@ -151,15 +151,16 @@ lazy val props = new {
         m.name == "better-monadic-for" ||
         m.name == "mdoc"
 
-  val ProjectScalaVersion: String = "3.0.0-RC1"
+  val ProjectScalaVersion: String = "3.0.0-RC2"
   val CrossScalaVersions: Seq[String] = Seq(
     "2.10.7",
     "2.11.12",
-    "2.12.12",
-    "2.13.3",
+    "2.12.13",
+    "2.13.5",
     "3.0.0-M1",
     "3.0.0-M2",
     "3.0.0-M3",
+    "3.0.0-RC1",
     ProjectScalaVersion,
   ).distinct
 

@@ -166,12 +166,14 @@ object Gens {
 
   def genMinMaxAlphaNumHyphenGroup: Gen[(Dsv, Dsv)] = for {
     minMaxAlps <- Gen.frequency1(
-        5 -> genMinMaxNum, 3 -> genMinMaxAlphabet(10), 1 -> genHyphen.map(x => (x, x))
+        5 -> genMinMaxNum,
+        3 -> genMinMaxAlphabet(10),
+        1 -> genHyphen.map(x => (x, x))
       ).list(Range.linear(1, 3))
-    (minAlps, maxAlps) = minMaxAlps.foldLeft(
+    (minAlps, maxAlps) = minMaxAlps.foldRight(
         (List.empty[Anh], List.empty[Anh])
-      ) { case ((ids1, ids2), (id1, id2)) =>
-        (ids1 :+ id1, ids2 :+ id2)
+      ) { case ((id1, id2), (ids1, ids2)) =>
+        (id1 :: ids1, id2 :: ids2)
       }
   } yield (Dsv(minAlps), Dsv(maxAlps))
 
@@ -180,11 +182,11 @@ object Gens {
   ): Gen[(List[Dsv], List[Dsv])] = for {
     minMaxIds <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
     (minIds, maxIds) =
-      minMaxIds.foldLeft(
+      minMaxIds.foldRight(
         (List.empty[Dsv], List.empty[Dsv])
       ) {
-        case ((ids1, ids2), (id1, id2)) =>
-          (ids1 :+ id1, ids2 :+ id2)
+        case ((id1, id2), (ids1, ids2)) =>
+          (id1 :: ids1, id2 :: ids2)
       }
   } yield (minIds, maxIds)
 
