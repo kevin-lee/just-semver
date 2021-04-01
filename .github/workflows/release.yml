@@ -42,29 +42,19 @@ jobs:
             -J-Xmx2048m \
             devOopsGitHubRelease
 
-  gh-release-artifacts-and-publish:
+  publish-gh-release-artifacts:
     needs: github-release
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        scala:
-          - { name: "Scala 2", version: "2.10.7",    binary-version: "2.10",      java-version: "adopt@1.8" }
-          - { name: "Scala 2", version: "2.11.12",   binary-version: "2.11",      java-version: "adopt@1.8" }
-          - { name: "Scala 2", version: "2.12.13",   binary-version: "2.12",      java-version: "adopt@1.11" }
-          - { name: "Scala 2", version: "2.13.5",    binary-version: "2.13",      java-version: "adopt@1.11" }
-          - { name: "Scala 3", version: "3.0.0-M1",  binary-version: "3.0.0-M1",  java-version: "adopt@1.11" }
-          - { name: "Scala 3", version: "3.0.0-M2",  binary-version: "3.0.0-M2",  java-version: "adopt@1.11" }
-          - { name: "Scala 3", version: "3.0.0-M3",  binary-version: "3.0.0-M3",  java-version: "adopt@1.11" }
-          - { name: "Scala 3", version: "3.0.0-RC1", binary-version: "3.0.0-RC1", java-version: "adopt@1.11" }
-          - { name: "Scala 3", version: "3.0.0-RC2", binary-version: "3.0.0-RC2", java-version: "adopt@1.11" }
-
     steps:
       - uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
       - uses: olafurpg/setup-scala@v10
         with:
-          java-version: ${{ matrix.scala.java-version }}
+          java-version: ${{ env.GH_JAVA_VERSION }}
+      - uses: olafurpg/setup-gpg@v3
 
       - name: Cache SBT
         uses: actions/cache@v2
@@ -73,45 +63,26 @@ jobs:
             ~/.ivy2/cache
             ~/.cache/coursier
             ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
           restore-keys: |
-            ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}
+            ${{ runner.os }}-sbt
 
-      - name: "sbt publish for ${{ matrix.scala.name }} ${{ matrix.scala.version }} - ${{ github.run_number }}"
+      - name: "sbt ci-release - ${{ github.run_number }}"
         env:
+          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_AUTH_TOKEN }}
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_PASS: ${{ secrets.BINTRAY_PASS }}
         run: |
-          echo "Run] sbt publish for Scala ${{ matrix.scala.version }}"
-          echo "mkdir -p dotty-docs"
-          mkdir -p dotty-docs
+          echo "Run] sbt ci-release"
           export SOURCE_DATE_EPOCH=$(date +%s)
           echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-          echo 'sbt -J-Xmx2048m ++${{ matrix.scala.version }}! -v clean publish'
-          sbt \
-            -J-Xmx2048m \
-            ++${{ matrix.scala.version }}! \
+          echo 'sbt -J-Xmx2048m -v clean +test +packagedArtifacts ci-release devOopsGitHubReleaseUploadArtifacts'
+          sbt -J-Xmx2048m \
             -v \
             clean \
-            test \
-            packagedArtifacts \
-            devOopsGitHubReleaseUploadArtifacts \
-            publish
-
-  publish_maven:
-    needs: gh-release-artifacts-and-publish
-    if: startsWith(github.ref, 'refs/tags/v')
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2.3.4
-
-      - name: Sync to Maven Central
-        env:
-          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
-          BINTRAY_PASS: ${{ secrets.BINTRAY_PASS }}
-        run: |
-          export GITHUB_TAG=${GITHUB_REF#refs/tags/}
-          .github/workflows/maven_central_sync.sh
+            +test \
+            +packagedArtifacts \
+            ci-release \
+            devOopsGitHubReleaseUploadArtifacts
