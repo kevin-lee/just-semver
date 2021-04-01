@@ -6,7 +6,6 @@ import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
-ThisBuild / version      := ProjectVersion
 ThisBuild / crossScalaVersions := props.CrossScalaVersions
 ThisBuild / developers   := List(
     Developer(
@@ -22,6 +21,7 @@ ThisBuild / scmInfo :=
         url("https://github.com/Kevin-Lee/just-semver")
       , "git@github.com:Kevin-Lee/just-semver.git"
     ).some
+ThisBuild / licenses := List("MIT" -> url("http://opensource.org/licenses/MIT"))
 
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
@@ -120,13 +120,9 @@ lazy val justSemVer = (project in file("."))
           option.contains("wartremover") || option.contains("import")
         ),
     /* } WartRemover and scalacOptions */
-  testFrameworks ++= Seq(TestFramework("hedgehog.sbt.Framework")),
+  testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
 
-  /* Bintray { */
-  bintrayPackageLabels := Seq("Scala", "SemanticVersion", "SemVer"),
-  bintrayVcsUrl := """git@github.com:Kevin-Lee/just-semver.git""".some,
-  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  /* } Bintray */
+  licenses := List("MIT" -> url("http://opensource.org/licenses/MIT")),
 
   console / initialCommands := """import just.semver.SemVer""",
 
