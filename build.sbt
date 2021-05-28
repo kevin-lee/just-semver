@@ -28,12 +28,6 @@ lazy val justSemVer = (project in file("."))
   .settings(
     name := "just-semver",
     description := "Semantic Versioning (SemVer) for Scala",
-    scalacOptions := (scalaBinaryVersion.value match {
-      case "3" =>
-        props.scala3cOptions
-      case _   =>
-        scalacOptions.value
-    }),
     Compile / unmanagedSourceDirectories ++= {
       val sharedSourceDir = (ThisBuild / baseDirectory).value / "src/main"
       if (isScala3(scalaVersion.value))
@@ -135,25 +129,6 @@ lazy val props =
       ).distinct
 
     final val hedgehogVersion = "0.7.0"
-
-    final val scala3cLanguageOptions =
-      "-language:" + List(
-        "dynamics",
-        "existentials",
-        "higherKinds",
-        "reflectiveCalls",
-        "experimental.macros",
-        "implicitConversions"
-      ).mkString(",")
-
-    final val scala3cOptions = List(
-      "-unchecked",
-      "-deprecation",
-      "-feature",
-      "-Xfatal-warnings",
-      scala3cLanguageOptions,
-      "-explain",
-    )
 
   }
 
