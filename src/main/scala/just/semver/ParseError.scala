@@ -20,6 +20,30 @@ object ParseError {
 
   final case class InvalidVersionStringError(value: String) extends ParseError
 
+  def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): ParseError =
+    InvalidAlphaNumHyphenError(c, rest)
+
+  def emptyAlphaNumHyphenError: ParseError =
+    EmptyAlphaNumHyphenError
+
+  def leadingZeroNumError(n: String): ParseError =
+    LeadingZeroNumError(n)
+
+  def preReleaseParseError(parseError: ParseError): ParseError =
+    PreReleaseParseError(parseError)
+
+  def buildMetadataParseError(parseError: ParseError): ParseError =
+    BuildMetadataParseError(parseError)
+
+  def combine(preReleaseError: ParseError, buildMetadataError: ParseError): ParseError =
+    CombinedParseError(
+      preReleaseParseError(preReleaseError)
+    , buildMetadataParseError(buildMetadataError)
+    )
+
+  def invalidVersionStringError(value: String): ParseError =
+    InvalidVersionStringError(value)
+
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def render(parseError: ParseError): String = parseError match {
     case InvalidAlphaNumHyphenError(c, rest) =>
@@ -47,28 +71,8 @@ object ParseError {
       s"Invalid SemVer String. value: $value"
   }
 
-  def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): ParseError =
-    InvalidAlphaNumHyphenError(c, rest)
-
-  def emptyAlphaNumHyphenError: ParseError =
-    EmptyAlphaNumHyphenError
-
-  def leadingZeroNumError(n: String): ParseError =
-    LeadingZeroNumError(n)
-
-  def preReleaseParseError(parseError: ParseError): ParseError =
-    PreReleaseParseError(parseError)
-
-  def buildMetadataParseError(parseError: ParseError): ParseError =
-    BuildMetadataParseError(parseError)
-
-  def combine(preReleaseError: ParseError, buildMetadataError: ParseError): ParseError =
-    CombinedParseError(
-      preReleaseParseError(preReleaseError)
-    , buildMetadataParseError(buildMetadataError)
-    )
-
-  def invalidVersionStringError(value: String): ParseError =
-    InvalidVersionStringError(value)
+  implicit final class ParseErrorOps(val parseError: ParseError) extends AnyVal {
+    @inline def render: String = ParseError.render(parseError)
+  }
 
 }

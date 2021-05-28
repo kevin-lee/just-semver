@@ -16,6 +16,8 @@ object AlphaNumHyphenSpec extends Properties {
   , property("AlphaHyphen(same).compare(AlphaHyphen(same)) should return 0", testAlphaHyphenEqual)
   , property("AlphaHyphen(less).compare(AlphaHyphen(greater)) should return the Int < 0", testAlphaHyphenLess)
   , property("AlphaHyphen(greater).compare(AlphaHyphen(less)) should return the Int > 0", testAlphaHyphenMore)
+  , property("test Anh.render(anh)", testAnhRenderAnh)
+  , property("test anh.render", testAnhRenderAnh)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
@@ -58,6 +60,26 @@ object AlphaNumHyphenSpec extends Properties {
     (alphaHyphen1, alphaHyphen2) = alphaHyphenPair
   } yield {
     Result.assert(alphaHyphen2.compare(alphaHyphen1) > 0)
+  }
+
+  def testAnhRenderAnh: Property = for {
+    anh <- Gen.frequency1(3 -> Gens.genNum, 6 -> Gens.genAlphabet(10), 1 -> Gens.genHyphen).log("anh")
+  } yield {
+    val expected: String = anh match {
+      case Anh.Alphabet(value) => value
+      case Anh.Num(value) => value
+      case Anh.Hyphen => "-"
+    }
+    val actual = Anh.render(anh)
+    actual ==== expected
+  }
+
+  def testAnhRender: Property = for {
+    anh <- Gen.frequency1(3 -> Gens.genNum, 6 -> Gens.genAlphabet(10), 1 -> Gens.genHyphen).log("anh")
+  } yield {
+    val expected: String = Anh.render(anh)
+    val actual = anh.render
+    actual ==== expected
   }
 
 }
