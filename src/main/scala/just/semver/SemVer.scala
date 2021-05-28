@@ -58,6 +58,9 @@ object SemVer {
   val semVerRegex: Regex =
     """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
 
+  def majorMinorPatch(semVer: SemVer): (SemVer.Major, SemVer.Minor, SemVer.Patch) =
+    (semVer.major, semVer.minor, semVer.patch)
+
   def render(semVer: SemVer): String = semVer match {
     case SemVer(major, minor, patch, pre, buildMetadata) =>
       val versionString = s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}"

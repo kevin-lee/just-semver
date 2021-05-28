@@ -55,6 +55,10 @@ object SemVerSpec extends Properties {
     , property("SemVer(same) >= SemVer(same) should be true", testSemVerGreaterOrEqualTrueForSame)
     , property("SemVer(less) >= SemVer(greater) should be false", testSemVerGreaterOrEqualFalse)
     , property("SemVer round trip", roundTripSemVer)
+    , property(
+        "SemVer.majorMinorPatch(semVer) should return (SemVer.Major, SemVer.Minor, SemVer.Patch)",
+        testSemVerMajorMinorPatch
+      )
     )
 
   def parseExample1: Result = {
@@ -683,6 +687,14 @@ object SemVerSpec extends Properties {
     val rendered = SemVer.render(semVer)
     val actual = SemVer.parse(rendered)
     actual ==== Right(semVer)
+  }
+
+  def testSemVerMajorMinorPatch: Property = for {
+    semVer <- Gens.genSemVer.log("semVer")
+  } yield {
+    val expected = (semVer.major, semVer.minor, semVer.patch)
+    val actual = SemVer.majorMinorPatch(semVer)
+    actual ==== expected
   }
 
 }
