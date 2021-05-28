@@ -10,15 +10,17 @@ import just.semver.SemVer.{Major, Minor, Patch}
 
 import scala.annotation.tailrec
 
-/**
-  * @author Kevin Lee
-  * @since 2018-11-04
+/** @author
+  *   Kevin Lee
+  * @since
+  *   2018-11-04
   */
 object Gens {
 
   def genAlphabetChar: Gen[Char] =
     Gen.frequency1(
-      8 -> Gen.char('a', 'z'), 2 -> Gen.char('A', 'Z')
+      8 -> Gen.char('a', 'z'),
+      2 -> Gen.char('A', 'Z')
     )
 
   def genDigitChar: Gen[Char] =
@@ -27,9 +29,13 @@ object Gens {
   def genHyphen: Gen[Anh] =
     Gen.constant(Anh.Hyphen)
 
-  def genMinMax[T : Ordering](genOrderedPair: Gen[(T, T)]): Gen[(T, T)] =
-    genOrderedPair.map { case (x, y) =>
-      if (implicitly[Ordering[T]].compare(x, y) <= 0) (x, y) else (y, x)
+  def genMinMax[T: Ordering](genOrderedPair: Gen[(T, T)]): Gen[(T, T)] =
+    genOrderedPair.map {
+      case (x, y) =>
+        if (implicitly[Ordering[T]].compare(x, y) <= 0)
+          (x, y)
+        else
+          (y, x)
     }
 
   def genInt(min: Int, max: Int): Gen[Int] =
@@ -43,9 +49,12 @@ object Gens {
     y <- genNonNegativeInt
   } yield {
     val z =
-      if (x !== y) y
-      else if (y === Int.MaxValue) 0
-      else y + 1
+      if (x !== y)
+        y
+      else if (y === Int.MaxValue)
+        0
+      else
+        y + 1
     (x, z)
   }
 
@@ -54,7 +63,6 @@ object Gens {
 
   def pairFromIntsTo[T](constructor: Int => T): ((Int, Int)) => (T, T) =
     pair => (constructor(pair._1), constructor(pair._2))
-
 
   def genMajor: Gen[Major] =
     genNonNegativeInt.map(Major.apply)
@@ -105,37 +113,37 @@ object Gens {
     @tailrec
     def combine(x: Anh, xs: List[Anh], acc: List[Anh]): List[Anh] =
       (x, xs) match {
-        case (Anh.Alphabet(a1), Anh.Alphabet(a2) :: rest) =>
+        case (Anh.Alphabet(a1), Anh.Alphabet(a2) :: rest)    =>
           combine(Anh.Alphabet(a1 + a2), rest, acc)
-        case (a@Anh.Alphabet(_), Anh.Num(n) :: rest) =>
+        case (a @ Anh.Alphabet(_), Anh.Num(n) :: rest)       =>
           combine(Anh.Num(n), rest, a :: acc)
-        case (a@Anh.Alphabet(_), Anh.Hyphen :: rest) =>
+        case (a @ Anh.Alphabet(_), Anh.Hyphen :: rest)       =>
           combine(Anh.Hyphen, rest, a :: acc)
-        case (Anh.Num(n1), Anh.Num(n2) :: rest) =>
+        case (Anh.Num(n1), Anh.Num(n2) :: rest)              =>
           combine(Anh.Num(n1 + n2), rest, acc)
-        case (n@Anh.Num(_), (a@Anh.Alphabet(_)) :: rest) =>
+        case (n @ Anh.Num(_), (a @ Anh.Alphabet(_)) :: rest) =>
           combine(a, rest, n :: acc)
-        case (n@Anh.Num(_), Anh.Hyphen :: rest) =>
+        case (n @ Anh.Num(_), Anh.Hyphen :: rest)            =>
           combine(Anh.Hyphen, rest, n :: acc)
-        case (Anh.Hyphen, Anh.Hyphen :: rest) =>
+        case (Anh.Hyphen, Anh.Hyphen :: rest)                =>
           combine(Anh.Hyphen, rest, Anh.Hyphen :: acc)
-        case (Anh.Hyphen, (a@Anh.Alphabet(_)) :: rest) =>
+        case (Anh.Hyphen, (a @ Anh.Alphabet(_)) :: rest)     =>
           combine(a, rest, Anh.Hyphen :: acc)
-        case (Anh.Hyphen, (n@Anh.Num(_)) :: rest) =>
+        case (Anh.Hyphen, (n @ Anh.Num(_)) :: rest)          =>
           combine(n, rest, Anh.Hyphen :: acc)
-        case (_, Nil) =>
+        case (_, Nil)                                        =>
           (x :: acc).reverse
       }
     alps match {
       case a :: as =>
         combine(a, as, List.empty)
-      case Nil =>
+      case Nil     =>
         Nil
     }
   }
 
   def genAlphaNumHyphenGroup: Gen[Dsv] = for {
-    values <- Gen.choice1[Anh](genNum, genAlphabet(10), genHyphen).list(Range.linear(1, 3))
+    values  <- Gen.choice1[Anh](genNum, genAlphabet(10), genHyphen).list(Range.linear(1, 3))
     combined = combineAlphaNumHyphen(values)
   } yield Dsv(combined)
 
@@ -145,18 +153,18 @@ object Gens {
         alps
       else
         Anh.Num(n.toInt.toString) :: Nil
-    case _ =>
+    case _                 =>
       alps
   }
 
   def genPreRelease: Gen[AdditionalInfo.PreRelease] =
     (for {
-      alpnhGroup <-genAlphaNumHyphenGroup
-      Dsv(alps) = alpnhGroup
-      newAlps = toValidNum(alps)
+      alpnhGroup <- genAlphaNumHyphenGroup
+      Dsv(alps)   = alpnhGroup
+      newAlps     = toValidNum(alps)
     } yield Dsv(newAlps))
-    .list(Range.linear(1, 5))
-    .map(PreRelease.apply)
+      .list(Range.linear(1, 5))
+      .map(PreRelease.apply)
 
   def genBuildMetaInfo: Gen[AdditionalInfo.BuildMetaInfo] =
     genAlphaNumHyphenGroup
@@ -164,22 +172,26 @@ object Gens {
       .map(BuildMetaInfo.apply)
 
   def genMinMaxAlphaNumHyphenGroup: Gen[(Dsv, Dsv)] = for {
-    minMaxAlps <- Gen.frequency1(
-        5 -> genMinMaxNum,
-        3 -> genMinMaxAlphabet(10),
-        1 -> genHyphen.map(x => (x, x))
-      ).list(Range.linear(1, 3))
-    (minAlps, maxAlps) = minMaxAlps.foldRight(
+    minMaxAlps        <- Gen
+                           .frequency1(
+                             5 -> genMinMaxNum,
+                             3 -> genMinMaxAlphabet(10),
+                             1 -> genHyphen.map(x => (x, x))
+                           )
+                           .list(Range.linear(1, 3))
+    (minAlps, maxAlps) =
+      minMaxAlps.foldRight(
         (List.empty[Anh], List.empty[Anh])
-      ) { case ((id1, id2), (ids1, ids2)) =>
-        (id1 :: ids1, id2 :: ids2)
+      ) {
+        case ((id1, id2), (ids1, ids2)) =>
+          (id1 :: ids1, id2 :: ids2)
       }
   } yield (Dsv(minAlps), Dsv(maxAlps))
 
   def genMinMaxAlphaNumHyphenGroupList(
     minMaxAlphaNumHyphenGroupGen: Gen[(Dsv, Dsv)]
   ): Gen[(List[Dsv], List[Dsv])] = for {
-    minMaxIds <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
+    minMaxIds       <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
     (minIds, maxIds) =
       minMaxIds.foldRight(
         (List.empty[Dsv], List.empty[Dsv])
@@ -207,67 +219,78 @@ object Gens {
             } else {
               (newMinAlps, newMaxAlps)
             }
+
           case (_, _) =>
             (newMinAlps, newMaxAlps)
         }
+
       case (Anh.Num(_) :: Nil, _) =>
         (toValidNum(minAlps), maxAlps)
       case (_, Anh.Num(_) :: Nil) =>
         (minAlps, toValidNum(maxAlps))
-      case (_, _) =>
+      case (_, _)                 =>
         (minAlps, maxAlps)
     }
 
-  def genMinMaxPreRelease: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.PreRelease)] = genMinMaxAlphaNumHyphenGroupList(
-    for {
-      minMaxAlpGroup <- genMinMaxAlphaNumHyphenGroup
-      (Dsv(minAlps), Dsv(maxAlps)) = minMaxAlpGroup
-      (newMinAlps, newMaxAlps) = toValidMinMaxNum(minAlps, maxAlps)
-    } yield (Dsv(newMinAlps), Dsv(newMaxAlps))
-  ).map { case (min, max) => (AdditionalInfo.PreRelease(min), AdditionalInfo.PreRelease(max)) }
+  def genMinMaxPreRelease: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.PreRelease)] =
+    genMinMaxAlphaNumHyphenGroupList(
+      for {
+        minMaxAlpGroup              <- genMinMaxAlphaNumHyphenGroup
+        (Dsv(minAlps), Dsv(maxAlps)) = minMaxAlpGroup
+        (newMinAlps, newMaxAlps)     = toValidMinMaxNum(minAlps, maxAlps)
+      } yield (Dsv(newMinAlps), Dsv(newMaxAlps))
+    ).map {
+      case (min, max) =>
+        (AdditionalInfo.PreRelease(min), AdditionalInfo.PreRelease(max))
+    }
 
   def genMinMaxBuildMetaInfo: Gen[(AdditionalInfo.BuildMetaInfo, AdditionalInfo.BuildMetaInfo)] =
     genMinMaxAlphaNumHyphenGroupList(genMinMaxAlphaNumHyphenGroup)
-      .map { case (min, max) => (AdditionalInfo.BuildMetaInfo(min), AdditionalInfo.BuildMetaInfo(max)) }
+      .map {
+        case (min, max) =>
+          (AdditionalInfo.BuildMetaInfo(min), AdditionalInfo.BuildMetaInfo(max))
+      }
 
   def genSemVer: Gen[SemVer] = for {
     major <- genMajor
     minor <- genMinor
     patch <- genPatch
-    pre <- genPreRelease.option
-    meta <- genBuildMetaInfo.option
+    pre   <- genPreRelease.option
+    meta  <- genBuildMetaInfo.option
   } yield SemVer(major, minor, patch, pre, meta)
 
   def genMinMaxSemVers: Gen[(SemVer, SemVer)] = for {
     majorPair <- genMinMaxMajors
     minorPair <- genMinMaxMinors
     patchPair <- genMinMaxPatches
-    pre <- genMinMaxPreRelease.option
-    meta <- genMinMaxBuildMetaInfo.option
+    pre       <- genMinMaxPreRelease.option
+    meta      <- genMinMaxBuildMetaInfo.option
   } yield {
-    val (pre1, pre2) =
-      pre.fold[(Option[AdditionalInfo.PreRelease], Option[AdditionalInfo.PreRelease])]((None, None))(
-        xy => (Option(xy._1), Option(xy._2))
+    val (pre1, pre2)   =
+      pre.fold[(Option[AdditionalInfo.PreRelease], Option[AdditionalInfo.PreRelease])]((None, None))(xy =>
+        (Option(xy._1), Option(xy._2))
       )
     val (meta1, meta2) =
-      meta.fold[(Option[AdditionalInfo.BuildMetaInfo], Option[AdditionalInfo.BuildMetaInfo])]((None, None))(
-        xy => (Option(xy._1), Option(xy._2))
+      meta.fold[(Option[AdditionalInfo.BuildMetaInfo], Option[AdditionalInfo.BuildMetaInfo])]((None, None))(xy =>
+        (Option(xy._1), Option(xy._2))
       )
 
-    (SemVer(
-        majorPair._1
-      , minorPair._1
-      , patchPair._1
-      , pre1
-      , meta1
-    ),
-    SemVer(
-        majorPair._2
-      , minorPair._2
-      , patchPair._2
-      , pre2
-      , meta2
-    ))
+    (
+      SemVer(
+        majorPair._1,
+        minorPair._1,
+        patchPair._1,
+        pre1,
+        meta1
+      ),
+      SemVer(
+        majorPair._2,
+        minorPair._2,
+        patchPair._2,
+        pre2,
+        meta2
+      )
+    )
   }
 
 }

@@ -4,11 +4,12 @@ import just.Common._
 
 import scala.annotation.tailrec
 
-/**
- * Dot separated value
- * @author Kevin Lee
- * @since 2018-10-21
- */
+/** Dot separated value
+  * @author
+  *   Kevin Lee
+  * @since
+  *   2018-10-21
+  */
 final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
   override def compare(that: Dsv): Int =
     compareElems(this.values, that.values)
@@ -31,7 +32,6 @@ object Dsv extends Compat {
     def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[ParseError, Vector[Anh]] =
       cs match {
         case x :: xs =>
-
           if (x.isDigit) {
             chars match {
               case Num(ns) =>

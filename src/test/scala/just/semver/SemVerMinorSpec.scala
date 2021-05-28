@@ -3,21 +3,25 @@ package just.semver
 import hedgehog._
 import hedgehog.runner._
 
-/**
- * @author Kevin Lee
- * @since 2018-11-04
- */
+/** @author
+  *   Kevin Lee
+  * @since
+  *   2018-11-04
+  */
 object SemVerMinorSpec extends Properties {
 
   override def tests: List[Test] = List(
-      property("Two SemVers with the same Minor and the rest are equal then it should be equal", testSameMinors)
-    , property("Two SemVers with the different Minors and the rest are equal then it should be not equal", testDifferentMinors)
-    , property("Test SemVer(Minor(less)) < SemVer(Minor(greater)) is true", testMinorLessCase)
-    , property("Test SemVer(Minor(greater)) > SemVer(Minor(less)) is true", testMinorMoreCase)
-    , property("Test SemVer(same Minor) <= SemVer(same Minor) is true", testLeeThanEqualWithSameMinors)
-    , property("Test SemVer(Minor(less)) <= SemVer(Minor(greater)) is true", testLeeThanEqualWithLess)
-    , property("Test SemVer(same Minor) >= SemVer(same Minor) is true", testMoreThanEqualWithSameMinors)
-    , property("Test SemVer(Minor(greater)) >= SemVer(Minor(less)) is true", testMoreThanEqualWithGreater)
+    property("Two SemVers with the same Minor and the rest are equal then it should be equal", testSameMinors),
+    property(
+      "Two SemVers with the different Minors and the rest are equal then it should be not equal",
+      testDifferentMinors
+    ),
+    property("Test SemVer(Minor(less)) < SemVer(Minor(greater)) is true", testMinorLessCase),
+    property("Test SemVer(Minor(greater)) > SemVer(Minor(less)) is true", testMinorMoreCase),
+    property("Test SemVer(same Minor) <= SemVer(same Minor) is true", testLeeThanEqualWithSameMinors),
+    property("Test SemVer(Minor(less)) <= SemVer(Minor(greater)) is true", testLeeThanEqualWithLess),
+    property("Test SemVer(same Minor) >= SemVer(same Minor) is true", testMoreThanEqualWithSameMinors),
+    property("Test SemVer(Minor(greater)) >= SemVer(Minor(less)) is true", testMoreThanEqualWithGreater)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))

@@ -1,11 +1,12 @@
 package just.semver
 
-/**
- * Alphabet / Number / Hyphen (Anh)
- *
- * @author Kevin Lee
- * @since 2018-10-21
- */
+/** Alphabet / Number / Hyphen (Anh)
+  *
+  * @author
+  *   Kevin Lee
+  * @since
+  *   2018-10-21
+  */
 sealed trait Anh extends Ordered[Anh] {
 
   import Anh._
@@ -14,20 +15,28 @@ sealed trait Anh extends Ordered[Anh] {
     (this, that) match {
       case (Num(thisValue), Num(thatValue)) =>
         Ordering[Int].compare(thisValue.toInt, thatValue.toInt)
+
       case (Num(_), Alphabet(_)) =>
         -1
+
       case (Num(_), Hyphen) =>
         -1
+
       case (Alphabet(_), Num(_)) =>
         1
+
       case (Alphabet(thisValue), Alphabet(thatValue)) =>
         thisValue.compareTo(thatValue)
+
       case (Alphabet(_), Hyphen) =>
         1
+
       case (Hyphen, Num(_)) =>
         1
+
       case (Hyphen, Alphabet(_)) =>
         -1
+
       case (Hyphen, Hyphen) =>
         0
     }
@@ -36,8 +45,8 @@ sealed trait Anh extends Ordered[Anh] {
 object Anh {
 
   final case class Alphabet(value: String) extends Anh
-  final case class Num(value: String) extends Anh
-  case object Hyphen extends Anh
+  final case class Num(value: String)      extends Anh
+  case object Hyphen                       extends Anh
 
   def alphabet(value: String): Anh =
     Alphabet(value)
@@ -59,9 +68,12 @@ object Anh {
   }
 
   def render(alphaNumHyphen: Anh): String = alphaNumHyphen match {
-    case Num(value) => value
-    case Alphabet(value) => value
-    case Hyphen => "-"
+    case Num(value)      =>
+      value
+    case Alphabet(value) =>
+      value
+    case Hyphen          =>
+      "-"
   }
 
 }

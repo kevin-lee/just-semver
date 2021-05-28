@@ -3,21 +3,25 @@ package just.semver
 import hedgehog._
 import hedgehog.runner._
 
-/**
- * @author Kevin Lee
- * @since 2018-11-04
- */
+/** @author
+  *   Kevin Lee
+  * @since
+  *   2018-11-04
+  */
 object SemVerMajorSpec extends Properties {
 
   override def tests: List[Test] = List(
-    property("Two SemVers with the same Major and the rest are equal then it should be equal", testSameMajors)
-  , property("Two SemVers with the different Majors and the rest are equal then it should be not equal", testDifferentMajors)
-  , property("Test SemVer(Major(less)) < SemVer(Major(greater)) is true", testMajorLessCase)
-  , property("Test SemVer(Major(greater)) > SemVer(Major(less)) is true", testMajorMoreCase)
-  , property("Test SemVer(same Major) <= SemVer(same Major) is true", testLeeThanEqualWithSameMajors)
-  , property("Test SemVer(Major(less)) <= SemVer(Major(greater)) is true", testLeeThanEqualWithLess)
-  , property("Test SemVer(same Major) >= SemVer(same Major) is true", testMoreThanEqualWithSameMajors)
-  , property("Test SemVer(Major(greater)) >= SemVer(Major(less)) is true", testMoreThanEqualWithGreater)
+    property("Two SemVers with the same Major and the rest are equal then it should be equal", testSameMajors),
+    property(
+      "Two SemVers with the different Majors and the rest are equal then it should be not equal",
+      testDifferentMajors
+    ),
+    property("Test SemVer(Major(less)) < SemVer(Major(greater)) is true", testMajorLessCase),
+    property("Test SemVer(Major(greater)) > SemVer(Major(less)) is true", testMajorMoreCase),
+    property("Test SemVer(same Major) <= SemVer(same Major) is true", testLeeThanEqualWithSameMajors),
+    property("Test SemVer(Major(less)) <= SemVer(Major(greater)) is true", testLeeThanEqualWithLess),
+    property("Test SemVer(same Major) >= SemVer(same Major) is true", testMoreThanEqualWithSameMajors),
+    property("Test SemVer(Major(greater)) >= SemVer(Major(less)) is true", testMoreThanEqualWithGreater)
   )
 
   @SuppressWarnings(Array("org.wartremover.warts.Equals"))
