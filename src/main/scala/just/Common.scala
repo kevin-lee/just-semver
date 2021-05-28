@@ -2,9 +2,10 @@ package just
 
 import scala.annotation.tailrec
 
-/**
-  * @author Kevin Lee
-  * @since 2018-12-15
+/** @author
+  *   Kevin Lee
+  * @since
+  *   2018-12-15
   */
 object Common {
 
@@ -20,12 +21,12 @@ object Common {
     @inline def some: Option[A] = Some(a)
 
     @inline def asRight[B]: Either[B, A] = Right[B, A](a)
-    @inline def asLeft[B]: Either[A, B] = Left[A, B](a)
+    @inline def asLeft[B]: Either[A, B]  = Left[A, B](a)
   }
 
   // $COVERAGE-OFF$
   @tailrec
-  def compareElems[A : Ordering](x: Seq[A], y: Seq[A]): Int = {
+  def compareElems[A: Ordering](x: Seq[A], y: Seq[A]): Int = {
     val ordering = implicitly[Ordering[A]]
     (x, y) match {
       case (head1 +: tail1, head2 +: tail2) =>
@@ -35,11 +36,12 @@ object Common {
         } else {
           result
         }
+
       case (Seq(), _ +: _) =>
         -1
       case (_ +: _, Seq()) =>
         1
-      case (Seq(), Seq()) =>
+      case (Seq(), Seq())  =>
         0
     }
   }

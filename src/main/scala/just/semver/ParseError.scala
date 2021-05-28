@@ -1,19 +1,20 @@
 package just.semver
 
-/**
- * @author Kevin Lee
- * @since 2018-10-21
- */
+/** @author
+  *   Kevin Lee
+  * @since
+  *   2018-10-21
+  */
 sealed trait ParseError
 
 object ParseError {
 
   final case class InvalidAlphaNumHyphenError(c: Char, rest: List[Char]) extends ParseError
-  case object EmptyAlphaNumHyphenError extends ParseError
+  case object EmptyAlphaNumHyphenError                                   extends ParseError
 
   final case class LeadingZeroNumError(n: String) extends ParseError
 
-  final case class PreReleaseParseError(parseError: ParseError) extends ParseError
+  final case class PreReleaseParseError(parseError: ParseError)    extends ParseError
   final case class BuildMetadataParseError(parseError: ParseError) extends ParseError
 
   final case class CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError) extends ParseError
@@ -37,8 +38,8 @@ object ParseError {
 
   def combine(preReleaseError: ParseError, buildMetadataError: ParseError): ParseError =
     CombinedParseError(
-      preReleaseParseError(preReleaseError)
-    , buildMetadataParseError(buildMetadataError)
+      preReleaseParseError(preReleaseError),
+      buildMetadataParseError(buildMetadataError)
     )
 
   def invalidVersionStringError(value: String): ParseError =
