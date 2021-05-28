@@ -2,9 +2,8 @@ package just.semver
 
 import hedgehog._
 
+import just.Common._
 import just.GenPlus
-
-import just.fp.syntax._
 
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}

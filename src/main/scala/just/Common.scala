@@ -2,13 +2,27 @@ package just
 
 import scala.annotation.tailrec
 
-import just.fp.syntax._
-
 /**
   * @author Kevin Lee
   * @since 2018-12-15
   */
 object Common {
+
+  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
+  implicit final class EqualA[A](val a1: A) extends AnyVal {
+    @inline def ===(a2: A): Boolean = a1 == a2
+    @inline def !==(a2: A): Boolean = a1 != a2
+  }
+
+  @inline def none[A]: Option[A] = None
+
+  implicit final class Ops[A](val a: A) extends AnyVal {
+    @inline def some: Option[A] = Some(a)
+
+    @inline def asRight[B]: Either[B, A] = Right[B, A](a)
+    @inline def asLeft[B]: Either[A, B] = Left[A, B](a)
+  }
+
   // $COVERAGE-OFF$
   @tailrec
   def compareElems[A : Ordering](x: Seq[A], y: Seq[A]): Int = {

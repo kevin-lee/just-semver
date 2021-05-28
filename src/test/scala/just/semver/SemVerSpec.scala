@@ -5,9 +5,8 @@ import Anh.{alphabet, hyphen, num, numFromStringUnsafe}
 import hedgehog._
 import hedgehog.runner._
 
+import just.Common._
 import just.semver.SemVer.{Major, Minor, Patch}
-
-import just.fp._, syntax._
 
 /**
   * @author Kevin Lee
@@ -493,7 +492,7 @@ object SemVerSpec extends Properties {
     minor <- Gens.genMinor.log("major")
     patch <- Gens.genPatch.log("major")
   } yield {
-    SemVer.semVer(major, minor, patch).right[ParseError] ====
+    SemVer.semVer(major, minor, patch).asRight[ParseError] ====
       SemVer.parse(s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}")
   }
 
