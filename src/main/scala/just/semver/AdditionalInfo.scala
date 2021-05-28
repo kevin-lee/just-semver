@@ -12,12 +12,18 @@ object AdditionalInfo {
 
   final case class PreRelease(identifier: List[Dsv])
   object PreRelease {
+    implicit final class PreReleaseOps(val preRelease: PreRelease) extends AnyVal {
+      @inline def render: String = PreRelease.render(preRelease)
+    }
     def render(preRelease: PreRelease): String =
       preRelease.identifier.map(Dsv.render).mkString(".")
   }
 
   final case class BuildMetaInfo(identifier: List[Dsv])
   object BuildMetaInfo {
+    implicit final class BuildMetaInfoOps(val buildMetaInfo: BuildMetaInfo) extends AnyVal {
+      @inline def render: String = BuildMetaInfo.render(buildMetaInfo)
+    }
     def render(buildMetaInfo: BuildMetaInfo): String =
       buildMetaInfo.identifier.map(Dsv.render).mkString(".")
   }

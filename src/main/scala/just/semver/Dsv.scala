@@ -7,6 +7,7 @@ import just.fp.syntax._
 import scala.annotation.tailrec
 
 /**
+ * Dot separated value
  * @author Kevin Lee
  * @since 2018-10-21
  */
@@ -18,6 +19,10 @@ final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
 object Dsv {
 
   import Anh._
+
+  implicit final class DsvOps(val dsv: Dsv) extends AnyVal {
+    @inline def render: String = Dsv.render(dsv)
+  }
 
   def render(alphaNumHyphenGroup: Dsv): String =
     alphaNumHyphenGroup.values.map(Anh.render).mkString

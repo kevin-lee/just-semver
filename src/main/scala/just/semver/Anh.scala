@@ -54,6 +54,10 @@ object Anh {
   def hyphen: Anh =
     Hyphen
 
+  implicit final class AnhOps(val anh: Anh) extends AnyVal {
+    @inline def render: String = Anh.render(anh)
+  }
+
   def render(alphaNumHyphen: Anh): String = alphaNumHyphen match {
     case Num(value) => value
     case Alphabet(value) => value

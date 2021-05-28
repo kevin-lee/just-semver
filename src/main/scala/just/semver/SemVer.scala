@@ -58,6 +58,13 @@ object SemVer {
   val semVerRegex: Regex =
     """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
 
+  implicit final class SemVerOps(val semVer: SemVer) extends AnyVal {
+    @inline def majorMinorPatch: (SemVer.Major, SemVer.Minor, SemVer.Patch) =
+      SemVer.majorMinorPatch(semVer)
+
+    @inline def render: String = SemVer.render(semVer)
+  }
+
   def majorMinorPatch(semVer: SemVer): (SemVer.Major, SemVer.Minor, SemVer.Patch) =
     (semVer.major, semVer.minor, semVer.patch)
 

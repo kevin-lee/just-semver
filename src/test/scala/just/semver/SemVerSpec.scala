@@ -54,7 +54,8 @@ object SemVerSpec extends Properties {
     , property("SemVer(greater) >= SemVer(less) should be true", testSemVerGreaterOrEqualTrue)
     , property("SemVer(same) >= SemVer(same) should be true", testSemVerGreaterOrEqualTrueForSame)
     , property("SemVer(less) >= SemVer(greater) should be false", testSemVerGreaterOrEqualFalse)
-    , property("SemVer round trip", roundTripSemVer)
+    , property("SemVer round trip SemVer.render(semVer)", roundTripSemVerRenderSemVer)
+    , property("SemVer round trip semVer.render", roundTripSemVerRender)
     , property(
         "SemVer.majorMinorPatch(semVer) should return (SemVer.Major, SemVer.Minor, SemVer.Patch)",
         testSemVerMajorMinorPatch
@@ -681,10 +682,18 @@ object SemVerSpec extends Properties {
       , v1, v2)((x, y) => !(x >= y))
   }
 
-  def roundTripSemVer: Property = for {
+  def roundTripSemVerRenderSemVer: Property = for {
     semVer <- Gens.genSemVer.log("semVer")
   } yield {
     val rendered = SemVer.render(semVer)
+    val actual = SemVer.parse(rendered)
+    actual ==== Right(semVer)
+  }
+
+  def roundTripSemVerRender: Property = for {
+    semVer <- Gens.genSemVer.log("semVer")
+  } yield {
+    val rendered = semVer.render
     val actual = SemVer.parse(rendered)
     actual ==== Right(semVer)
   }
