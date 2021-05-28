@@ -1,12 +1,12 @@
 package just.semver
 
-import just.fp.syntax._
+import just.Common._
 
 /**
  * @author Kevin Lee
  * @since 2018-10-21
  */
-object AdditionalInfo {
+object AdditionalInfo extends Compat {
 
   import Anh._
 
@@ -51,21 +51,21 @@ object AdditionalInfo {
         .map(_.split("\\."))
         .map(_.map(Dsv.parse)) match {
         case Some(preRelease) =>
-          preRelease.foldRight[Either[ParseError, List[Dsv]]](List.empty.right) {
+          preRelease.foldRight(List.empty[Dsv].asRight[ParseError]) {
             (x, acc) =>
               x.flatMap(validator) match {
                 case Right(alp) =>
                   acc.map(alps => alp :: alps)
                 case Left(error) =>
-                  error.left
+                  error.asLeft[List[Dsv]]
               }
           }
         case None =>
-          List.empty.right
+          List.empty[Dsv].asRight[ParseError]
       }
     alphaNumHyphens.map {
       case Nil =>
-        none
+        none[List[Dsv]]
       case xs =>
         xs.some
     }

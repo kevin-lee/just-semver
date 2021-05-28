@@ -1,8 +1,6 @@
 package just.semver
 
-import just.Common.compareElems
-
-import just.fp.syntax._
+import just.Common._
 
 import scala.annotation.tailrec
 
@@ -16,7 +14,7 @@ final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
     compareElems(this.values, that.values)
 }
 
-object Dsv {
+object Dsv extends Compat {
 
   import Anh._
 

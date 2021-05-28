@@ -1,7 +1,7 @@
 import ProjectInfo._
-import kevinlee.sbt.SbtCommon.crossVersionProps
 import just.semver.SemVer
-import SemVer.{Major, Minor}
+import SemVer.Major
+import kevinlee.sbt.SbtCommon.crossVersionProps
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
@@ -12,7 +12,7 @@ ThisBuild / developers := List(
     "Kevin-Lee",
     "Kevin Lee",
     "kevin.code@kevinlee.io",
-    url("https://github.com/Kevin-Lee"),
+    url("https://github.com/Kevin-Lee")
   )
 )
 ThisBuild / homepage := url("https://github.com/Kevin-Lee/just-semver").some
@@ -28,16 +28,16 @@ lazy val justSemVer = (project in file("."))
   .settings(
     name := "just-semver",
     description := "Semantic Versioning (SemVer) for Scala",
-    Compile / unmanagedSourceDirectories ++= {
-      val sharedSourceDir = (ThisBuild / baseDirectory).value / "src/main"
-      if (isScala3(scalaVersion.value))
-        Seq(sharedSourceDir / "scala-3")
-      else if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
-        Seq(sharedSourceDir / "scala-2.12_2.13")
-      else
-        Seq(sharedSourceDir / "scala-2.10_2.11")
+    Compile / unmanagedSourceDirectories := {
+      val sharedSourceDir = baseDirectory.value / "src/main"
+      val moreSrcs        =
+        if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
+          Seq(sharedSourceDir / "scala-2.12_2.13")
+        else
+          Seq.empty[File]
+      ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
-    libraryDependencies := Seq(libs.justFp) ++
+    libraryDependencies :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(3), _, _) =>
           libs.hedgehogLibs(props.hedgehogVersion) ++
@@ -104,7 +104,7 @@ lazy val justSemVer = (project in file("."))
       case _             =>
         true
     }),
-    coverallsTokenFile := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some,
+    coverallsTokenFile := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some
     /* } Coveralls */
 
   )
@@ -125,7 +125,7 @@ lazy val props =
         "2.11.12",
         "2.12.13",
         "2.13.5",
-        ProjectScalaVersion,
+        ProjectScalaVersion
       ).distinct
 
     final val hedgehogVersion = "0.7.0"
@@ -138,10 +138,8 @@ lazy val libs =
     def hedgehogLibs(hedgehogVersion: String): Seq[ModuleID] = Seq(
       "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
       "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
-      "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test,
+      "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
     )
-
-    lazy val justFp: ModuleID = "io.kevinlee" %% "just-fp-core" % "1.6.0"
 
   }
 
