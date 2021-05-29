@@ -3,12 +3,12 @@ name: Task template
 about: For a task ticket
 title: ''
 labels: task
-assignees: ''
+assignees: 'Kevin-Lee'
 
 ---
 
 # Task
-## Summary 
+## Summary
 
 ## Project Details
 Version:
