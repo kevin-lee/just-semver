@@ -8,7 +8,7 @@ import hedgehog.runner._
   * @since
   *   2018-11-04
   */
-object AlphaNumHyphenSpec extends Properties {
+object AnhSpec extends Properties {
 
   override def tests: List[Test] = List(
     property("Num(same).compare(Num(same)) should return 0", testNumEqual),
