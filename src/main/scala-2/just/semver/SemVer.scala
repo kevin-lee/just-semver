@@ -1,6 +1,6 @@
 package just.semver
 
-import just.Common
+import just.Common._
 
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
@@ -29,7 +29,7 @@ final case class SemVer(
       case (0, 0, 0)  =>
         (this.pre, that.pre) match {
           case (Some(thisPre), Some(thatPre)) =>
-            Common.compareElems(thisPre.identifier, thatPre.identifier)
+            thisPre.identifier.compareElems(thatPre.identifier)
 
           case (Some(_), None) =>
             -1
@@ -61,7 +61,7 @@ object SemVer {
 
   val semVerRegex: Regex = """(\d+)\.(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
 
-  implicit final class SemVerOps(val semVer: SemVer) extends AnyVal {
+  implicit final class SemVerOps(private val semVer: SemVer) extends AnyVal {
     @inline def majorMinorPatch: (SemVer.Major, SemVer.Minor, SemVer.Patch) =
       SemVer.majorMinorPatch(semVer)
 

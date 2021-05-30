@@ -191,7 +191,7 @@ object Gens {
   def genMinMaxAlphaNumHyphenGroupList(
     minMaxAlphaNumHyphenGroupGen: Gen[(Dsv, Dsv)]
   ): Gen[(List[Dsv], List[Dsv])] = for {
-    minMaxIds       <- genMinMaxAlphaNumHyphenGroup.list(Range.linear(1, 3))
+    minMaxIds       <- minMaxAlphaNumHyphenGroupGen.list(Range.linear(1, 3))
     (minIds, maxIds) =
       minMaxIds.foldRight(
         (List.empty[Dsv], List.empty[Dsv])
@@ -260,33 +260,39 @@ object Gens {
   } yield SemVer(major, minor, patch, pre, meta)
 
   def genMinMaxSemVers: Gen[(SemVer, SemVer)] = for {
-    majorPair <- genMinMaxMajors
-    minorPair <- genMinMaxMinors
-    patchPair <- genMinMaxPatches
-    pre       <- genMinMaxPreRelease.option
-    meta      <- genMinMaxBuildMetaInfo.option
+    (majorPair1, majorPair2) <- genMinMaxMajors
+    (minorPair1, minorPair2) <- genMinMaxMinors
+    (patchPair1, patchPair2) <- genMinMaxPatches
+    pre                      <- genMinMaxPreRelease.option
+    meta                     <- genMinMaxBuildMetaInfo.option
   } yield {
     val (pre1, pre2)   =
-      pre.fold[(Option[AdditionalInfo.PreRelease], Option[AdditionalInfo.PreRelease])]((None, None))(xy =>
-        (Option(xy._1), Option(xy._2))
-      )
+      pre.fold(
+        (none[AdditionalInfo.PreRelease], none[AdditionalInfo.PreRelease])
+      ) {
+        case (xy1, xy2) =>
+          (xy1.some, xy2.some)
+      }
     val (meta1, meta2) =
-      meta.fold[(Option[AdditionalInfo.BuildMetaInfo], Option[AdditionalInfo.BuildMetaInfo])]((None, None))(xy =>
-        (Option(xy._1), Option(xy._2))
-      )
+      meta.fold(
+        (none[AdditionalInfo.BuildMetaInfo], none[AdditionalInfo.BuildMetaInfo])
+      ) {
+        case (xy1, xy2) =>
+          (xy1.some, xy2.some)
+      }
 
     (
       SemVer(
-        majorPair._1,
-        minorPair._1,
-        patchPair._1,
+        majorPair1,
+        minorPair1,
+        patchPair1,
         pre1,
         meta1
       ),
       SemVer(
-        majorPair._2,
-        minorPair._2,
-        patchPair._2,
+        majorPair2,
+        minorPair2,
+        patchPair2,
         pre2,
         meta2
       )

@@ -37,24 +37,30 @@ lazy val justSemVer = (project in file("."))
           Seq.empty[File]
       ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
+    useAggressiveScalacOptions := true,
+    scalacOptions := {
+      val scalaVer = scalaVersion.value
+      val scOptions = scalacOptions.value
+      if (scalaVer.startsWith("3.0")) {
+        scOptions ++ List(
+          "-print-lines",
+          "-Ysafe-init",
+          "-Yexplicit-nulls",
+        )
+      } else if (scalaVer.startsWith("2.11")) {
+        scOptions.filterNot(_ == "-Ywarn-unused")
+      } else {
+        scOptions
+      }
+    },
     libraryDependencies :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(3), _, _) =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++
+          libs.hedgehogLibs(props.hedgehogVersion) ++ List(libs.canEqual) ++
             libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x                =>
           libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
       },
-    /* Ammonite-REPL { */
-    libraryDependencies ++=
-      (scalaBinaryVersion.value match {
-        case "2.12" | "2.13" =>
-          Seq("com.lihaoyi" % "ammonite" % "2.3.8-58-aa8b2ab1" % Test cross CrossVersion.full)
-        case "2.11"          =>
-          Seq("com.lihaoyi" % "ammonite" % "1.6.7" % Test cross CrossVersion.full)
-        case _               =>
-          Seq.empty[ModuleID]
-      }),
     libraryDependencies := (
       if (isScala3(scalaVersion.value)) {
         libraryDependencies
@@ -64,18 +70,6 @@ lazy val justSemVer = (project in file("."))
         libraryDependencies.value
       }
     ),
-    Test / sourceGenerators +=
-      (scalaBinaryVersion.value match {
-        case "2.11" | "2.12" | "2.13" =>
-          task {
-            val file = (Test / sourceManaged).value / "amm.scala"
-            IO.write(file, """object amm extends App { ammonite.Main.main(args) }""")
-            Seq(file)
-          }
-        case _                        =>
-          task(Seq.empty[File])
-      }),
-    /* } Ammonite-REPL */
     /* WartRemover and scalacOptions { */
 //      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
 //      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
@@ -120,15 +114,18 @@ lazy val props =
           m.name == "mdoc"
 
     final val ProjectScalaVersion: String     = "3.0.0"
+    // final val ProjectScalaVersion: String     = "2.13.3"
     final val CrossScalaVersions: Seq[String] =
       Seq(
         "2.11.12",
         "2.12.13",
-        "2.13.5",
+        "2.13.3",
         ProjectScalaVersion
       ).distinct
 
     final val hedgehogVersion = "0.7.0"
+
+    final val canEqualVersion = "0.1.0"
 
   }
 
@@ -140,6 +137,8 @@ lazy val libs =
       "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
       "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
     )
+
+    lazy val canEqual = "io.kevinlee" %% "can-equal" % props.canEqualVersion
 
   }
 

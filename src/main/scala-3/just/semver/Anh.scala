@@ -7,7 +7,11 @@ package just.semver
   * @since
   *   2018-10-21
   */
-sealed trait Anh extends Ordered[Anh] {
+enum Anh extends Ordered[Anh] derives CanEqual {
+
+  case Alphabet(value: String)
+  case Num(value: String)
+  case Hyphen
 
   import Anh._
 
@@ -44,36 +48,30 @@ sealed trait Anh extends Ordered[Anh] {
 
 object Anh {
 
-  final case class Alphabet(value: String) extends Anh
-  final case class Num(value: String)      extends Anh
-  case object Hyphen                       extends Anh
-
   def alphabet(value: String): Anh =
-    Alphabet(value)
+    Anh.Alphabet(value)
 
   def num(value: Int): Anh =
-    Num(value.toString)
+    Anh.Num(value.toString)
 
   def numFromStringUnsafe(value: String): Anh =
     if (value.forall(_.isDigit))
-      Num(value)
+      Anh.Num(value)
     else
       sys.error(s"The Num value cannot contain any non-digit. value: $value")
 
   def hyphen: Anh =
-    Hyphen
+    Anh.Hyphen
 
-  implicit final class AnhOps(val anh: Anh) extends AnyVal {
-    @inline def render: String = Anh.render(anh)
-  }
-
-  def render(alphaNumHyphen: Anh): String = alphaNumHyphen match {
-    case Num(value)      =>
-      value
-    case Alphabet(value) =>
-      value
-    case Hyphen          =>
-      "-"
+  extension (anh: Anh) {
+    def render: String = anh match {
+      case Num(value)      =>
+        value
+      case Alphabet(value) =>
+        value
+      case Hyphen          =>
+        "-"
+    }
   }
 
 }

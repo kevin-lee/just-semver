@@ -1,6 +1,7 @@
 package just.semver
 
 import just.Common._
+import canequal.all.given
 
 /** @author
   *   Kevin Lee
@@ -11,22 +12,20 @@ object AdditionalInfo extends Compat {
 
   import Anh._
 
-  final case class PreRelease(identifier: List[Dsv])
+  final case class PreRelease(identifier: List[Dsv]) derives CanEqual
   object PreRelease {
-    implicit final class PreReleaseOps(val preRelease: PreRelease) extends AnyVal {
-      @inline def render: String = PreRelease.render(preRelease)
+    extension (preRelease: PreRelease) {
+      def render: String =
+        preRelease.identifier.map(_.render).mkString(".")
     }
-    def render(preRelease: PreRelease): String =
-      preRelease.identifier.map(Dsv.render).mkString(".")
   }
 
-  final case class BuildMetaInfo(identifier: List[Dsv])
+  final case class BuildMetaInfo(identifier: List[Dsv]) derives CanEqual
   object BuildMetaInfo {
-    implicit final class BuildMetaInfoOps(val buildMetaInfo: BuildMetaInfo) extends AnyVal {
-      @inline def render: String = BuildMetaInfo.render(buildMetaInfo)
+    extension (buildMetaInfo: BuildMetaInfo) {
+      def render: String =
+        buildMetaInfo.identifier.map(_.render).mkString(".")
     }
-    def render(buildMetaInfo: BuildMetaInfo): String =
-      buildMetaInfo.identifier.map(Dsv.render).mkString(".")
   }
 
   def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
@@ -34,7 +33,7 @@ object AdditionalInfo extends Compat {
       value,
       {
         case a @ Dsv(Num(n) :: Nil) =>
-          if ((n === "0") || n.takeWhile(_ === '0').length === 0)
+          if ((n == "0") || n.takeWhile(_ == '0').length == 0)
             Right(a)
           else
             Left(ParseError.leadingZeroNumError(n))
@@ -52,7 +51,14 @@ object AdditionalInfo extends Compat {
   ): Either[ParseError, Option[List[Dsv]]] = {
     val alphaNumHyphens: Either[ParseError, List[Dsv]] =
       Option(value)
-        .map(_.split("\\."))
+        .flatMap { s =>
+          Option(s.split("\\.")).map { array =>
+            array.nn.toList.collect {
+              case s: String =>
+                s
+            }
+          }
+        }
         .map(_.map(Dsv.parse)) match {
         case Some(preRelease) =>
           preRelease.foldRight(List.empty[Dsv].asRight[ParseError]) { (x, acc) =>
