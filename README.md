@@ -4,7 +4,6 @@
 [![Release Status](https://github.com/Kevin-Lee/just-semver/workflows/Release/badge.svg)](https://github.com/Kevin-Lee/just-semver/actions?workflow=Release)
 [![Coverage Status](https://coveralls.io/repos/github/Kevin-Lee/just-semver/badge.svg?branch=master)](https://coveralls.io/github/Kevin-Lee/just-semver?branch=master)
 
-[![Download](https://api.bintray.com/packages/kevinlee/maven/just-semver/images/download.svg)](https://bintray.com/kevinlee/maven/just-semver/_latestVersion)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.kevinlee/just-semver_2.13/badge.svg)](https://search.maven.org/artifact/io.kevinlee/just-semver_2.13)
 [![Latest version](https://index.scala-lang.org/kevin-lee/just-semver/just-semver/latest.svg)](https://index.scala-lang.org/kevin-lee/just-semver/just-semver)
 
@@ -13,7 +12,7 @@ Semantic Versioning (`SemVer`) for Scala
 
 # Get just-semver
 ```scala
-libraryDependencies += "io.kevinlee" %% "just-semver" % "0.1.0"
+libraryDependencies += "io.kevinlee" %% "just-semver" % "0.3.0"
 ```
 
 # How to Use
@@ -24,7 +23,7 @@ val v = SemVer.parse("1.0.0")
 // v: Either[ParseError, SemVer] = Right(SemVer(Major(1), Minor(0), Patch(0), None, None))
 
 // To render it to `String`,
-v.map(SemVer.render)
+v.map(_.render)
 // Either[ParseError, String] = Right("1.0.0")
 
 // Invalid version
@@ -41,7 +40,7 @@ val v = SemVer.parseUnsafe("1.0.0")
 // v: SemVer = SemVer(Major(1), Minor(0), Patch(0), None, None)
 
 // to String
-SemVer.render(v)
+v.render
 // String = "1.0.0"
 
 
@@ -79,7 +78,7 @@ val v = SemVer.parse("1.0.0-3.123.9a")
 //   )
 // )
 
-v.map(SemVer.render)
+v.map(_.render)
 // v: [ParseError, String] = Right("1.0.0-3.123.9a")
 ```
 
@@ -101,7 +100,7 @@ val v = SemVer.parse("1.0.0+100.0.12abc")
 //   )
 // )
 
-v.map(SemVer.render)
+v.map(_.render)
 // Either[ParseError, String] = Right("1.0.0+100.0.12abc")
 ```
 
@@ -142,7 +141,7 @@ val v = SemVer.parse("1.0.0-3.123.9a+100.0.12abc")
 //   )
 // )
 
-v.map(SemVer.render)
+v.map(_.render)
 // v: [ParseError, String] = Right("1.0.0-3.123.9a+100.0.12abc")
 ```
 
