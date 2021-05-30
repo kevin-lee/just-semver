@@ -72,7 +72,7 @@ object ParseError {
       s"Invalid SemVer String. value: $value"
   }
 
-  implicit final class ParseErrorOps(val parseError: ParseError) extends AnyVal {
+  implicit final class ParseErrorOps(private val parseError: ParseError) extends AnyVal {
     @inline def render: String = ParseError.render(parseError)
   }
 

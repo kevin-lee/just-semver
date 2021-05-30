@@ -1,6 +1,7 @@
 package just.semver
 
 import just.Common._
+import canequal.all.given
 
 import scala.annotation.tailrec
 
@@ -10,21 +11,18 @@ import scala.annotation.tailrec
   * @since
   *   2018-10-21
   */
-final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
+final case class Dsv(values: List[Anh]) extends Ordered[Dsv] derives CanEqual {
   override def compare(that: Dsv): Int =
-    compareElems(this.values, that.values)
+    this.values.compareElems(that.values)
 }
 
 object Dsv extends Compat {
 
   import Anh._
 
-  implicit final class DsvOps(val dsv: Dsv) extends AnyVal {
-    @inline def render: String = Dsv.render(dsv)
+  extension (dsv: Dsv) {
+    def render: String = dsv.values.map(_.render).mkString
   }
-
-  def render(alphaNumHyphenGroup: Dsv): String =
-    alphaNumHyphenGroup.values.map(Anh.render).mkString
 
   def parse(value: String): Either[ParseError, Dsv] = {
 
@@ -40,7 +38,7 @@ object Dsv extends Compat {
               case _ =>
                 accumulate(xs, Num(x.toString), acc :+ chars)
             }
-          } else if (x === '-') {
+          } else if (x == '-') {
             accumulate(xs, Hyphen, acc :+ chars)
           } else if (x.isUpper || x.isLower) {
             chars match {
@@ -65,7 +63,7 @@ object Dsv extends Compat {
         val result =
           if (x.isDigit) {
             accumulate(xs, Num(x.toString), Vector.empty)
-          } else if (x === '-')
+          } else if (x == '-')
             accumulate(xs, Hyphen, Vector.empty)
           else if (x.isLower || x.isUpper)
             accumulate(xs, Alphabet(x.toString), Vector.empty)
