@@ -52,6 +52,37 @@ jobs:
           java -version
           .github/workflows/sbt-build-all.sh ${{ matrix.scala.version }}
 
+  scalafix:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_JAVA_VERSION: "adopt@1.11"
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: ${{ env.GH_JAVA_VERSION }}
+
+      - name: Cache SBT
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.cache/coursier
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt
+
+      - name: "sbt +scalafix"
+        run: |
+          sbt \
+            -J-XX:MaxMetaspaceSize=1024m \
+            -J-Xmx2048m \
+            clean \
+            +scalafix
+
 
   build_with_test_coverage:
     runs-on: ubuntu-latest
