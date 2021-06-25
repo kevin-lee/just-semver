@@ -38,21 +38,6 @@ lazy val justSemVer = (project in file("."))
       ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
     useAggressiveScalacOptions := true,
-    scalacOptions := {
-      val scalaVer = scalaVersion.value
-      val scOptions = scalacOptions.value
-      if (scalaVer.startsWith("3.0")) {
-        scOptions ++ List(
-          "-print-lines",
-          "-Ysafe-init",
-          "-Yexplicit-nulls",
-        )
-      } else if (scalaVer.startsWith("2.11")) {
-        scOptions.filterNot(_ == "-Ywarn-unused")
-      } else {
-        scOptions
-      }
-    },
     libraryDependencies :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(3), _, _) =>
