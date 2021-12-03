@@ -5,10 +5,8 @@ import just.Common._
 import scala.annotation.tailrec
 
 /** Dot separated value
-  * @author
-  *   Kevin Lee
-  * @since
-  *   2018-10-21
+  * @author  Kevin Lee
+  * @since   2018-10-21
   */
 final case class Dsv(values: List[Anh]) extends Ordered[Dsv] {
   override def compare(that: Dsv): Int =

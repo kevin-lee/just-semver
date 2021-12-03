@@ -1,12 +1,9 @@
 package just.semver
 
 import just.Common._
-import canequal.all.given
 
-/** @author
-  *   Kevin Lee
-  * @since
-  *   2018-10-21
+/** @author Kevin Lee
+  * @since 2018-10-21
   */
 object AdditionalInfo extends Compat {
 

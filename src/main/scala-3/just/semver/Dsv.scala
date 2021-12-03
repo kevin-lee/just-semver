@@ -1,15 +1,11 @@
 package just.semver
 
-import just.Common._
-import canequal.all.given
-
+import just.Common.*
 import scala.annotation.tailrec
 
 /** Dot separated value
-  * @author
-  *   Kevin Lee
-  * @since
-  *   2018-10-21
+  * @author Kevin Lee
+  * @since 2018-10-21
   */
 final case class Dsv(values: List[Anh]) extends Ordered[Dsv] derives CanEqual {
   override def compare(that: Dsv): Int =
@@ -32,21 +28,17 @@ object Dsv extends Compat {
         case x :: xs =>
           if (x.isDigit) {
             chars match {
-              case Num(ns) =>
-                accumulate(xs, Num(ns :+ x), acc)
+              case Num(ns) => accumulate(xs, Num(ns :+ x), acc)
 
-              case _ =>
-                accumulate(xs, Num(x.toString), acc :+ chars)
+              case _ => accumulate(xs, Num(x.toString), acc :+ chars)
             }
           } else if (x == '-') {
             accumulate(xs, Hyphen, acc :+ chars)
           } else if (x.isUpper || x.isLower) {
             chars match {
-              case Alphabet(as) =>
-                accumulate(xs, Alphabet(as :+ x), acc)
+              case Alphabet(as) => accumulate(xs, Alphabet(as :+ x), acc)
 
-              case _ =>
-                accumulate(xs, Alphabet(x.toString), acc :+ chars)
+              case _ => accumulate(xs, Alphabet(x.toString), acc :+ chars)
             }
           } else {
             Left(
@@ -54,8 +46,7 @@ object Dsv extends Compat {
             )
           }
 
-        case Nil =>
-          Right(acc :+ chars)
+        case Nil => Right(acc :+ chars)
       }
 
     value.toList match {
@@ -74,8 +65,7 @@ object Dsv extends Compat {
 
         result.map(groups => Dsv(groups.toList))
 
-      case Nil =>
-        Left(ParseError.emptyAlphaNumHyphenError)
+      case Nil => Left(ParseError.emptyAlphaNumHyphenError)
     }
 
   }

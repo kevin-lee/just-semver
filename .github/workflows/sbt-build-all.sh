@@ -5,12 +5,13 @@ set -x
 if [ -z "$1" ]
   then
     echo "Missing parameters. Please enter the [Scala version]."
-    echo "sbt-build.sh 2.13.5"
+    echo "sbt-build-all.sh 2.13.5"
     exit 1
 else
   : ${CURRENT_BRANCH_NAME:?"CURRENT_BRANCH_NAME is missing."}
 
   scala_version=$1
+  sbt_params="$2"
   echo "============================================"
   echo "Build projects"
   echo "--------------------------------------------"
@@ -27,7 +28,7 @@ else
       -J-XX:MaxMetaspaceSize=1024m \
       -J-Xmx2048m \
       ++${scala_version}! \
-      -v \
+      -v "${sbt_params}" \
       clean \
       test \
       packagedArtifacts
@@ -38,7 +39,7 @@ else
       -J-XX:MaxMetaspaceSize=1024m \
       -J-Xmx2048m \
       ++${scala_version}! \
-      -v \
+      -v "${sbt_params}" \
       clean \
       test \
       package

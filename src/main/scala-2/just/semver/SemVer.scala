@@ -7,10 +7,8 @@ import just.semver.SemVer.{Major, Minor, Patch}
 
 import scala.util.matching.Regex
 
-/** @author
-  *   Kevin Lee
-  * @since
-  *   2018-10-21
+/** @author Kevin Lee
+  * @since 2018-10-21
   */
 final case class SemVer(
   major: Major,

@@ -43,8 +43,43 @@ jobs:
             -J-Xmx2048m \
             devOopsGitHubRelease
 
-  publish-gh-release-artifacts:
+  build:
     needs: github-release
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        scala:
+          - { name: "Scala 2",   version: "2.11.12", binary-version: "2.11", java-version: "adopt@1.8",  params: "" }
+          - { name: "Scala 2",   version: "2.12.13", binary-version: "2.12", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 2",   version: "2.13.3",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 3",   version: "3.0.0",   binary-version: "3",    java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 3.1", version: "3.1.0",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
+
+    steps:
+      - uses: actions/checkout@v2.3.4
+      - uses: olafurpg/setup-scala@v10
+        with:
+          java-version: ${{ matrix.scala.java-version }}
+
+      - name: Cache SBT
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.cache/coursier
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}
+
+      - name: "Build All for Scala ${{ matrix.scala.version }}"
+        run: |
+          java -version
+          .github/workflows/sbt-build-test.sh ${{ matrix.scala.version }} "${{ matrix.scala.params }}"
+
+  publish-gh-release-artifacts:
+    needs: build
 
     runs-on: ubuntu-latest
 
@@ -85,7 +120,6 @@ jobs:
             -J-Xmx2048m \
             -v \
             clean \
-            +test \
             +packagedArtifacts \
             ci-release \
             devOopsGitHubReleaseUploadArtifacts
