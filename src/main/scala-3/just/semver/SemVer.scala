@@ -1,6 +1,5 @@
 package just.semver
 
-import canequal.all.given
 import just.Common._
 
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
@@ -8,10 +7,8 @@ import just.semver.SemVer.{Major, Minor, Patch}
 
 import scala.util.matching.Regex
 
-/** @author
-  *   Kevin Lee
-  * @since
-  *   2018-10-21
+/** @author Kevin Lee
+  * @since 2018-10-21
   */
 final case class SemVer(
   major: Major,
@@ -19,7 +16,8 @@ final case class SemVer(
   patch: Patch,
   pre: Option[PreRelease],
   buildMetadata: Option[BuildMetaInfo]
-) extends Ordered[SemVer] derives CanEqual {
+) extends Ordered[SemVer]
+    derives CanEqual {
 
   override def compare(that: SemVer): Int = {
     (

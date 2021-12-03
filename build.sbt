@@ -37,11 +37,11 @@ lazy val justSemVer = (project in file("."))
           Seq.empty[File]
       ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
-    useAggressiveScalacOptions := true,
+//    useAggressiveScalacOptions := true,
     libraryDependencies :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(3), _, _) =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++ List(libs.canEqual) ++
+          libs.hedgehogLibs(props.hedgehogVersion) ++
             libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
         case x                =>
           libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
@@ -108,9 +108,7 @@ lazy val props =
         ProjectScalaVersion
       ).distinct
 
-    final val hedgehogVersion = "0.7.0"
-
-    final val canEqualVersion = "0.1.0"
+    final val hedgehogVersion = "0.8.0"
 
   }
 
@@ -122,8 +120,6 @@ lazy val libs =
       "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
       "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
     )
-
-    lazy val canEqual = "io.kevinlee" %% "can-equal" % props.canEqualVersion
 
   }
 
