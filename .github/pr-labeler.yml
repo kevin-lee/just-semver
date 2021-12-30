@@ -1,0 +1,4 @@
+dependencies: [ 'update/**', 'dependabot/**' ]
+documentation: [ 'docs/**' ]
+pr: '**'
+release: 'prepare-to-release'
