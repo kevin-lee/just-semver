@@ -79,6 +79,7 @@ lazy val justSemVer = (project in file("."))
     licenses                                := List("MIT" -> url("http://opensource.org/licenses/MIT")),
     console / initialCommands               := """import just.semver.SemVer""",
   )
+  .settings(mavenCentralPublishSettings)
 
 lazy val props =
   new {
