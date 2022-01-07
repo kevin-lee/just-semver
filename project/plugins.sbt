@@ -1,6 +1,6 @@
 logLevel := sbt.Level.Warn
 
-addSbtPlugin("com.geirsson"    % "sbt-ci-release"  % "1.5.7")
+addSbtPlugin("com.github.sbt"  % "sbt-ci-release"  % "1.5.10")
 addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.4.13")
 addSbtPlugin("org.scoverage"   % "sbt-scoverage"   % "1.9.2")
 addSbtPlugin("org.scoverage"   % "sbt-coveralls"   % "1.3.1")

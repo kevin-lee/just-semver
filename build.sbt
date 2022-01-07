@@ -4,9 +4,10 @@ import SemVer.Major
 import kevinlee.sbt.SbtCommon.crossVersionProps
 import org.scoverage.coveralls.Imports.CoverallsKeys._
 
-ThisBuild / scalaVersion := props.ProjectScalaVersion
-ThisBuild / organization := "io.kevinlee"
+ThisBuild / scalaVersion       := props.ProjectScalaVersion
+ThisBuild / organization       := "io.kevinlee"
 ThisBuild / crossScalaVersions := props.CrossScalaVersions
+
 ThisBuild / developers := List(
   Developer(
     "Kevin-Lee",
@@ -15,20 +16,22 @@ ThisBuild / developers := List(
     url("https://github.com/Kevin-Lee")
   )
 )
-ThisBuild / homepage := url("https://github.com/Kevin-Lee/just-semver").some
-ThisBuild / scmInfo :=
+ThisBuild / homepage   := url("https://github.com/Kevin-Lee/just-semver").some
+ThisBuild / scmInfo    :=
   ScmInfo(
     url("https://github.com/Kevin-Lee/just-semver"),
     "git@github.com:Kevin-Lee/just-semver.git"
   ).some
-ThisBuild / licenses := List("MIT" -> url("http://opensource.org/licenses/MIT"))
+ThisBuild / licenses   := List("MIT" -> url("http://opensource.org/licenses/MIT"))
+
+ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
-    name := "just-semver",
-    description := "Semantic Versioning (SemVer) for Scala",
-    Compile / unmanagedSourceDirectories := {
+    name                                    := "just-semver",
+    description                             := "Semantic Versioning (SemVer) for Scala",
+    Compile / unmanagedSourceDirectories    := {
       val sharedSourceDir = baseDirectory.value / "src/main"
       val moreSrcs        =
         if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
@@ -38,7 +41,7 @@ lazy val justSemVer = (project in file("."))
       ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
 //    useAggressiveScalacOptions := true,
-    libraryDependencies :=
+    libraryDependencies                     :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
         case (Major(3), _, _) =>
           libs.hedgehogLibs(props.hedgehogVersion) ++
@@ -46,7 +49,7 @@ lazy val justSemVer = (project in file("."))
         case x                =>
           libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
       },
-    libraryDependencies := (
+    libraryDependencies                     := (
       if (isScala3(scalaVersion.value)) {
         libraryDependencies
           .value
@@ -60,30 +63,30 @@ lazy val justSemVer = (project in file("."))
 //      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
     wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
     //      wartremoverErrors ++= Warts.all,
-    Compile / console / wartremoverErrors := List.empty,
+    Compile / console / wartremoverErrors   := List.empty,
     Compile / console / wartremoverWarnings := List.empty,
-    Compile / console / scalacOptions :=
+    Compile / console / scalacOptions       :=
       (console / scalacOptions)
         .value
         .filterNot(option => option.contains("wartremover") || option.contains("import")),
-    Test / console / wartremoverErrors := List.empty,
-    Test / console / wartremoverWarnings := List.empty,
-    Test / console / scalacOptions :=
+    Test / console / wartremoverErrors      := List.empty,
+    Test / console / wartremoverWarnings    := List.empty,
+    Test / console / scalacOptions          :=
       (console / scalacOptions)
         .value
         .filterNot(option => option.contains("wartremover") || option.contains("import")),
     /* } WartRemover and scalacOptions */
     testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
-    licenses := List("MIT" -> url("http://opensource.org/licenses/MIT")),
-    console / initialCommands := """import just.semver.SemVer""",
+    licenses                                := List("MIT" -> url("http://opensource.org/licenses/MIT")),
+    console / initialCommands               := """import just.semver.SemVer""",
     /* Coveralls { */
-    coverageHighlighting := (CrossVersion.partialVersion(scalaVersion.value) match {
+    coverageHighlighting                    := (CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 10)) =>
         false
       case _             =>
         true
     }),
-    coverallsTokenFile := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some
+    coverallsTokenFile                      := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some
     /* } Coveralls */
 
   )
@@ -108,6 +111,9 @@ lazy val props =
         ProjectScalaVersion
       ).distinct
 
+    val SonatypeCredentialHost = "s01.oss.sonatype.org"
+    val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
+
     final val hedgehogVersion = "0.8.0"
 
   }
@@ -124,3 +130,10 @@ lazy val libs =
   }
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
+
+lazy val mavenCentralPublishSettings: SettingsDefinition = List(
+  /* Publish to Maven Central { */
+  sonatypeCredentialHost := props.SonatypeCredentialHost,
+  sonatypeRepository     := props.SonatypeRepository,
+  /* } Publish to Maven Central */
+)
