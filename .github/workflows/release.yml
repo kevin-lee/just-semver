@@ -128,7 +128,7 @@ jobs:
             -J-Xmx2048m \
             devOopsGitHubRelease
 
-  publish-gh-release-artifacts:
+  publish:
     needs: github-release
     if: startsWith(github.ref, 'refs/tags/v')
 
@@ -173,8 +173,7 @@ jobs:
             -v \
             clean \
             +packagedArtifacts \
-            ci-release \
-            devOopsGitHubReleaseUploadArtifacts
+            ci-release
 
 #  publish-snapshot:
 #    needs: build
