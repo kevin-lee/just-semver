@@ -2,7 +2,6 @@ import ProjectInfo._
 import just.semver.SemVer
 import SemVer.Major
 import kevinlee.sbt.SbtCommon.crossVersionProps
-import org.scoverage.coveralls.Imports.CoverallsKeys._
 
 ThisBuild / scalaVersion       := props.ProjectScalaVersion
 ThisBuild / organization       := "io.kevinlee"
@@ -79,16 +78,6 @@ lazy val justSemVer = (project in file("."))
     testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
     licenses                                := List("MIT" -> url("http://opensource.org/licenses/MIT")),
     console / initialCommands               := """import just.semver.SemVer""",
-    /* Coveralls { */
-    coverageHighlighting                    := (CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 10)) =>
-        false
-      case _             =>
-        true
-    }),
-    coverallsTokenFile                      := s"""${Path.userHome.absolutePath}/.coveralls-credentials""".some
-    /* } Coveralls */
-
   )
 
 lazy val props =

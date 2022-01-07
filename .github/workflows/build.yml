@@ -120,7 +120,7 @@ jobs:
           echo "RUN_ID=${RUN_ID}"
           echo "RUN_NUMBER=${RUN_NUMBER}"
           export CI_BRANCH=$CURRENT_BRANCH_NAME
-          .github/workflows/sbt-build.sh 2.13.3
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.3
 
       - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
         if: github.event_name == 'pull_request'
@@ -138,4 +138,5 @@ jobs:
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
           .github/workflows/sbt-build-all-with-coverage.sh 2.13.3
 
-      - uses: codecov/codecov-action@v2
+      - if: github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v2

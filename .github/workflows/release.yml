@@ -75,7 +75,6 @@ jobs:
             ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}-
 
       - name: "[Codecov] Report ${{ matrix.scala.name }} ${{ matrix.scala.version }} - ${{ github.run_number }}"
-        if: ${{ matrix.scala.report == 'report' }}
         env:
           CURRENT_BRANCH_NAME: ${{ github.ref }}
           RUN_ID: ${{ github.run_id }}
