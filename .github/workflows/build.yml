@@ -136,4 +136,6 @@ jobs:
           echo "RUN_NUMBER=${RUN_NUMBER}"
           echo "PR #${PR_NUMBER}"
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
-          .github/workflows/sbt-build.sh 2.13.3
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.3
+
+      - uses: codecov/codecov-action@v2
