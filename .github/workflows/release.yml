@@ -2,49 +2,18 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - '*'
 
 env:
   GH_JAVA_VERSION: "adopt@1.11"
+  GH_JVM_OPTS: "-Xss64m -Xms1024m -XX:MaxMetaspaceSize=1G -Xmx2G -XX:MaxInlineLevel=18 -XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler"
 
 jobs:
-  github-release:
-
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2.4.0
-      - uses: olafurpg/setup-scala@v13
-        with:
-          java-version: ${{ env.GH_JAVA_VERSION }}
-
-      - name: Cache SBT
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.ivy2/cache
-            ~/.cache/coursier
-            ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-sbt
-
-      - name: sbt GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
-        run: |
-          echo "Run] sbt GitHub release"
-          export SOURCE_DATE_EPOCH=$(date +%s)
-          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-          echo "====================="
-          echo 'sbt -J-Xmx2048m devOopsGitHubRelease'
-          sbt \
-            -J-XX:MaxMetaspaceSize=1024m \
-            -J-Xmx2048m \
-            devOopsGitHubRelease
 
   build:
-    needs: github-release
     runs-on: ubuntu-latest
 
     strategy:
@@ -74,12 +43,94 @@ jobs:
             ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}
 
       - name: "Build All for Scala ${{ matrix.scala.version }}"
+        env:
+          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           java -version
           .github/workflows/sbt-build-test.sh ${{ matrix.scala.version }} "${{ matrix.scala.params }}"
 
-  publish-gh-release-artifacts:
+  test_report:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        scala:
+          - { name: "Scala 2", version: "2.13.5", binary-version: "2.13", java-version: "adopt@1.11" }
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: olafurpg/setup-scala@v13
+        with:
+          java-version: ${{ matrix.scala.java-version }}
+
+      - name: Cache SBT
+        uses: actions/cache@v2.1.7
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.cache/coursier
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt-${{ matrix.scala.binary-version }}-
+
+      - name: "[Codecov] Report ${{ matrix.scala.name }} ${{ matrix.scala.version }} - ${{ github.run_number }}"
+        if: ${{ matrix.scala.report == 'report' }}
+        env:
+          CURRENT_BRANCH_NAME: ${{ github.ref }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_NUMBER: ${{ github.run_number }}
+          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+        run: |
+          echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+          export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
+          echo " [AFTER]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
+          echo "RUN_ID=${RUN_ID}"
+          echo "RUN_NUMBER=${RUN_NUMBER}"
+          .github/workflows/sbt-build-all-with-coverage.sh ${{ matrix.scala.version }}
+
+      - uses: codecov/codecov-action@v2
+
+  github-release:
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - uses: olafurpg/setup-scala@v13
+        with:
+          java-version: ${{ env.GH_JAVA_VERSION }}
+
+      - name: Cache SBT
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.cache/coursier
+            ~/.sbt
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-sbt
+
+      - name: sbt GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
+          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+        run: |
+          echo "Run] sbt GitHub release"
+          export SOURCE_DATE_EPOCH=$(date +%s)
+          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+          echo "====================="
+          echo 'sbt -J-Xmx2048m devOopsGitHubRelease'
+          sbt \
+            -J-XX:MaxMetaspaceSize=1024m \
+            -J-Xmx2048m \
+            devOopsGitHubRelease
+
+  publish-gh-release-artifacts:
+    needs: github-release
+    if: startsWith(github.ref, 'refs/tags/v')
 
     runs-on: ubuntu-latest
 
@@ -110,6 +161,7 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
+          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "Run] sbt ci-release"
           export SOURCE_DATE_EPOCH=$(date +%s)
@@ -123,3 +175,50 @@ jobs:
             +packagedArtifacts \
             ci-release \
             devOopsGitHubReleaseUploadArtifacts
+
+#  publish-snapshot:
+#    needs: build
+#    if: startsWith(github.ref, 'refs/heads/')
+#
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2.4.0
+#        with:
+#          fetch-depth: 0
+#      - uses: olafurpg/setup-scala@v13
+#        with:
+#          java-version: ${{ env.GH_JAVA_VERSION }}
+#      - uses: olafurpg/setup-gpg@v3
+#
+#      - name: Cache SBT
+#        uses: actions/cache@v2.1.7
+#        with:
+#          path: |
+#            ~/.ivy2/cache
+#            ~/.cache/coursier
+#            ~/.sbt
+#          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
+#          restore-keys: |
+#            ${{ runner.os }}-sbt
+#
+#      - name: "sbt ci-release (no tag) - ${{ github.run_number }}"
+#        if: startsWith(github.ref, 'refs/heads/')
+#        env:
+#          PGP_PASSPHRASE: ${{ secrets.PGP_PASSPHRASE }}
+#          PGP_SECRET: ${{ secrets.PGP_SECRET }}
+#          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
+#          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
+#          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+#        run: |
+#          echo "Run] sbt ci-release"
+#          export SOURCE_DATE_EPOCH=$(date +%s)
+#          echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
+#          echo "JVM_OPTS=${JVM_OPTS}"
+#          echo "SBT_OPTS=${SBT_OPTS}"
+#          echo 'sbt -v clean +packagedArtifacts ci-release'
+#          sbt \
+#            -v \
+#            clean \
+#            +packagedArtifacts \
+#            ci-release
