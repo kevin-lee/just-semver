@@ -32,8 +32,7 @@ else
     sbt \
       -J-XX:MaxMetaspaceSize=1024m \
       -J-Xmx2048m \
-      ++${scala_version}! \
-      coveralls
+      ++${scala_version}!
     sbt \
       -J-XX:MaxMetaspaceSize=1024m \
       -J-Xmx2048m \
@@ -54,8 +53,7 @@ else
     sbt \
       -J-XX:MaxMetaspaceSize=1024m \
       -J-Xmx2048m \
-      ++${scala_version}! \
-      coveralls
+      ++${scala_version}!
   fi
 
   echo "============================================"
