@@ -22,7 +22,7 @@ jobs:
           - { name: "Scala 3.1", version: "3.1.0",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ matrix.scala.java-version }}
@@ -65,7 +65,7 @@ jobs:
       GH_JAVA_VERSION: "adopt@1.11"
 
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
       - uses: olafurpg/setup-scala@v13
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
@@ -93,7 +93,7 @@ jobs:
   build_with_test_coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v3
 
       - name: Cache Coursier
         uses: actions/cache@v3
