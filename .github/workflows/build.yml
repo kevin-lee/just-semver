@@ -28,7 +28,7 @@ jobs:
           java-version: ${{ matrix.scala.java-version }}
 
       - name: Cache SBT
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.ivy2/cache
@@ -71,7 +71,7 @@ jobs:
           java-version: ${{ env.GH_JAVA_VERSION }}
 
       - name: Cache SBT
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.ivy2/cache
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@v2.4.0
 
       - name: Cache Coursier
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.cache/coursier
           key: ${{ runner.os }}-coursier-scala-2_13-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
@@ -104,7 +104,7 @@ jobs:
             ${{ runner.os }}-coursier-scala-2_13-
 
       - name: Cache Ivy
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.ivy2/cache
           key: ${{ runner.os }}-ivy-scala-2_13-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
