@@ -41,7 +41,7 @@ object Common {
             -1
           case (_ +: _, Seq()) =>
             1
-          case (Seq(), Seq())  =>
+          case (Seq(), Seq()) =>
             0
         }
       compareElems0(x, y)

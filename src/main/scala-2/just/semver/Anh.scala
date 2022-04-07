@@ -45,8 +45,8 @@ sealed trait Anh extends Ordered[Anh] {
 object Anh {
 
   final case class Alphabet(value: String) extends Anh
-  final case class Num(value: String)      extends Anh
-  case object Hyphen                       extends Anh
+  final case class Num(value: String) extends Anh
+  case object Hyphen extends Anh
 
   def alphabet(value: String): Anh =
     Alphabet(value)
@@ -68,11 +68,11 @@ object Anh {
   }
 
   def render(alphaNumHyphen: Anh): String = alphaNumHyphen match {
-    case Num(value)      =>
+    case Num(value) =>
       value
     case Alphabet(value) =>
       value
-    case Hyphen          =>
+    case Hyphen =>
       "-"
   }
 
