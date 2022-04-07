@@ -29,14 +29,14 @@ object AnhSpec extends Properties {
   }
 
   def testNumLess: Property = for {
-    minMax      <- Gens.genMinMaxNum.log("(num1, num2)")
+    minMax <- Gens.genMinMaxNum.log("(num1, num2)")
     (num1, num2) = minMax
   } yield {
     num1.compare(num2) ==== -1
   }
 
   def testNumMore: Property = for {
-    minMax      <- Gens.genMinMaxNum.log("(num1, num2)")
+    minMax <- Gens.genMinMaxNum.log("(num1, num2)")
     (num1, num2) = minMax
   } yield {
     num2.compare(num1) ==== 1
@@ -50,14 +50,14 @@ object AnhSpec extends Properties {
   }
 
   def testAlphaHyphenLess: Property = for {
-    alphaHyphenPair             <- Gens.genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
+    alphaHyphenPair <- Gens.genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
     (alphaHyphen1, alphaHyphen2) = alphaHyphenPair
   } yield {
     Result.assert(alphaHyphen1.compare(alphaHyphen2) < 0)
   }
 
   def testAlphaHyphenMore: Property = for {
-    alphaHyphenPair             <- Gens.genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
+    alphaHyphenPair <- Gens.genMinMaxAlphabet(10).log("(alphaHyphen1, alphaHyphen2)")
     (alphaHyphen1, alphaHyphen2) = alphaHyphenPair
   } yield {
     Result.assert(alphaHyphen2.compare(alphaHyphen1) > 0)
@@ -70,9 +70,9 @@ object AnhSpec extends Properties {
       anh match {
         case Anh.Alphabet(value) =>
           value
-        case Anh.Num(value)      =>
+        case Anh.Num(value) =>
           value
-        case Anh.Hyphen          =>
+        case Anh.Hyphen =>
           "-"
       }
     val actual           = Anh.render(anh)

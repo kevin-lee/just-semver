@@ -8,11 +8,11 @@ sealed trait ParseError
 object ParseError {
 
   final case class InvalidAlphaNumHyphenError(c: Char, rest: List[Char]) extends ParseError
-  case object EmptyAlphaNumHyphenError                                   extends ParseError
+  case object EmptyAlphaNumHyphenError extends ParseError
 
   final case class LeadingZeroNumError(n: String) extends ParseError
 
-  final case class PreReleaseParseError(parseError: ParseError)    extends ParseError
+  final case class PreReleaseParseError(parseError: ParseError) extends ParseError
   final case class BuildMetadataParseError(parseError: ParseError) extends ParseError
 
   final case class CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError) extends ParseError

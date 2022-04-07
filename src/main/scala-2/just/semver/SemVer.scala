@@ -24,7 +24,7 @@ final case class SemVer(
       this.minor.minor.compareTo(that.minor.minor),
       this.patch.patch.compareTo(that.patch.patch)
     ) match {
-      case (0, 0, 0)  =>
+      case (0, 0, 0) =>
         (this.pre, that.pre) match {
           case (Some(thisPre), Some(thatPre)) =>
             thisPre.identifier.compareElems(thatPre.identifier)
@@ -33,7 +33,7 @@ final case class SemVer(
             -1
           case (None, Some(_)) =>
             1
-          case (None, None)    =>
+          case (None, None) =>
             0
         }
       case (0, 0, pt) =>
@@ -76,11 +76,11 @@ object SemVer {
         (pre, buildMetadata) match {
           case (Some(p), Some(m)) =>
             s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
-          case (Some(p), None)    =>
+          case (Some(p), None) =>
             s"-${PreRelease.render(p)}"
-          case (None, Some(m))    =>
+          case (None, Some(m)) =>
             s"+${BuildMetaInfo.render(m)}"
-          case (None, None)       =>
+          case (None, None) =>
             ""
         }
       versionString + additionalInfoString
@@ -90,7 +90,7 @@ object SemVer {
     parse(version) match {
       case Right(semVer) =>
         semVer
-      case Left(error)   =>
+      case Left(error) =>
         sys.error(ParseError.render(error))
     }
 
@@ -101,11 +101,11 @@ object SemVer {
       (preRelease, metaInfo) match {
         case (Left(preError), Left(metaError)) =>
           Left(ParseError.combine(preError, metaError))
-        case (Left(preError), _)               =>
+        case (Left(preError), _) =>
           Left(ParseError.preReleaseParseError(preError))
-        case (_, Left(metaError))              =>
+        case (_, Left(metaError)) =>
           Left(ParseError.buildMetadataParseError(metaError))
-        case (Right(preR), Right(metaI))       =>
+        case (Right(preR), Right(metaI)) =>
           Right(
             SemVer(
               Major(major.toInt),

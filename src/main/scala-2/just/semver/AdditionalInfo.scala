@@ -36,7 +36,7 @@ object AdditionalInfo extends Compat {
             Right(a)
           else
             Left(ParseError.leadingZeroNumError(n))
-        case a @ Dsv(_)             =>
+        case a @ Dsv(_) =>
           Right(a)
       }
     ).map(_.map(PreRelease.apply))
@@ -55,19 +55,19 @@ object AdditionalInfo extends Compat {
         case Some(preRelease) =>
           preRelease.foldRight(List.empty[Dsv].asRight[ParseError]) { (x, acc) =>
             x.flatMap(validator) match {
-              case Right(alp)  =>
+              case Right(alp) =>
                 acc.map(alps => alp :: alps)
               case Left(error) =>
                 error.asLeft[List[Dsv]]
             }
           }
-        case None             =>
+        case None =>
           List.empty[Dsv].asRight[ParseError]
       }
     alphaNumHyphens.map {
       case Nil =>
         none[List[Dsv]]
-      case xs  =>
+      case xs =>
         xs.some
     }
   }

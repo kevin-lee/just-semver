@@ -65,11 +65,11 @@ object Anh {
 
   extension (anh: Anh) {
     def render: String = anh match {
-      case Num(value)      =>
+      case Num(value) =>
         value
       case Alphabet(value) =>
         value
-      case Hyphen          =>
+      case Hyphen =>
         "-"
     }
   }
