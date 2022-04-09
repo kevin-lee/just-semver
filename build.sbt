@@ -92,7 +92,7 @@ lazy val props =
           m.name == "mdoc"
 
     final val ProjectScalaVersion: String     = "3.0.0"
-    // final val ProjectScalaVersion: String     = "2.13.3"
+//     final val ProjectScalaVersion: String     = "2.13.3"
     final val CrossScalaVersions: Seq[String] =
       Seq(
         "2.11.12",

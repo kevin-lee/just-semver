@@ -1,12 +1,12 @@
 package just.semver
 
 import Anh.{alphabet, hyphen, num, numFromStringUnsafe}
-
 import hedgehog._
 import hedgehog.runner._
-
 import just.Common._
 import just.semver.SemVer.{Major, Minor, Patch}
+import just.semver.expr.ComparisonOperator
+import just.semver.matcher.{SemVerComparison, SemVerMatcher, SemVerMatchers, Gens => MatcherGens}
 
 /** @author
   *   Kevin Lee
@@ -107,6 +107,130 @@ object SemVerSpec extends Properties {
     property(
       "SemVer.majorMinorPatch(semVer) should return (SemVer.Major, SemVer.Minor, SemVer.Patch)",
       testSemVerMajorMinorPatch
+    ),
+    property("test Isomorphism: parse <=> render", testIsomorphismParseRender),
+    property("test Isomorphism: parseUnsafe <=> render", testIsomorphismParseUnsafeRender)
+  ) ++ List(
+    example(
+      "test  Example-1 SemVer(1.0.0).matches(SemVerMatchers(1.0.0 - 2.0.0)) should return true",
+      MatchesSpec.testExample1
+    ),
+    example(
+      "test  Example-2 SemVer(2.0.0).matches(SemVerMatchers(1.0.0 - 2.0.0)) should return true",
+      MatchesSpec.testExample2
+    ),
+    example(
+      "test  Example-3 SemVer(1.0.1).matches(SemVerMatchers(1.0.0 - 2.0.0)) should return true",
+      MatchesSpec.testExample3
+    ),
+    example(
+      "test  Example-4 SemVer(1.999.999).matches(SemVerMatchers(1.0.0 - 2.0.0)) should return true",
+      MatchesSpec.testExample4
+    ),
+    example(
+      "test  Example-5 SemVer(1.0.0).matches(SemVerMatchers(>1.0.0 <2.0.0)) should return false",
+      MatchesSpec.testExample5
+    ),
+    example(
+      "test  Example-6 SemVer(2.0.0).matches(SemVerMatchers(>1.0.0 <2.0.0)) should return false",
+      MatchesSpec.testExample6
+    ),
+    example(
+      "test  Example-7 SemVer(1.0.1).matches(SemVerMatchers(>1.0.0 <2.0.0)) should return true",
+      MatchesSpec.testExample7
+    ),
+    example(
+      "test  Example-8 SemVer(1.999.999).matches(SemVerMatchers(>1.0.0 <2.0.0)) should return true",
+      MatchesSpec.testExample8
+    ),
+    example(
+      "test  Example-9 SemVer(1.0.0).matches(SemVerMatchers(>=1.0.0 <=2.0.0)) should return true",
+      MatchesSpec.testExample5
+    ),
+    example(
+      "test Example-10 SemVer(2.0.0).matches(SemVerMatchers(>=1.0.0 <=2.0.0)) should return true",
+      MatchesSpec.testExample6
+    ),
+    example(
+      "test Example-11 SemVer(1.0.1).matches(SemVerMatchers(>=1.0.0 <=2.0.0)) should return true",
+      MatchesSpec.testExample7
+    ),
+    example(
+      "test Example-12 SemVer(1.999.999).matches(SemVerMatchers(>=1.0.0 <=2.0.0)) should return true",
+      MatchesSpec.testExample8
+    ),
+    property(
+      "test SemVer(Valid).matches(SemVerMatchers(Range || Comparison))",
+      MatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparison
+    ),
+    property(
+      "test SemVer(Valid).matches(SemVerMatchers(Comparison and Comparison))",
+      MatchesSpec.testSemVerValidMatchesSemVerMatchersComparisonAndComparison
+    ),
+    property(
+      "test SemVer.matches(SemVerMatchers(Range || Comparison and Comparison))",
+      MatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison
+    )
+  ) ++ List(
+    example(
+      "test  Example-1 SemVer(1.0.0).unsafeMatches(1.0.0 - 2.0.0) should return true",
+      UnsafeMatchesSpec.testExample1
+    ),
+    example(
+      "test  Example-2 SemVer(2.0.0).unsafeMatches(1.0.0 - 2.0.0) should return true",
+      UnsafeMatchesSpec.testExample2
+    ),
+    example(
+      "test  Example-3 SemVer(1.0.1).unsafeMatches(1.0.0 - 2.0.0) should return true",
+      UnsafeMatchesSpec.testExample3
+    ),
+    example(
+      "test  Example-4 SemVer(1.999.999).unsafeMatches(1.0.0 - 2.0.0) should return true",
+      UnsafeMatchesSpec.testExample4
+    ),
+    example(
+      "test  Example-5 SemVer(1.0.0).unsafeMatches(>1.0.0 <2.0.0) should return false",
+      UnsafeMatchesSpec.testExample5
+    ),
+    example(
+      "test  Example-6 SemVer(2.0.0).unsafeMatches(>1.0.0 <2.0.0) should return false",
+      UnsafeMatchesSpec.testExample6
+    ),
+    example(
+      "test  Example-7 SemVer(1.0.1).unsafeMatches(>1.0.0 <2.0.0) should return true",
+      UnsafeMatchesSpec.testExample7
+    ),
+    example(
+      "test  Example-8 SemVer(1.999.999).unsafeMatches(>1.0.0 <2.0.0) should return true",
+      UnsafeMatchesSpec.testExample8
+    ),
+    example(
+      "test  Example-9 SemVer(1.0.0).unsafeMatches(>=1.0.0 <=2.0.0) should return true",
+      UnsafeMatchesSpec.testExample5
+    ),
+    example(
+      "test Example-10 SemVer(2.0.0).unsafeMatches(>=1.0.0 <=2.0.0) should return true",
+      UnsafeMatchesSpec.testExample6
+    ),
+    example(
+      "test Example-11 SemVer(1.0.1).unsafeMatches(>=1.0.0 <=2.0.0) should return true",
+      UnsafeMatchesSpec.testExample7
+    ),
+    example(
+      "test Example-12 SemVer(1.999.999).unsafeMatches(>=1.0.0 <=2.0.0) should return true",
+      UnsafeMatchesSpec.testExample8
+    ),
+    property(
+      "test SemVer(Valid).unsafeMatches(Range || Comparison)",
+      UnsafeMatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparison
+    ),
+    property(
+      "test SemVer(Valid).unsafeMatches(Comparison and Comparison)",
+      UnsafeMatchesSpec.testSemVerValidMatchesSemVerMatchersComparisonAndComparison
+    ),
+    property(
+      "test SemVer.unsafeMatches(Range || Comparison and Comparison)",
+      UnsafeMatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison
     )
   )
 
@@ -705,6 +829,539 @@ object SemVerSpec extends Properties {
     val expected = (semVer.major, semVer.minor, semVer.patch)
     val actual   = SemVer.majorMinorPatch(semVer)
     actual ==== expected
+  }
+
+  def testIsomorphismParseRender: Property = for {
+    semVer <- Gens.genSemVer.log("semVer")
+  } yield {
+    val input = semVer.render
+    SemVer.parse(input) match {
+      case Right(actual) =>
+        val expected = semVer
+        actual ==== expected
+
+      case Left(err) =>
+        Result.failure.log(s"SemVer.parse failed with error: ${err.render}")
+    }
+  }
+
+  def testIsomorphismParseUnsafeRender: Property = for {
+    semVer <- Gens.genSemVer.log("semVer")
+  } yield {
+    val input    = semVer.render
+    val actual   = SemVer.parseUnsafe(input)
+    val expected = semVer
+    actual ==== expected
+  }
+
+  object MatchesSpec {
+
+    def testExample1: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.0").matches(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0")))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample2: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("2.0.0").matches(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0")))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample3: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").matches(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0")))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample4: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").matches(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0")))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.999.999) failed")
+    }
+
+    def testExample5: Result = {
+      Result
+        .diff(SemVer.parseUnsafe("1.0.0").matches(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0")), false)(_ === _)
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample6: Result = {
+      Result
+        .diff(SemVer.parseUnsafe("2.0.0").matches(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0")), false)(_ === _)
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample7: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").matches(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0")))
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample8: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").matches(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0")))
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.999.999) failed")
+    }
+
+    def testExample9: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.0").matches(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0")))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample10: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("2.0.0").matches(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0")))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample11: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").matches(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0")))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample12: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").matches(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0")))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.999.999) failed")
+    }
+
+    def testSemVerValidMatchesSemVerMatchersRangeOrComparison: Property = for {
+      major  <- Gen.int(Range.linear(5, 10)).log("major")
+      minor  <- Gen.int(Range.linear(1, 10)).log("minor")
+      patch  <- Gen.int(Range.linear(1, 100)).log("patch")
+      major2 <- Gen.int(Range.linear(5, 10)).map(_ + major).log("major2")
+      minor2 <- Gen.int(Range.linear(1, 10)).map(_ + minor).log("minor2")
+      patch2 <- Gen.int(Range.linear(1, 100)).map(_ + patch).log("patch2")
+      op     <- MatcherGens.genComparisonOperator.log("op")
+    } yield {
+      val semVer = SemVer.semVer(SemVer.Major(major), SemVer.Minor(minor), SemVer.Patch(patch))
+
+      val v1       = SemVer.semVer(SemVer.Major(major - 1), SemVer.Minor(minor - 1), SemVer.Patch(patch - 1))
+      val v2       = SemVer.semVer(SemVer.Major(major + 1), SemVer.Minor(minor + 1), SemVer.Patch(patch + 1))
+      val matcher1 = SemVerMatcher.range(v1, v2)
+
+      val semVer2  = SemVer.semVer(SemVer.Major(major2), SemVer.Minor(minor2), SemVer.Patch(patch2))
+      val matcher2 = SemVerMatcher.comparison(SemVerComparison(op, semVer2))
+
+      // format: off
+      val versions = op match {
+        case ComparisonOperator.Lt =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1))
+          )
+        case ComparisonOperator.Le =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(    patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(    patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1)),
+            semVer2.copy()
+          )
+        case ComparisonOperator.Eql =>
+          List(
+            semVer2.copy()
+          )
+        case ComparisonOperator.Ne =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1))
+          )
+        case ComparisonOperator.Gt =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1))
+          )
+        case ComparisonOperator.Ge =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1)),
+            semVer2.copy()
+          )
+      }
+      // format: on
+
+      val semVerMatchers = SemVerMatchers.unsafeParse(s"${matcher1.render} || ${matcher2.render}")
+
+      println(
+        s"""# Range || Comparison:
+           |- matchers: ${semVerMatchers.render}
+           |-   semVer: ${semVer.render}
+           |-  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(semVer.matches(semVerMatchers))
+            .log(
+              s""" Range || Comparison - range test failed
+                 |> matchers: ${semVerMatchers.render}
+                 |>   semVer: ${semVer.render}
+                 |""".stripMargin
+            ),
+          Result
+            .assert(versions.forall(v => v.matches(semVerMatchers)))
+            .log(
+              s""" Range || Comparison - comparison test failed
+                 |> matchers: ${semVerMatchers.render}
+                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+                 |""".stripMargin
+            )
+        )
+      )
+    }
+
+    def testSemVerValidMatchesSemVerMatchersComparisonAndComparison: Property = for {
+      v1V2SemVer <- MatcherGens
+                      .genRangedSemVerComparison(
+                        Range.linear(11, 30),
+                        Range.linear(11, 50),
+                        Range.linear(11, 100)
+                      )
+                      .log("(v1, v2, semVer)")
+      (v1, v2, semVer) = v1V2SemVer
+    } yield {
+      val semVerMatchers = SemVerMatchers.unsafeParse(s"${v1.render} ${v2.render}")
+
+      println(
+        s"""# Comparison and Comparison
+           |- matchers: ${semVerMatchers.render}
+           |-   semVer: ${semVer.render}
+           |""".stripMargin
+      )
+
+      Result
+        .assert(semVer.matches(semVerMatchers))
+        .log(
+          s""" Comparison and Comparison - failed
+             |> matchers: ${semVerMatchers.render}
+             |>   semVer: ${semVer.render}
+             |""".stripMargin
+        )
+    }
+
+    def testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison: Property = for {
+      rangeMatcherSemVerInRange <- MatcherGens
+                                     .genSemVerMatcherRangeAndSemverInRange(
+                                       majorRange = Range.linear(11, 30),
+                                       minorRange = Range.linear(11, 50),
+                                       patchRange = Range.linear(11, 100)
+                                     )
+                                     .log("(rangeMatcher, semVerInRange)")
+      (rangeMatcher, semVerInRange) = rangeMatcherSemVerInRange
+      v1V2SemVer <- MatcherGens
+                      .genRangedSemVerComparison(
+                        majorRange = Range.linear(31, 100),
+                        minorRange = Range.linear(51, 100),
+                        patchRange = Range.linear(101, 1000)
+                      )
+                      .log("(v1, v2, semVer)")
+      (v1, v2, semVer) = v1V2SemVer
+    } yield {
+      val semVerMatchers = SemVerMatchers.unsafeParse(s"${rangeMatcher.render} || ${v1.render} ${v2.render}")
+
+      println(
+        s"""# Range || Comparison and Comparison
+           |-      matchers: ${semVerMatchers.render}
+           |- semVerInRange: ${semVerInRange.render}
+           |-  semVerInComp: ${semVer.render}
+           |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(semVerInRange.matches(semVerMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing range failed
+                 |>      matchers: ${semVerMatchers.render}
+                 |> semVerInRange: ${semVerInRange.render}
+                 |""".stripMargin
+            ),
+          Result
+            .assert(semVer.matches(semVerMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing (comparison and comparison) failed
+                 |>     matchers: ${semVerMatchers.render}
+                 |> semVerInComp: ${semVer.render}
+                 |""".stripMargin
+            )
+        )
+      )
+    }
+
+  }
+
+  object UnsafeMatchesSpec {
+
+    def testExample1: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.0").unsafeMatches("1.0.0 - 2.0.0"))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample2: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("2.0.0").unsafeMatches("1.0.0 - 2.0.0"))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample3: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").unsafeMatches("1.0.0 - 2.0.0"))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample4: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").unsafeMatches("1.0.0 - 2.0.0"))
+        .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.999.999) failed")
+    }
+
+    def testExample5: Result = {
+      Result
+        .diff(SemVer.parseUnsafe("1.0.0").unsafeMatches(">1.0.0 <2.0.0"), false)(_ === _)
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample6: Result = {
+      Result
+        .diff(SemVer.parseUnsafe("2.0.0").unsafeMatches(">1.0.0 <2.0.0"), false)(_ === _)
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample7: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").unsafeMatches(">1.0.0 <2.0.0"))
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample8: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").unsafeMatches(">1.0.0 <2.0.0"))
+        .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.999.999) failed")
+    }
+
+    def testExample9: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.0").unsafeMatches(">=1.0.0 <=2.0.0"))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.0) failed")
+    }
+
+    def testExample10: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("2.0.0").unsafeMatches(">=1.0.0 <=2.0.0"))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(2.0.0) failed")
+    }
+
+    def testExample11: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.0.1").unsafeMatches(">=1.0.0 <=2.0.0"))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.1) failed")
+    }
+
+    def testExample12: Result = {
+      Result
+        .assert(SemVer.parseUnsafe("1.999.999").unsafeMatches(">=1.0.0 <=2.0.0"))
+        .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.999.999) failed")
+    }
+
+    def testSemVerValidMatchesSemVerMatchersRangeOrComparison: Property = for {
+      major  <- Gen.int(Range.linear(5, 10)).log("major")
+      minor  <- Gen.int(Range.linear(1, 10)).log("minor")
+      patch  <- Gen.int(Range.linear(1, 100)).log("patch")
+      major2 <- Gen.int(Range.linear(5, 10)).map(_ + major).log("major2")
+      minor2 <- Gen.int(Range.linear(1, 10)).map(_ + minor).log("minor2")
+      patch2 <- Gen.int(Range.linear(1, 100)).map(_ + patch).log("patch2")
+      op     <- MatcherGens.genComparisonOperator.log("op")
+    } yield {
+      val semVer = SemVer.semVer(SemVer.Major(major), SemVer.Minor(minor), SemVer.Patch(patch))
+
+      val v1       = SemVer.semVer(SemVer.Major(major - 1), SemVer.Minor(minor - 1), SemVer.Patch(patch - 1))
+      val v2       = SemVer.semVer(SemVer.Major(major + 1), SemVer.Minor(minor + 1), SemVer.Patch(patch + 1))
+      val matcher1 = SemVerMatcher.range(v1, v2)
+
+      val semVer2  = SemVer.semVer(SemVer.Major(major2), SemVer.Minor(minor2), SemVer.Patch(patch2))
+      val matcher2 = SemVerMatcher.comparison(SemVerComparison(op, semVer2))
+
+      // format: off
+      val versions = op match {
+        case ComparisonOperator.Lt =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1))
+          )
+        case ComparisonOperator.Le =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(    patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(    patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1)),
+            semVer2.copy()
+          )
+        case ComparisonOperator.Eql =>
+          List(
+            semVer2.copy()
+          )
+        case ComparisonOperator.Ne =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 - 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 - 1), SemVer.Minor(minor2 - 1), SemVer.Patch(patch2 - 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1))
+          )
+        case ComparisonOperator.Gt =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1))
+          )
+        case ComparisonOperator.Ge =>
+          List(
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2),     SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2 + 1), SemVer.Patch(patch2)),
+            SemVer.semVer(SemVer.Major(major2),     SemVer.Minor(minor2),     SemVer.Patch(patch2 + 1)),
+            SemVer.semVer(SemVer.Major(major2 + 1), SemVer.Minor(minor2 + 1), SemVer.Patch(patch2 + 1)),
+            semVer2.copy()
+          )
+      }
+      // format: on
+
+      val semVerMatchers = s"${matcher1.render} || ${matcher2.render}"
+
+      println(
+        s"""# Range || Comparison:
+           |- matchers: ${semVerMatchers}
+           |-   semVer: ${semVer.render}
+           |-  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(semVer.unsafeMatches(semVerMatchers))
+            .log(
+              s""" Range || Comparison - range test failed
+                 |> matchers: $semVerMatchers
+                 |>   semVer: ${semVer.render}
+                 |""".stripMargin
+            ),
+          Result
+            .assert(versions.forall(v => v.unsafeMatches(semVerMatchers)))
+            .log(
+              s""" Range || Comparison - comparison test failed
+                 |> matchers: $semVerMatchers
+                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+                 |""".stripMargin
+            )
+        )
+      )
+    }
+
+    def testSemVerValidMatchesSemVerMatchersComparisonAndComparison: Property = for {
+      v1V2SemVer <- MatcherGens
+                      .genRangedSemVerComparison(
+                        Range.linear(11, 30),
+                        Range.linear(11, 50),
+                        Range.linear(11, 100)
+                      )
+                      .log("(v1, v2, semVer)")
+      (v1, v2, semVer) = v1V2SemVer
+    } yield {
+      val semVerMatchers = s"${v1.render} ${v2.render}"
+
+      println(
+        s"""# Comparison and Comparison
+           |- matchers: $semVerMatchers
+           |-   semVer: ${semVer.render}
+           |""".stripMargin
+      )
+
+      Result
+        .assert(semVer.unsafeMatches(semVerMatchers))
+        .log(
+          s""" Comparison and Comparison - failed
+             |> matchers: ${semVerMatchers}
+             |>   semVer: ${semVer.render}
+             |""".stripMargin
+        )
+    }
+
+    def testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison: Property = for {
+      rangeMatcherSemVerInRange <- MatcherGens
+                                     .genSemVerMatcherRangeAndSemverInRange(
+                                       majorRange = Range.linear(11, 30),
+                                       minorRange = Range.linear(11, 50),
+                                       patchRange = Range.linear(11, 100)
+                                     )
+                                     .log("(rangeMatcher, semVerInRange)")
+      (rangeMatcher, semVerInRange) = rangeMatcherSemVerInRange
+      v1V2SemVer <- MatcherGens
+                      .genRangedSemVerComparison(
+                        majorRange = Range.linear(31, 100),
+                        minorRange = Range.linear(51, 100),
+                        patchRange = Range.linear(101, 1000)
+                      )
+                      .log("(v1, v2, semVer)")
+      (v1, v2, semVer) = v1V2SemVer
+    } yield {
+      val semVerMatchers = s"${rangeMatcher.render} || ${v1.render} ${v2.render}"
+
+      println(
+        s"""# Range || Comparison and Comparison
+           |-      matchers: $semVerMatchers
+           |- semVerInRange: ${semVerInRange.render}
+           |-  semVerInComp: ${semVer.render}
+           |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(semVerInRange.unsafeMatches(semVerMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing range failed
+                 |>      matchers: $semVerMatchers
+                 |> semVerInRange: ${semVerInRange.render}
+                 |""".stripMargin
+            ),
+          Result
+            .assert(semVer.unsafeMatches(semVerMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing (comparison and comparison) failed
+                 |>     matchers: $semVerMatchers
+                 |> semVerInComp: ${semVer.render}
+                 |""".stripMargin
+            )
+        )
+      )
+    }
+
   }
 
 }

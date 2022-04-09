@@ -1,9 +1,9 @@
 package just.semver
 
 import just.Common._
-
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
+import just.semver.matcher.SemVerMatchers
 
 import scala.util.matching.Regex
 
@@ -63,11 +63,24 @@ object SemVer {
     @inline def majorMinorPatch: (SemVer.Major, SemVer.Minor, SemVer.Patch) =
       SemVer.majorMinorPatch(semVer)
 
+    @inline def renderMajorMinorPatch: String =
+      SemVer.renderMajorMinorPatch(semVer)
+
     @inline def render: String = SemVer.render(semVer)
+
+    def matches(semVerMatchers: SemVerMatchers): Boolean = semVerMatchers.matches(semVer)
+
+    def unsafeMatches(semVerMatchers: String): Boolean =
+      SemVerMatchers
+        .unsafeParse(semVerMatchers)
+        .matches(semVer)
   }
 
   def majorMinorPatch(semVer: SemVer): (SemVer.Major, SemVer.Minor, SemVer.Patch) =
     (semVer.major, semVer.minor, semVer.patch)
+
+  def renderMajorMinorPatch(semVer: SemVer): String =
+    s"${semVer.major.major.toString}.${semVer.minor.minor.toString}.${semVer.patch.patch.toString}"
 
   def render(semVer: SemVer): String = semVer match {
     case SemVer(major, minor, patch, pre, buildMetadata) =>
