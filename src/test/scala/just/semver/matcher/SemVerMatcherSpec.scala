@@ -57,9 +57,9 @@ object SemVerMatcherSpec extends Properties {
     val matcher        = SemVerMatcher.range(v1, v2)
 
     val semVer2 = v2.copy(
-      major = SemVer.Major(v2.major.major + majorMoreLess),
-      minor = SemVer.Minor(v2.minor.minor + minorMoreLess),
-      patch = SemVer.Patch(v2.patch.patch + patchMoreLess1)
+      major = SemVer.Major(v2.major.value + majorMoreLess),
+      minor = SemVer.Minor(v2.minor.value + minorMoreLess),
+      patch = SemVer.Patch(v2.patch.value + patchMoreLess1)
     )
 
     Result.all(
