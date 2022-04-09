@@ -64,20 +64,35 @@ object Gens {
   def pairFromIntsTo[T](constructor: Int => T): ((Int, Int)) => (T, T) =
     pair => (constructor(pair._1), constructor(pair._2))
 
+  def genVersionNumber: Gen[Int] =
+    Gen.frequency1(30 -> Gen.elementUnsafe((0 to 10).toList), 70 -> genNonNegativeInt)
+
+  def genVersionNumberWithRange(range: Range[Int]): Gen[Int] =
+    Gen.int(range)
+
   def genMajor: Gen[Major] =
-    genNonNegativeInt.map(Major.apply)
+    genVersionNumber.map(Major.apply)
+
+  def genMajorWithRange(range: Range[Int]): Gen[Major] =
+    genVersionNumberWithRange(range).map(Major.apply)
 
   def genMinMaxMajors: Gen[(Major, Major)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Major.apply))
 
   def genMinor: Gen[Minor] =
-    genNonNegativeInt.map(Minor.apply)
+    genVersionNumber.map(Minor.apply)
+
+  def genMinorWithRange(range: Range[Int]): Gen[Minor] =
+    genVersionNumberWithRange(range).map(Minor.apply)
 
   def genMinMaxMinors: Gen[(Minor, Minor)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Minor.apply))
 
   def genPatch: Gen[Patch] =
-    genNonNegativeInt.map(Patch.apply)
+    genVersionNumber.map(Patch.apply)
+
+  def genPatchWithRange(range: Range[Int]): Gen[Patch] =
+    genVersionNumberWithRange(range).map(Patch.apply)
 
   def genMinMaxPatches: Gen[(Patch, Patch)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Patch.apply))
@@ -171,6 +186,11 @@ object Gens {
       .list(Range.linear(1, 5))
       .map(BuildMetaInfo.apply)
 
+  def genPreReleaseAndBuildMetaInfo: Gen[(AdditionalInfo.PreRelease, AdditionalInfo.BuildMetaInfo)] = for {
+    preRelease    <- genPreRelease
+    buildMetaInfo <- genBuildMetaInfo
+  } yield (preRelease, buildMetaInfo)
+
   def genMinMaxAlphaNumHyphenGroup: Gen[(Dsv, Dsv)] = for {
     minMaxAlps <- Gen
                     .frequency1(
@@ -255,9 +275,52 @@ object Gens {
     major <- genMajor
     minor <- genMinor
     patch <- genPatch
-    pre   <- genPreRelease.option
-    meta  <- genBuildMetaInfo.option
+    pre   <- Gen.frequency1[Option[PreRelease]](5 -> Gen.constant(None), 7 -> genPreRelease.map(Some(_)))
+    meta  <- Gen.frequency1[Option[BuildMetaInfo]](5 -> Gen.constant(None), 7 -> genBuildMetaInfo.map(Some(_)))
   } yield SemVer(major, minor, patch, pre, meta)
+
+  def genSemVerWithOnlyMajorMinorPatch(
+    majorRange: Range[Int],
+    minorRange: Range[Int],
+    patchRange: Range[Int]
+  ): Gen[SemVer] = for {
+    major <- genMajorWithRange(majorRange)
+    minor <- genMinorWithRange(minorRange)
+    patch <- genPatchWithRange(patchRange)
+  } yield SemVer(major, minor, patch, None, None)
+
+  def genSemVerWithRange(majorRange: Range[Int], minorRange: Range[Int], patchRange: Range[Int]): Gen[SemVer] =
+    for {
+      semVer          <- genSemVerWithOnlyMajorMinorPatch(majorRange, minorRange, patchRange)
+      maybePreAndMeta <- Gen
+                           .frequency1(
+                             5 -> genPreReleaseAndBuildMetaInfo.map[(Option[PreRelease], Option[BuildMetaInfo])] {
+                               case (pre, meta) =>
+                                 ((Some(pre), Some(meta)))
+                             },
+                             5 -> Gen
+                               .frequency1[Option[PreRelease]](
+                                 5 -> Gen.constant(None),
+                                 7 -> genPreRelease.map(Some(_))
+                               )
+                               .flatMap { preRelease =>
+                                 Gen
+                                   .frequency1[Option[BuildMetaInfo]](
+                                     5 -> Gen.constant(None),
+                                     7 -> genBuildMetaInfo.map(Some(_))
+                                   )
+                                   .map(meta => (preRelease, meta))
+
+                               }
+                           )
+                           .option
+
+    } yield maybePreAndMeta match {
+      case Some((pre, meta)) =>
+        semVer.copy(pre = pre, buildMetadata = meta)
+      case None =>
+        semVer
+    }
 
   def genMinMaxSemVers: Gen[(SemVer, SemVer)] = for {
     (majorPair1, majorPair2) <- genMinMaxMajors

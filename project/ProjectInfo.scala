@@ -9,7 +9,9 @@ object ProjectInfo {
   def commonWarts(scalaBinaryVersion: String): Seq[wartremover.Wart] = scalaBinaryVersion match {
     case "2.10" =>
       Seq.empty
-    case "2.11" | "2.12" | "2.13" =>
+    case "2.11" =>
+      Warts.allBut(Wart.DefaultArguments, Wart.Overloading, Wart.Any, Wart.Nothing, Wart.NonUnitStatements, Wart.Product)
+    case "2.12" | "2.13" =>
       Warts.allBut(Wart.DefaultArguments, Wart.Overloading, Wart.Any, Wart.Nothing, Wart.NonUnitStatements)
     case "3" =>
       Seq.empty[wartremover.Wart]
