@@ -38,14 +38,14 @@ object Gens {
     one <- Gen.element1(1, 2, 4)
     (m, n, p) = ((4 & one) >> 2, (2 & one) >> 1, 1 & one)
     v2     <- SemVerGens.genSemVerWithRange(
-                Range.linear(v1.major.major + m, v1.major.major + 100),
-                Range.linear(v1.minor.minor + n, v1.minor.minor + 100),
-                Range.linear(v1.patch.patch + p, v1.patch.patch + 100)
+                Range.linear(v1.major.value + m, v1.major.value + 100),
+                Range.linear(v1.minor.value + n, v1.minor.value + 100),
+                Range.linear(v1.patch.value + p, v1.patch.value + 100)
               )
     semVer <- SemVerGens.genSemVerWithRange(
-                Range.linear(v1.major.major, v2.major.major),
-                Range.linear(v1.minor.minor, v2.minor.minor),
-                Range.linear(v1.patch.patch, v2.patch.patch)
+                Range.linear(v1.major.value, v2.major.value),
+                Range.linear(v1.minor.value, v2.minor.value),
+                Range.linear(v1.patch.value, v2.patch.value)
               )
   } yield (SemVerMatcher.range(v1, v2), v1.copy(major = semVer.major, minor = semVer.minor, patch = semVer.patch))
 
@@ -90,9 +90,9 @@ object Gens {
     inclusive match {
       case false =>
         val semVer = v1SemVer.copy(
-          major = SemVer.Major(v1SemVer.major.major + m),
-          minor = SemVer.Minor(v1SemVer.minor.minor + n),
-          patch = SemVer.Patch(v1SemVer.patch.patch + p)
+          major = SemVer.Major(v1SemVer.major.value + m),
+          minor = SemVer.Minor(v1SemVer.minor.value + n),
+          patch = SemVer.Patch(v1SemVer.patch.value + p)
         )
         val v1     = SemVerComparison(
           ComparisonOperator.gt,
@@ -102,17 +102,17 @@ object Gens {
           ComparisonOperator.lt,
           v1.semVer
             .copy(
-              major = SemVer.Major(semVer.major.major + m),
-              minor = SemVer.Minor(semVer.minor.minor + n),
-              patch = SemVer.Patch(semVer.patch.patch + p)
+              major = SemVer.Major(semVer.major.value + m),
+              minor = SemVer.Minor(semVer.minor.value + n),
+              patch = SemVer.Patch(semVer.patch.value + p)
             )
         )
         (v1, v2, semVer)
       case true =>
         val semVer = v1SemVer.copy(
-          major = SemVer.Major(v1SemVer.major.major + m),
-          minor = SemVer.Minor(v1SemVer.minor.minor + n),
-          patch = SemVer.Patch(v1SemVer.patch.patch + p)
+          major = SemVer.Major(v1SemVer.major.value + m),
+          minor = SemVer.Minor(v1SemVer.minor.value + n),
+          patch = SemVer.Patch(v1SemVer.patch.value + p)
         )
         val v1     = SemVerComparison(
           ComparisonOperator.ge,
@@ -122,9 +122,9 @@ object Gens {
           ComparisonOperator.le,
           v1.semVer
             .copy(
-              major = SemVer.Major(semVer.major.major + m),
-              minor = SemVer.Minor(semVer.minor.minor + n),
-              patch = SemVer.Patch(semVer.patch.patch + p)
+              major = SemVer.Major(semVer.major.value + m),
+              minor = SemVer.Minor(semVer.minor.value + n),
+              patch = SemVer.Patch(semVer.patch.value + p)
             )
         )
         (v1, v2, semVer)

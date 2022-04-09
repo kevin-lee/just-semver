@@ -20,9 +20,9 @@ final case class SemVer(
 
   override def compare(that: SemVer): Int = {
     (
-      this.major.major.compareTo(that.major.major),
-      this.minor.minor.compareTo(that.minor.minor),
-      this.patch.patch.compareTo(that.patch.patch)
+      this.major.value.compareTo(that.major.value),
+      this.minor.value.compareTo(that.minor.value),
+      this.patch.value.compareTo(that.patch.value)
     ) match {
       case (0, 0, 0) =>
         (this.pre, that.pre) match {
@@ -49,9 +49,26 @@ final case class SemVer(
 
 object SemVer {
 
-  final case class Major(major: Int) extends AnyVal
-  final case class Minor(minor: Int) extends AnyVal
-  final case class Patch(patch: Int) extends AnyVal
+  final case class Major(value: Int) extends AnyVal
+  object Major {
+    implicit class MajorOps(private val major0: Major) {
+      def major: Int = major0.value
+    }
+  }
+
+  final case class Minor(value: Int) extends AnyVal
+  object Minor {
+    implicit class MinorOps(private val minor0: Minor) {
+      def minor: Int = minor0.value
+    }
+  }
+
+  final case class Patch(value: Int) extends AnyVal
+  object Patch {
+    implicit class PatchOps(private val patch0: Patch) {
+      def patch: Int = patch0.value
+    }
+  }
 
   val major0: Major = Major(0)
   val minor0: Minor = Minor(0)
@@ -80,11 +97,11 @@ object SemVer {
     (semVer.major, semVer.minor, semVer.patch)
 
   def renderMajorMinorPatch(semVer: SemVer): String =
-    s"${semVer.major.major.toString}.${semVer.minor.minor.toString}.${semVer.patch.patch.toString}"
+    s"${semVer.major.value.toString}.${semVer.minor.value.toString}.${semVer.patch.value.toString}"
 
   def render(semVer: SemVer): String = semVer match {
     case SemVer(major, minor, patch, pre, buildMetadata) =>
-      val versionString        = s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}"
+      val versionString        = s"${major.value.toString}.${minor.value.toString}.${patch.value.toString}"
       val additionalInfoString =
         (pre, buildMetadata) match {
           case (Some(p), Some(m)) =>
@@ -147,12 +164,12 @@ object SemVer {
     SemVer(major0, minor0, patch, None, None)
 
   def increaseMajor(semVer: SemVer): SemVer =
-    semVer.copy(major = Major(semVer.major.major + 1))
+    semVer.copy(major = Major(semVer.major.value + 1))
 
   def increaseMinor(semVer: SemVer): SemVer =
-    semVer.copy(minor = Minor(semVer.minor.minor + 1))
+    semVer.copy(minor = Minor(semVer.minor.value + 1))
 
   def increasePatch(semVer: SemVer): SemVer =
-    semVer.copy(patch = Patch(semVer.patch.patch + 1))
+    semVer.copy(patch = Patch(semVer.patch.value + 1))
 
 }

@@ -649,13 +649,13 @@ object SemVerSpec extends Properties {
     patch <- Gens.genPatch.log("major")
   } yield {
     SemVer.semVer(major, minor, patch).asRight[ParseError] ====
-      SemVer.parse(s"${major.major.toString}.${minor.minor.toString}.${patch.patch.toString}")
+      SemVer.parse(s"${major.value.toString}.${minor.value.toString}.${patch.value.toString}")
   }
 
   def testSemVerIncreaseMajor: Property = for {
     v <- Gens.genSemVer.log("v")
   } yield {
-    val expected = v.copy(major = Major(v.major.major + 1))
+    val expected = v.copy(major = Major(v.major.value + 1))
     val actual   = SemVer.increaseMajor(v)
     actual ==== expected
   }
@@ -663,7 +663,7 @@ object SemVerSpec extends Properties {
   def testSemVerIncreaseMinor: Property = for {
     v <- Gens.genSemVer.log("v")
   } yield {
-    val expected = v.copy(minor = Minor(v.minor.minor + 1))
+    val expected = v.copy(minor = Minor(v.minor.value + 1))
     val actual   = SemVer.increaseMinor(v)
     actual ==== expected
   }
@@ -671,7 +671,7 @@ object SemVerSpec extends Properties {
   def testSemVerIncreasePatch: Property = for {
     v <- Gens.genSemVer.log("v")
   } yield {
-    val expected = v.copy(patch = Patch(v.patch.patch + 1))
+    val expected = v.copy(patch = Patch(v.patch.value + 1))
     val actual   = SemVer.increasePatch(v)
     actual ==== expected
   }
