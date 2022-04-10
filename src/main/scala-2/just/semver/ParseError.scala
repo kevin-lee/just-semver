@@ -1,5 +1,7 @@
 package just.semver
 
+import just.semver.matcher.SemVerMatchers
+
 /** @author Kevin Lee
   * @since 2018-10-21
   */
@@ -18,6 +20,8 @@ object ParseError {
   final case class CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError) extends ParseError
 
   final case class InvalidVersionStringError(value: String) extends ParseError
+
+  final case class SemVerMatchersParseErrors(error: matcher.SemVerMatchers.ParseErrors) extends ParseError
 
   def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): ParseError =
     InvalidAlphaNumHyphenError(c, rest)
@@ -42,6 +46,8 @@ object ParseError {
 
   def invalidVersionStringError(value: String): ParseError =
     InvalidVersionStringError(value)
+
+  def semVerMatchersParseErrors(error: SemVerMatchers.ParseErrors): ParseError = SemVerMatchersParseErrors(error)
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def render(parseError: ParseError): String = parseError match {
@@ -68,6 +74,9 @@ object ParseError {
 
     case InvalidVersionStringError(value) =>
       s"Invalid SemVer String. value: $value"
+
+    case SemVerMatchersParseErrors(error) =>
+      s"Error when parsing SemVerMatchers: ${error.render}"
   }
 
   implicit final class ParseErrorOps(private val parseError: ParseError) extends AnyVal {
