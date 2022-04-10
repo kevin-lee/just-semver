@@ -130,13 +130,15 @@ object SemVer {
         .matches(semVer)
   }
 
-  def parseUnsafe(version: String): SemVer =
+  def unsafeParse(version: String): SemVer =
     parse(version) match {
       case Right(semVer) =>
         semVer
       case Left(error) =>
         sys.error(ParseError.render(error))
     }
+
+  def parseUnsafe(version: String): SemVer = unsafeParse(version)
 
   def parse(version: String): Either[ParseError, SemVer] = version match {
     case semVerRegex(major, minor, patch, pre, meta) =>

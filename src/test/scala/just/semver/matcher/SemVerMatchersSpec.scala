@@ -201,73 +201,73 @@ object SemVerMatchersSpec extends Properties {
 
     def testExample1: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.parseUnsafe("1.0.0")))
+        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.unsafeParse("1.0.0")))
         .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.0) failed")
     }
 
     def testExample2: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.parseUnsafe("2.0.0")))
+        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.unsafeParse("2.0.0")))
         .log("SemVerMatchers(1.0.0 - 2.0.0).matches(2.0.0) failed")
     }
 
     def testExample3: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.parseUnsafe("1.0.1")))
+        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.unsafeParse("1.0.1")))
         .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.0.1) failed")
     }
 
     def testExample4: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.parseUnsafe("1.999.999")))
+        .assert(SemVerMatchers.unsafeParse("1.0.0 - 2.0.0").matches(SemVer.unsafeParse("1.999.999")))
         .log("SemVerMatchers(1.0.0 - 2.0.0).matches(1.999.999) failed")
     }
 
     def testExample5: Result = {
       Result
-        .diff(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.parseUnsafe("1.0.0")), false)(_ === _)
+        .diff(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.unsafeParse("1.0.0")), false)(_ === _)
         .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.0) failed")
     }
 
     def testExample6: Result = {
       Result
-        .diff(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.parseUnsafe("2.0.0")), false)(_ === _)
+        .diff(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.unsafeParse("2.0.0")), false)(_ === _)
         .log("SemVerMatchers(>1.0.0 <2.0.0).matches(2.0.0) failed")
     }
 
     def testExample7: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.parseUnsafe("1.0.1")))
+        .assert(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.unsafeParse("1.0.1")))
         .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.0.1) failed")
     }
 
     def testExample8: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.parseUnsafe("1.999.999")))
+        .assert(SemVerMatchers.unsafeParse(">1.0.0 <2.0.0").matches(SemVer.unsafeParse("1.999.999")))
         .log("SemVerMatchers(>1.0.0 <2.0.0).matches(1.999.999) failed")
     }
 
     def testExample9: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.parseUnsafe("1.0.0")))
+        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.unsafeParse("1.0.0")))
         .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.0) failed")
     }
 
     def testExample10: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.parseUnsafe("2.0.0")))
+        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.unsafeParse("2.0.0")))
         .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(2.0.0) failed")
     }
 
     def testExample11: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.parseUnsafe("1.0.1")))
+        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.unsafeParse("1.0.1")))
         .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.1) failed")
     }
 
     def testExample12: Result = {
       Result
-        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.parseUnsafe("1.999.999")))
+        .assert(SemVerMatchers.unsafeParse(">=1.0.0 <=2.0.0").matches(SemVer.unsafeParse("1.999.999")))
         .log("SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.999.999) failed")
     }
 
