@@ -10,9 +10,9 @@ final case class SemVerMatchers(matchers: SemVerMatchers.Or) derives CanEqual
 object SemVerMatchers extends Compat {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion", "org.wartremover.warts.ListAppend"))
-  def parse(selector: String): Either[List[SemVerMatcher.ParseError], SemVerMatchers] = {
+  def parse(selector: String): Either[SemVerMatchers.ParseErrors, SemVerMatchers] = {
     @SuppressWarnings(Array("org.wartremover.warts.JavaSerializable", "org.wartremover.warts.Serializable"))
-    def each(s: String): Either[List[SemVerMatcher.ParseError], List[SemVerMatcher]] = {
+    def each(s: String): Either[(SemVerMatcher.ParseError, List[SemVerMatcher.ParseError]), List[SemVerMatcher]] = {
       val spaced      = s.split("\\s+")
       val hyphenIndex = spaced.indexWhere(_ === "-")
       if (hyphenIndex >= 0) {
@@ -48,46 +48,49 @@ object SemVerMatchers extends Compat {
                     (failed, success :+ parsed)
                 }
 
-            if (failed.isEmpty) {
-              if (after.isEmpty) {
-                Right(success)
-              } else {
-                each(after.mkString(" ")) match {
-                  case Right(rest) =>
-                    Right(success ++ rest)
-                  case Left(err) =>
-                    Left(failed ++ err)
+            failed match {
+              case Nil =>
+                if (after.isEmpty) {
+                  Right(success)
+                } else {
+                  each(after.mkString(" ")).map(rest => success ++ rest)
                 }
-              }
-            } else {
-              if (after.isEmpty) {
-                Left(failed)
-              } else {
-                each(after.mkString(" ")) match {
-                  case Right(_) =>
-                    Left(failed)
-                  case Left(err) =>
-                    Left(failed ++ err)
+
+              case failed :: failedMore =>
+                if (after.isEmpty) {
+                  Left((failed, failedMore))
+                } else {
+                  each(after.mkString(" ")) match {
+                    case Right(_) =>
+                      Left((failed, failedMore))
+                    case Left((err, errs)) =>
+                      Left((failed, failedMore ++ (err :: errs)))
+                  }
                 }
-              }
 
             }
+
           case (Right(before), Left(err)) =>
             Left(
-              List(
-                SemVerMatcher.ParseError.rangeParseFailure("Parsing 'to' in range failed: ", List(err), Some(before))
+              (
+                SemVerMatcher.ParseError.rangeParseFailure("Parsing 'to' in range failed: ", List(err), Some(before)),
+                Nil
               )
             )
           case (Left(err), Right(end)) =>
             Left(
-              List(SemVerMatcher.ParseError.rangeParseFailure("Parsing 'from' in range failed: ", List(err), Some(end)))
+              (
+                SemVerMatcher.ParseError.rangeParseFailure("Parsing 'from' in range failed: ", List(err), Some(end)),
+                Nil
+              )
             )
           case (Left(err1), Left(err2)) =>
             Left(
-              List(
+              (
                 SemVerMatcher
                   .ParseError
-                  .rangeParseFailure("Parsing both 'from' and 'to' in range failed: ", List(err1, err2), None)
+                  .rangeParseFailure("Parsing both 'from' and 'to' in range failed: ", List(err1, err2), None),
+                Nil
               )
             )
         }
@@ -108,10 +111,11 @@ object SemVerMatchers extends Compat {
               case ((failed, success), Right(parsed)) =>
                 (failed, success :+ parsed)
             }
-        if (failed.isEmpty) {
-          Right(success)
-        } else {
-          Left(failed)
+        failed match {
+          case Nil =>
+            Right(success)
+          case err :: errs =>
+            Left((err, errs))
         }
 
       }
@@ -124,18 +128,19 @@ object SemVerMatchers extends Compat {
       .foldLeft((List.empty[SemVerMatcher.ParseError], List.empty[And])) {
         case ((failed, success), Right(ands)) =>
           (failed, success :+ And(ands))
-        case ((failed, success), Left(errs)) =>
-          (failed ++ errs, success)
+        case ((failed, success), Left((err, errs))) =>
+          (failed ++ (err :: errs), success)
       }
-    if (failed.isEmpty) {
-      Right(SemVerMatchers(Or(success)))
-    } else {
-      Left(failed)
+    failed match {
+      case Nil =>
+        Right(SemVerMatchers(Or(success)))
+      case err :: errs =>
+        Left(ParseErrors(err, errs))
     }
   }
 
   def unsafeParse(matchers: String): SemVerMatchers =
-    parse(matchers).fold(errs => sys.error(errs.map(_.render).mkString(", ")), identity)
+    parse(matchers).fold(errs => sys.error(errs.render), identity)
 
   type Or = Or.Or
   object Or {
@@ -189,4 +194,18 @@ object SemVerMatchers extends Compat {
 
   }
 
+  final case class ParseErrors(
+    private val error: SemVerMatcher.ParseError,
+    private val errors: List[SemVerMatcher.ParseError]
+  )
+  object ParseErrors {
+    extension (parseErrors: ParseErrors) {
+
+      /** Returns List[SemVerMatcher.ParseError]. The List returned is guaranteed non-empty.
+        */
+      def allErrors: List[SemVerMatcher.ParseError] = parseErrors.error :: parseErrors.errors
+
+      def render: String = allErrors.map(_.render).mkString("[", ", ", "]")
+    }
+  }
 }
