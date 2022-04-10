@@ -1,7 +1,7 @@
 package just.semver.matcher
 
 import just.Common._
-import just.semver.{Compat, SemVer}
+import just.semver.{Compat, SemVer, ParseError => SemVerParseError}
 
 /** @author Kevin Lee
   * @since 2022-04-07
@@ -183,6 +183,11 @@ object SemVerMatchers extends Compat {
       def allErrors: List[SemVerMatcher.ParseError] = parseErrors.error :: parseErrors.errors
 
       def render: String = allErrors.map(_.render).mkString("[", ", ", "]")
+    }
+
+    implicit class ParseErrorsOrSemVerMatchersOps(private val eth: Either[ParseErrors, SemVerMatchers]) extends AnyVal {
+      def toSemVerParseError: Either[SemVerParseError, SemVerMatchers] =
+        eth.left.map(SemVerParseError.semVerMatchersParseErrors)
     }
   }
 }

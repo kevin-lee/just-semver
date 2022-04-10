@@ -1,5 +1,7 @@
 package just.semver
 
+import just.semver.matcher.SemVerMatchers
+
 /** @author Kevin Lee
   * @since 2018-10-21
   */
@@ -12,6 +14,7 @@ enum ParseError derives CanEqual {
   case BuildMetadataParseError(parseError: ParseError)
   case CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError)
   case InvalidVersionStringError(value: String)
+  case SemVerMatchersParseErrors(error: matcher.SemVerMatchers.ParseErrors)
 }
 
 object ParseError {
@@ -39,6 +42,9 @@ object ParseError {
   def invalidVersionStringError(value: String): ParseError =
     InvalidVersionStringError(value)
 
+  def semVerMatchersParseErrors(error: SemVerMatchers.ParseErrors): ParseError =
+    SemVerMatchersParseErrors(error)
+
   extension (parseError: ParseError) {
     def render: String = parseError match {
       case InvalidAlphaNumHyphenError(c, rest) =>
@@ -64,6 +70,9 @@ object ParseError {
 
       case InvalidVersionStringError(value) =>
         s"Invalid SemVer String. value: $value"
+
+      case SemVerMatchersParseErrors(error) =>
+        s"Error when parsing SemVerMatchers: ${error.render}"
     }
   }
 
