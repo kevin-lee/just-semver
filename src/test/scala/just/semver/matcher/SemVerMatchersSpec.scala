@@ -103,7 +103,7 @@ object SemVerMatchersSpec extends Properties {
         Result
           .failure
           .log(
-            s"""${errs.mkString("\n")}
+            s"""${errs.render}
                |input: $input
                |""".stripMargin
           )
@@ -127,11 +127,11 @@ object SemVerMatchersSpec extends Properties {
       case Left(errs) =>
         Result.all(
           List(
-            Result.assert(errs.nonEmpty).log("SemVerMatchers.parse(invalid) failed but no errors found"),
+            Result.assert(errs.allErrors.nonEmpty).log("SemVerMatchers.parse(invalid) failed but no errors found"),
             Result
-              .assert(errs.map(_.render).forall(s => s.contains("ParseError") && s.contains("at 0")))
+              .assert(errs.allErrors.map(_.render).forall(s => s.contains("ParseError") && s.contains("at 0")))
               .log(s"""SemVerMatchers.parse(invalid) failed but doesn't have expected ParseError.
-                  |> Errors: ${errs.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
+                  |> Errors: ${errs.allErrors.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
                   |""".stripMargin)
           )
         )
