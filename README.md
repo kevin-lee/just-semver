@@ -12,10 +12,15 @@ Semantic Versioning (`SemVer`) for Scala
 
 # Get just-semver
 ```scala
-libraryDependencies += "io.kevinlee" %% "just-semver" % "0.3.0"
+libraryDependencies += "io.kevinlee" %% "just-semver" % "0.4.0"
 ```
 
 # How to Use
+
+> NOTE: For now, please do not use any types and methods from the package other than `just.semver`.
+> * `just.semver`: Fine
+> *  `just.semver.matcher` or any other `just.semver.xxx` packages: Don't use. It's currently experimental.
+
 ```scala
 import just.semver.SemVer
 
@@ -36,7 +41,7 @@ SemVer.parse("a1.0.0")
 import just.semver.SemVer
 
 // parse unsafe - NOT RECOMMENDED!!!
-val v = SemVer.parseUnsafe("1.0.0")
+val v = SemVer.unsafeParse("1.0.0")
 // v: SemVer = SemVer(Major(1), Minor(0), Patch(0), None, None)
 
 // to String
@@ -45,7 +50,7 @@ v.render
 
 
 // Invalid version
-SemVer.parseUnsafe("a1.0.0")
+SemVer.unsafeParse("a1.0.0")
 // java.lang.RuntimeException: Invalid SemVer String. value: a1.0.0
 ```
 
@@ -209,3 +214,27 @@ for {
 } yield a >= b
 // Either[ParseError, Boolean] = Right(true)
 ```
+
+## Matchers
+```scala
+SemVer.unsefeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsefeParse("1.5.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsefeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsefeParse("0.9.9").unsafeMatches("1.0.0 - 2.0.0") // false
+SemVer.unsefeParse("2.0.1").unsafeMatches("1.0.0 - 2.0.0") // false
+
+SemVer.unsefeParse("1.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
+SemVer.unsefeParse("1.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
+SemVer.unsefeParse("1.5.0").unsafeMatches(">1.0.0 <2.0.0") // true
+SemVer.unsefeParse("2.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
+SemVer.unsefeParse("2.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
+SemVer.unsefeParse("0.9.9").unsafeMatches(">=1.0.0 <=2.0.0") // false
+SemVer.unsefeParse("2.0.1").unsafeMatches(">=1.0.0 <=2.0.0") // false
+
+SemVer.unsefeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
+SemVer.unsefeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
+SemVer.unsefeParse("3.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // false
+SemVer.unsefeParse("3.0.1").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
+SemVer.unsefeParse("4.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
+```
+
