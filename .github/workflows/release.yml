@@ -88,7 +88,7 @@ jobs:
           echo "RUN_NUMBER=${RUN_NUMBER}"
           .github/workflows/sbt-build-all-with-coverage.sh ${{ matrix.scala.version }}
 
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v3
 
   github-release:
     needs: build
