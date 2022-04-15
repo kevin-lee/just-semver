@@ -1,6 +1,5 @@
-import ProjectInfo._
 import just.semver.SemVer
-import SemVer.Major
+import SemVer.{Major, Minor}
 import kevinlee.sbt.SbtCommon.crossVersionProps
 
 ThisBuild / scalaVersion       := props.ProjectScalaVersion
@@ -28,9 +27,23 @@ ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCrede
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
-    name                                    := "just-semver",
-    description                             := "Semantic Versioning (SemVer) for Scala",
-    Compile / unmanagedSourceDirectories    := {
+    name                                 := "just-semver",
+    description                          := "Semantic Versioning (SemVer) for Scala",
+    libraryDependencies ++= {
+      if (isGhaPublishing) {
+        List.empty[ModuleID]
+      } else {
+        SemVer.majorMinorPatch(SemVer.parseUnsafe(scalaVersion.value)) match {
+          case (Major(2), Minor(11), _) =>
+            List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
+          case (Major(3), Minor(0), _) =>
+            List.empty[ModuleID]
+          case (_, _, _) =>
+            List(compilerPlugin("org.wartremover" %% "wartremover" % "3.0.0" cross CrossVersion.full))
+        }
+      }
+    },
+    Compile / unmanagedSourceDirectories := {
       val sharedSourceDir = baseDirectory.value / "src/main"
       val moreSrcs        =
         if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
@@ -40,15 +53,19 @@ lazy val justSemVer = (project in file("."))
       ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
     },
 //    useAggressiveScalacOptions := true,
-    libraryDependencies                     :=
+    libraryDependencies                  :=
       crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
-        case (Major(3), _, _) =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++
+        case (SemVer.Major(3), SemVer.Minor(0), _) =>
+          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value ++
             libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
-        case x                =>
+
+        case (Major(3), _, _) =>
+          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+
+        case x =>
           libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
       },
-    libraryDependencies                     := (
+    libraryDependencies                  := (
       if (isScala3(scalaVersion.value)) {
         libraryDependencies
           .value
@@ -57,27 +74,43 @@ lazy val justSemVer = (project in file("."))
         libraryDependencies.value
       }
     ),
+    scalacOptions ++= (if (isGhaPublishing) List.empty[String]
+                       else ProjectInfo.commonWarts(scalaVersion.value)),
+//    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
+//                                           else ProjectInfo.commonWarts(scalaVersion.value)),
+//    (Test / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
+//                                        else ProjectInfo.commonWarts(scalaVersion.value)),
+//      (Compile / console / scalacOptions)
+//        .value
+//        .filterNot(option => option.contains("wartremover") || option.contains("import")),
+//    Test / console / scalacOptions    :=
+//      (Test / console / scalacOptions)
+//        .value
+//        .filterNot(option => option.contains("wartremover") || option.contains("import")),
+// -----------
+
     /* WartRemover and scalacOptions { */
 //      Compile / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
 //      Test / compile / wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
-    wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+
     //      wartremoverErrors ++= Warts.all,
-    Compile / console / wartremoverErrors   := List.empty,
-    Compile / console / wartremoverWarnings := List.empty,
-    Compile / console / scalacOptions       :=
-      (console / scalacOptions)
-        .value
-        .filterNot(option => option.contains("wartremover") || option.contains("import")),
-    Test / console / wartremoverErrors      := List.empty,
-    Test / console / wartremoverWarnings    := List.empty,
-    Test / console / scalacOptions          :=
-      (console / scalacOptions)
-        .value
-        .filterNot(option => option.contains("wartremover") || option.contains("import")),
-    /* } WartRemover and scalacOptions */
+    /////////// wartremoverErrors ++= commonWarts((update / scalaBinaryVersion).value),
+    //    Compile / console / wartremoverErrors   := List.empty,
+//    Compile / console / wartremoverWarnings := List.empty,
+//    Compile / console / scalacOptions       :=
+//      (console / scalacOptions)
+//        .value
+//        .filterNot(option => option.contains("wartremover") || option.contains("import")),
+//    Test / console / wartremoverErrors      := List.empty,
+//    Test / console / wartremoverWarnings    := List.empty,
+//    Test / console / scalacOptions          :=
+//      (console / scalacOptions)
+//        .value
+//        .filterNot(option => option.contains("wartremover") || option.contains("import")),
+//    /* } WartRemover and scalacOptions */
     testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
-    licenses                                := List("MIT" -> url("http://opensource.org/licenses/MIT")),
-    console / initialCommands               := """import just.semver.SemVer""",
+    licenses                  := List("MIT" -> url("http://opensource.org/licenses/MIT")),
+    console / initialCommands := """import just.semver.SemVer""",
   )
   .settings(mavenCentralPublishSettings)
 
@@ -85,21 +118,27 @@ lazy val props =
   new {
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
-        m.name == "wartremover" ||
-          m.name == "ammonite" ||
+//        m.name == "wartremover" ||
+        m.name == "ammonite" ||
           m.name == "kind-projector" ||
           m.name == "better-monadic-for" ||
           m.name == "mdoc"
 
-    final val ProjectScalaVersion: String     = "3.0.0"
-//     final val ProjectScalaVersion: String     = "2.13.3"
-    final val CrossScalaVersions: Seq[String] =
-      Seq(
-        "2.11.12",
-        "2.12.13",
-        "2.13.3",
-        ProjectScalaVersion
-      ).distinct
+    val isWartRemover: ModuleID => Boolean =
+      m => m.name == "wartremover"
+
+    final val ProjectScalaVersion: String      = "3.1.1"
+//     final val ProjectScalaVersion: String     = "2.13.6"
+    final val CrossScalaVersions: List[String] =
+      (if (isGhaPublishing) (_: List[String]).diff(List(ProjectScalaVersion)) else identity[List[String]] _)(
+        List(
+          "2.11.12",
+          "2.12.13",
+          "2.13.6",
+          "3.0.0",
+          ProjectScalaVersion
+        ).distinct
+      )
 
     val SonatypeCredentialHost = "s01.oss.sonatype.org"
     val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
@@ -111,13 +150,15 @@ lazy val props =
 lazy val libs =
   new {
 
-    def hedgehogLibs(hedgehogVersion: String): Seq[ModuleID] = Seq(
+    def hedgehogLibs(hedgehogVersion: String): List[ModuleID] = List(
       "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
       "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
       "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
     )
 
   }
+
+def isGhaPublishing: Boolean = sys.env.get("GHA_IS_PUBLISHING").fold(false)(_.toBoolean)
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
 

@@ -5,7 +5,7 @@ set -x
 if [ -z "$1" ]
   then
     echo "Missing parameters. Please enter the [Scala version]."
-    echo "sbt-build-test.sh 2.13.5"
+    echo "sbt-build-test.sh 2.13.6"
     exit 1
 else
 

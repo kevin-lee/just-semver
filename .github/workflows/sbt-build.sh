@@ -5,7 +5,7 @@ set -x
 if [ -z "$1" ]
   then
     echo "Scala version is missing. Please enter the Scala version."
-    echo "sbt-build.sh 2.13.5"
+    echo "sbt-build.sh 2.13.6"
     exit 1
 else
   scala_version=$1

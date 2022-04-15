@@ -17,9 +17,9 @@ jobs:
         scala:
           - { name: "Scala 2",   version: "2.11.12", binary-version: "2.11", java-version: "adopt@1.8",  params: "" }
           - { name: "Scala 2",   version: "2.12.13", binary-version: "2.12", java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 2",   version: "2.13.3",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 2",   version: "2.13.6",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
           - { name: "Scala 3",   version: "3.0.0",   binary-version: "3",    java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 3.1", version: "3.1.0",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
+          - { name: "Scala 3.1", version: "3.1.1",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
 
     steps:
       - uses: actions/checkout@v3
@@ -125,7 +125,7 @@ jobs:
           echo "RUN_ID=${RUN_ID}"
           echo "RUN_NUMBER=${RUN_NUMBER}"
           export CI_BRANCH=$CURRENT_BRANCH_NAME
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.3
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.6
 
       - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
         if: github.event_name == 'pull_request'
@@ -141,7 +141,7 @@ jobs:
           echo "RUN_NUMBER=${RUN_NUMBER}"
           echo "PR #${PR_NUMBER}"
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.3
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.6
 
       - if: github.event_name == 'pull_request'
         uses: codecov/codecov-action@v3
