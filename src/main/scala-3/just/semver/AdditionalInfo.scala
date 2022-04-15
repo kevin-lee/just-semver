@@ -30,7 +30,7 @@ object AdditionalInfo extends Compat {
       value,
       {
         case a @ Dsv(Num(n) :: Nil) =>
-          if ((n == "0") || n.takeWhile(_ == '0').length == 0)
+          if ((n === "0") || n.takeWhile(_ === '0').length == 0)
             Right(a)
           else
             Left(ParseError.leadingZeroNumError(n))

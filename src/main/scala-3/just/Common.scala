@@ -11,7 +11,9 @@ object Common {
   // $COVERAGE-OFF$
 
   extension [A](a1: A)(using CanEqual[A, A]) {
+    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
     inline def ===(a2: A): Boolean = a1 == a2
+    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
     inline def !==(a2: A): Boolean = a1 != a2
   }
 

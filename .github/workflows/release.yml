@@ -21,9 +21,9 @@ jobs:
         scala:
           - { name: "Scala 2",   version: "2.11.12", binary-version: "2.11", java-version: "adopt@1.8",  params: "" }
           - { name: "Scala 2",   version: "2.12.13", binary-version: "2.12", java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 2",   version: "2.13.3",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 2",   version: "2.13.6",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
           - { name: "Scala 3",   version: "3.0.0",   binary-version: "3",    java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 3.1", version: "3.1.0",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
+          - { name: "Scala 3.1", version: "3.1.1",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
 
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +55,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2", version: "2.13.5", binary-version: "2.13", java-version: "adopt@1.11" }
+          - { name: "Scala 2", version: "2.13.6", binary-version: "2.13", java-version: "adopt@1.11" }
 
     steps:
       - uses: actions/checkout@v3
@@ -161,6 +161,7 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
           JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          GHA_IS_PUBLISHING: "true"
         run: |
           echo "Run] sbt ci-release"
           export SOURCE_DATE_EPOCH=$(date +%s)
@@ -208,6 +209,7 @@ jobs:
 #          SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
 #          SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
 #          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+#          GHA_IS_PUBLISHING: "true"
 #        run: |
 #          echo "Run] sbt ci-release"
 #          export SOURCE_DATE_EPOCH=$(date +%s)
