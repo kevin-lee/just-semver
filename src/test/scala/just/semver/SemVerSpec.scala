@@ -4,6 +4,7 @@ import Anh.{alphabet, hyphen, num, numFromStringUnsafe}
 import hedgehog._
 import hedgehog.runner._
 import just.Common._
+import just.decver.{DecVer, Gens => DecVerGens}
 import just.semver.SemVer.{Major, Minor, Patch}
 import just.semver.expr.ComparisonOperator
 import just.semver.matcher.{SemVerComparison, SemVerMatcher, SemVerMatchers, Gens => MatcherGens}
@@ -231,6 +232,14 @@ object SemVerSpec extends Properties {
     property(
       "test SemVer.unsafeMatches(Range || Comparison and Comparison)",
       UnsafeMatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison
+    ),
+    property(
+      "SemVer(major, minor, patch).toDecVer should return DecVer(major, minor)",
+      testSemVerToDecVer
+    ),
+    property(
+      "SemVer.fromDecVer(DecVer(major, minor)) should return SemVer(major, minor, 0)",
+      testSemVerFromDecVer
     )
   )
 
@@ -1362,6 +1371,22 @@ object SemVerSpec extends Properties {
       )
     }
 
+  }
+
+  def testSemVerToDecVer: Property = for {
+    semVer <- Gens.genSemVer.log("semVer")
+  } yield {
+    val expected = DecVer(DecVer.Major(semVer.major.value), DecVer.Minor(semVer.minor.value))
+    val actual   = semVer.toDecVer
+    actual ==== expected
+  }
+
+  def testSemVerFromDecVer: Property = for {
+    decVer <- DecVerGens.genDecVer.log("decVer")
+  } yield {
+    val expected = SemVer.semVer(SemVer.Major(decVer.major.value), SemVer.Minor(decVer.minor.value), SemVer.patch0)
+    val actual   = SemVer.fromDecVer(decVer)
+    actual ==== expected
   }
 
 }

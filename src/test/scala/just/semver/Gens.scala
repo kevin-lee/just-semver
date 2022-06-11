@@ -1,10 +1,8 @@
 package just.semver
 
 import hedgehog._
-
 import just.Common._
 import just.GenPlus
-
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
 
@@ -43,6 +41,9 @@ object Gens {
 
   def genNonNegativeInt: Gen[Int] =
     GenPlus.range(Range.linear(0, Int.MaxValue))(Gen.int)
+
+  def genNonNegativeIntWithMax(max: Int): Gen[Int] =
+    GenPlus.range(Range.linear(0, max))(Gen.int)
 
   def genDifferentNonNegIntPair: Gen[(Int, Int)] = for {
     x <- genNonNegativeInt

@@ -127,8 +127,8 @@ lazy val props =
     val isWartRemover: ModuleID => Boolean =
       m => m.name == "wartremover"
 
-    final val ProjectScalaVersion: String      = "3.1.1"
-//     final val ProjectScalaVersion: String     = "2.13.6"
+    final val ProjectScalaVersion: String      = "3.1.2"
+//    final val ProjectScalaVersion: String     = "2.13.6"
     final val CrossScalaVersions: List[String] =
       (if (isGhaPublishing) (_: List[String]).diff(List(ProjectScalaVersion)) else identity[List[String]] _)(
         List(
