@@ -217,24 +217,23 @@ for {
 
 ## Matchers
 ```scala
-SemVer.unsefeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
-SemVer.unsefeParse("1.5.0").unsafeMatches("1.0.0 - 2.0.0") // true
-SemVer.unsefeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
-SemVer.unsefeParse("0.9.9").unsafeMatches("1.0.0 - 2.0.0") // false
-SemVer.unsefeParse("2.0.1").unsafeMatches("1.0.0 - 2.0.0") // false
+SemVer.unsafeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsafeParse("1.5.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsafeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0") // true
+SemVer.unsafeParse("0.9.9").unsafeMatches("1.0.0 - 2.0.0") // false
+SemVer.unsafeParse("2.0.1").unsafeMatches("1.0.0 - 2.0.0") // false
 
-SemVer.unsefeParse("1.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
-SemVer.unsefeParse("1.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
-SemVer.unsefeParse("1.5.0").unsafeMatches(">1.0.0 <2.0.0") // true
-SemVer.unsefeParse("2.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
-SemVer.unsefeParse("2.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
-SemVer.unsefeParse("0.9.9").unsafeMatches(">=1.0.0 <=2.0.0") // false
-SemVer.unsefeParse("2.0.1").unsafeMatches(">=1.0.0 <=2.0.0") // false
+SemVer.unsafeParse("1.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
+SemVer.unsafeParse("1.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
+SemVer.unsafeParse("1.5.0").unsafeMatches(">1.0.0 <2.0.0") // true
+SemVer.unsafeParse("2.0.0").unsafeMatches(">1.0.0 <2.0.0") // false
+SemVer.unsafeParse("2.0.0").unsafeMatches(">=1.0.0 <=2.0.0") // true
+SemVer.unsafeParse("0.9.9").unsafeMatches(">=1.0.0 <=2.0.0") // false
+SemVer.unsafeParse("2.0.1").unsafeMatches(">=1.0.0 <=2.0.0") // false
 
-SemVer.unsefeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
-SemVer.unsefeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
-SemVer.unsefeParse("3.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // false
-SemVer.unsefeParse("3.0.1").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
-SemVer.unsefeParse("4.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
+SemVer.unsafeParse("1.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
+SemVer.unsafeParse("2.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <4.0.0") // true
+SemVer.unsafeParse("3.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // false
+SemVer.unsafeParse("3.0.1").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
+SemVer.unsafeParse("4.0.0").unsafeMatches("1.0.0 - 2.0.0 || >3.0.0 <=4.0.0") // true
 ```
-
