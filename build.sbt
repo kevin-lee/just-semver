@@ -23,59 +23,19 @@ ThisBuild / scmInfo    :=
 ThisBuild / licenses   := List("MIT" -> url("http://opensource.org/licenses/MIT"))
 
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
+ThisBuild / publishTo := updateSnapshotPublishTo((ThisBuild / publishTo).value)
 
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
-    name                                 := "just-semver",
-    description                          := "Semantic Versioning (SemVer) for Scala",
-    libraryDependencies ++= {
-      if (isGhaPublishing) {
-        List.empty[ModuleID]
-      } else {
-        SemVer.majorMinorPatch(SemVer.parseUnsafe(scalaVersion.value)) match {
-          case (Major(2), Minor(11), _) =>
-            List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
-          case (Major(3), Minor(0), _) =>
-            List.empty[ModuleID]
-          case (_, _, _) =>
-            List(compilerPlugin("org.wartremover" %% "wartremover" % "3.0.0" cross CrossVersion.full))
-        }
-      }
-    },
-    Compile / unmanagedSourceDirectories := {
-      val sharedSourceDir = baseDirectory.value / "src/main"
-      val moreSrcs        =
-        if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
-          Seq(sharedSourceDir / "scala-2.12_2.13")
-        else
-          Seq.empty[File]
-      ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
-    },
-//    useAggressiveScalacOptions := true,
-    libraryDependencies                  :=
-      crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
-        case (SemVer.Major(3), SemVer.Minor(0), _) =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value ++
-            libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
+    name        := props.RepoName,
+    description := "Semantic Versioning (SemVer) for Scala",
+  )
+  .settings(mavenCentralPublishSettings)
+  .aggregate(core)
 
-        case (Major(3), _, _) =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
-
-        case x =>
-          libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
-      },
-    libraryDependencies                  := (
-      if (isScala3(scalaVersion.value)) {
-        libraryDependencies
-          .value
-          .filterNot(props.removeDottyIncompatible)
-      } else {
-        libraryDependencies.value
-      }
-    ),
-    scalacOptions ++= (if (isGhaPublishing) List.empty[String]
-                       else ProjectInfo.commonWarts(scalaVersion.value)),
+lazy val core = module("core")
+  .settings(
 //    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
 //                                           else ProjectInfo.commonWarts(scalaVersion.value)),
 //    (Test / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
@@ -108,14 +68,15 @@ lazy val justSemVer = (project in file("."))
 //        .value
 //        .filterNot(option => option.contains("wartremover") || option.contains("import")),
 //    /* } WartRemover and scalacOptions */
-    testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
-    licenses                  := List("MIT" -> url("http://opensource.org/licenses/MIT")),
     console / initialCommands := """import just.semver.SemVer""",
   )
-  .settings(mavenCentralPublishSettings)
 
 lazy val props =
   new {
+    val RepoName = "just-semver"
+
+    val licenses = List("MIT" -> url("http://opensource.org/licenses/MIT"))
+
     val removeDottyIncompatible: ModuleID => Boolean =
       m =>
 //        m.name == "wartremover" ||
@@ -168,3 +129,76 @@ lazy val mavenCentralPublishSettings: SettingsDefinition = List(
   sonatypeRepository     := props.SonatypeRepository,
   /* } Publish to Maven Central */
 )
+
+// scalafmt: off
+def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
+// scalafmt: on
+
+def module(projectName: String): Project = {
+  val prefixedName = prefixedProjectName(projectName)
+  Project(projectName, file(s"modules/$prefixedName"))
+    .settings(
+      testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
+    )
+    .settings(
+      libraryDependencies ++= {
+        if (isGhaPublishing) {
+          List.empty[ModuleID]
+        } else {
+          SemVer.majorMinorPatch(SemVer.parseUnsafe(scalaVersion.value)) match {
+            case (Major(2), Minor(11), _) =>
+              List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
+            case (Major(3), Minor(0), _) =>
+              List.empty[ModuleID]
+            case (_, _, _) =>
+              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.0.0" cross CrossVersion.full))
+          }
+        }
+      },
+      Compile / unmanagedSourceDirectories := {
+        val sharedSourceDir = baseDirectory.value / "src/main"
+        val moreSrcs        =
+          if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
+            Seq(sharedSourceDir / "scala-2.12_2.13")
+          else
+            Seq.empty[File]
+        ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
+      },
+      //    useAggressiveScalacOptions := true,
+      libraryDependencies                  :=
+        crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
+          case (SemVer.Major(3), SemVer.Minor(0), _) =>
+            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value ++
+              libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
+
+          case (Major(3), _, _) =>
+            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+
+          case x =>
+            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+        },
+      libraryDependencies                  := (
+        if (isScala3(scalaVersion.value)) {
+          libraryDependencies
+            .value
+            .filterNot(props.removeDottyIncompatible)
+        } else {
+          libraryDependencies.value
+        }
+      ),
+      scalacOptions ++= (if (isGhaPublishing) List.empty[String]
+                         else ProjectInfo.commonWarts(scalaVersion.value)),
+      publishTo                            := updateSnapshotPublishTo(publishTo.value),
+    )
+    .settings(mavenCentralPublishSettings)
+}
+
+def updateSnapshotPublishTo(resolver: Option[Resolver]): Option[Resolver] = resolver match {
+  case Some(resolver) =>
+    if (resolver.name == "sonatype-snapshots")
+      ("sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots").some
+    else
+      resolver.some
+  case None =>
+    none
+}
