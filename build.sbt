@@ -20,7 +20,7 @@ ThisBuild / scmInfo    :=
     url("https://github.com/Kevin-Lee/just-semver"),
     "git@github.com:Kevin-Lee/just-semver.git"
   ).some
-ThisBuild / licenses   := List("MIT" -> url("http://opensource.org/licenses/MIT"))
+ThisBuild / licenses   := props.licenses
 
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 ThisBuild / publishTo := updateSnapshotPublishTo((ThisBuild / publishTo).value)
@@ -32,6 +32,7 @@ lazy val justSemVer = (project in file("."))
     description := "Semantic Versioning (SemVer) for Scala",
   )
   .settings(mavenCentralPublishSettings)
+  .dependsOn(core)
   .aggregate(core)
 
 lazy val core = module("core")
@@ -138,6 +139,7 @@ def module(projectName: String): Project = {
   val prefixedName = prefixedProjectName(projectName)
   Project(projectName, file(s"modules/$prefixedName"))
     .settings(
+      name := prefixedName,
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
     )
     .settings(
