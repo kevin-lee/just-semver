@@ -101,6 +101,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
         val versions = props
           .CrossScalaVersions
           .map(CrossVersion.binaryScalaVersion)
+          .distinct
           .map(binVer => s"`$binVer`")
         if (versions.length > 1)
           s"${versions.init.mkString(", ")} and ${versions.last}"
