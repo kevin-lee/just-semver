@@ -72,6 +72,47 @@ lazy val core = module("core")
     console / initialCommands := """import just.semver.SemVer""",
   )
 
+lazy val docs = (project in file("docs-gen-tmp/docs"))
+  .enablePlugins(MdocPlugin, DocusaurPlugin)
+  .settings(
+    scalaVersion     := "2.13.8",
+    name             := prefixedProjectName("docs"),
+    mdocIn           := file("docs"),
+    mdocOut          := file("generated-docs/docs"),
+    cleanFiles += file("generated-docs/docs"),
+    libraryDependencies ++= {
+      import sys.process._
+      "git fetch --tags".!
+      val tag           = "git rev-list --tags --max-count=1".!!.trim
+      val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
+
+      List(
+        "io.kevinlee" %% "just-semver" % latestVersion,
+      )
+    },
+    mdocVariables    := Map(
+      "VERSION"                  -> {
+        import sys.process._
+        "git fetch --tags".!
+        val tag = "git rev-list --tags --max-count=1".!!.trim
+        s"git describe --tags $tag".!!.trim.stripPrefix("v")
+      },
+      "SUPPORTED_SCALA_VERSIONS" -> {
+        val versions = props
+          .CrossScalaVersions
+          .map(CrossVersion.binaryScalaVersion)
+          .map(binVer => s"`$binVer`")
+        if (versions.length > 1)
+          s"${versions.init.mkString(", ")} and ${versions.last}"
+        else
+          versions.mkString
+      },
+    ),
+    docusaurDir      := (ThisBuild / baseDirectory).value / "website",
+    docusaurBuildDir := docusaurDir.value / "build",
+  )
+  .settings(noPublish)
+
 lazy val props =
   new {
     val RepoName = "just-semver"
