@@ -16,7 +16,14 @@ slug: '/'
 
 Semantic Versioning (`SemVer`) for Scala
 
+:::info
+Supported Scala Versions: @SUPPORTED_SCALA_VERSIONS@
+
+Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/just-semver/artifacts)
+:::
+
+
 # Get just-semver
 ```scala
-libraryDependencies += "io.kevinlee" %% "just-semver" % "0.4.0"
+libraryDependencies += "io.kevinlee" %% "just-semver" % "@VERSION@"
 ```
