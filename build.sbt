@@ -32,10 +32,18 @@ lazy val justSemVer = (project in file("."))
     description := "Semantic Versioning (SemVer) for Scala",
   )
   .settings(mavenCentralPublishSettings)
-  .dependsOn(core)
-  .aggregate(core)
+  .dependsOn(
+    coreJvm,
+    coreJs,
+  )
+  .aggregate(
+    coreJvm,
+    coreJs,
+  )
 
-lazy val core = module("core")
+import sbtcrossproject.CrossProject
+
+lazy val core = module("core", crossProject(JVMPlatform, JSPlatform))
   .settings(
 //    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
 //                                           else ProjectInfo.commonWarts(scalaVersion.value)),
@@ -71,6 +79,9 @@ lazy val core = module("core")
 //    /* } WartRemover and scalacOptions */
     console / initialCommands := """import just.semver.SemVer""",
   )
+
+lazy val coreJvm = core.jvm
+lazy val coreJs  = core.js.settings(Test / fork := false)
 
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
@@ -177,9 +188,10 @@ lazy val mavenCentralPublishSettings: SettingsDefinition = List(
 def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
 // scalafmt: on
 
-def module(projectName: String): Project = {
+def module(projectName: String, crossProject: CrossProject.Builder): CrossProject = {
   val prefixedName = prefixedProjectName(projectName)
-  Project(projectName, file(s"modules/$prefixedName"))
+  crossProject
+    .in(file(s"modules/$prefixedName"))
     .settings(
       name := prefixedName,
       testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
@@ -200,7 +212,7 @@ def module(projectName: String): Project = {
         }
       },
       Compile / unmanagedSourceDirectories := {
-        val sharedSourceDir = baseDirectory.value / "src/main"
+        val sharedSourceDir = baseDirectory.value.getParentFile / "shared/src/main"
         val moreSrcs        =
           if (scalaVersion.value.startsWith("2.13") || scalaVersion.value.startsWith("2.12"))
             Seq(sharedSourceDir / "scala-2.12_2.13")
