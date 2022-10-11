@@ -13,7 +13,6 @@ slug: '/'
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.kevinlee/just-semver_2.13/badge.svg)](https://search.maven.org/artifact/io.kevinlee/just-semver_2.13)
 [![Latest version](https://index.scala-lang.org/kevin-lee/just-semver/just-semver/latest.svg)](https://index.scala-lang.org/kevin-lee/just-semver/just-semver)
 
-
 Semantic Versioning (`SemVer`) for Scala
 
 :::info
@@ -25,5 +24,22 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 
 # Get just-semver
 ```scala
+"io.kevinlee" %% "just-semver" % "@VERSION@"
+```
+
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
+
+Since `0.6.0` `just-semver` supports Scala.js.
+
+```scala
+"io.kevinlee" %%% "just-semver" % "@VERSION@"
+```
+
+
+e.g.)
+```scala
 libraryDependencies += "io.kevinlee" %% "just-semver" % "@VERSION@"
+```
+```scala
+libraryDependencies += "io.kevinlee" %%% "just-semver" % "@VERSION@"
 ```
