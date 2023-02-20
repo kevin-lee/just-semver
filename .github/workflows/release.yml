@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: olafurpg/setup-scala@v13
+      - uses: olafurpg/setup-scala@v14
         with:
           java-version: ${{ matrix.scala.java-version }}
 
@@ -59,7 +59,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: olafurpg/setup-scala@v13
+      - uses: olafurpg/setup-scala@v14
         with:
           java-version: ${{ matrix.scala.java-version }}
 
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: olafurpg/setup-scala@v13
+      - uses: olafurpg/setup-scala@v14
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
 
@@ -137,7 +137,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: olafurpg/setup-scala@v13
+      - uses: olafurpg/setup-scala@v14
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
       - uses: olafurpg/setup-gpg@v3
@@ -185,7 +185,7 @@ jobs:
 #      - uses: actions/checkout@v3
 #        with:
 #          fetch-depth: 0
-#      - uses: olafurpg/setup-scala@v13
+#      - uses: olafurpg/setup-scala@v14
 #        with:
 #          java-version: ${{ env.GH_JAVA_VERSION }}
 #      - uses: olafurpg/setup-gpg@v3
