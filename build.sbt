@@ -2,8 +2,8 @@ import just.semver.SemVer
 import SemVer.{Major, Minor}
 import kevinlee.sbt.SbtCommon.crossVersionProps
 
-ThisBuild / scalaVersion       := props.ProjectScalaVersion
-ThisBuild / organization       := "io.kevinlee"
+ThisBuild / scalaVersion := props.ProjectScalaVersion
+ThisBuild / organization := "io.kevinlee"
 ThisBuild / crossScalaVersions := props.CrossScalaVersions
 
 ThisBuild / developers := List(
@@ -14,13 +14,13 @@ ThisBuild / developers := List(
     url("https://github.com/Kevin-Lee")
   )
 )
-ThisBuild / homepage   := url("https://github.com/Kevin-Lee/just-semver").some
-ThisBuild / scmInfo    :=
+ThisBuild / homepage := url("https://github.com/Kevin-Lee/just-semver").some
+ThisBuild / scmInfo :=
   ScmInfo(
     url("https://github.com/Kevin-Lee/just-semver"),
     "git@github.com:Kevin-Lee/just-semver.git"
   ).some
-ThisBuild / licenses   := props.licenses
+ThisBuild / licenses := props.licenses
 
 ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
 ThisBuild / publishTo := updateSnapshotPublishTo((ThisBuild / publishTo).value)
@@ -28,7 +28,7 @@ ThisBuild / publishTo := updateSnapshotPublishTo((ThisBuild / publishTo).value)
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
-    name        := props.RepoName,
+    name := props.RepoName,
     description := "Semantic Versioning (SemVer) for Scala",
   )
   .settings(mavenCentralPublishSettings)
@@ -86,10 +86,10 @@ lazy val coreJs  = core.js.settings(Test / fork := false)
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
   .settings(
-    scalaVersion     := "2.13.8",
-    name             := prefixedProjectName("docs"),
-    mdocIn           := file("docs"),
-    mdocOut          := file("generated-docs/docs"),
+    scalaVersion := "2.13.8",
+    name := prefixedProjectName("docs"),
+    mdocIn := file("docs"),
+    mdocOut := file("generated-docs/docs"),
     cleanFiles += file("generated-docs/docs"),
     libraryDependencies ++= {
       import sys.process._
@@ -101,7 +101,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
         "io.kevinlee" %% "just-semver" % latestVersion,
       )
     },
-    mdocVariables    := Map(
+    mdocVariables := Map(
       "VERSION"                  -> {
         import sys.process._
         "git fetch --tags".!
@@ -120,7 +120,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
           versions.mkString
       },
     ),
-    docusaurDir      := (ThisBuild / baseDirectory).value / "website",
+    docusaurDir := (ThisBuild / baseDirectory).value / "website",
     docusaurBuildDir := docusaurDir.value / "build",
   )
   .settings(noPublish)
@@ -145,12 +145,17 @@ lazy val props =
     final val ProjectScalaVersion: String      = "3.1.2"
 //    final val ProjectScalaVersion: String     = "2.13.6"
     final val CrossScalaVersions: List[String] =
-      (if (isGhaPublishing) (_: List[String]).diff(List(ProjectScalaVersion)) else identity[List[String]] _)(
+      (
+        if (isGhaPublishing)
+          (_: List[String]).diff(List(ProjectScalaVersion))
+        else
+          identity[List[String]] _
+      ) (
         List(
           "2.11.12",
           "2.12.13",
           "2.13.6",
-          "3.0.0",
+          "3.0.2",
           ProjectScalaVersion
         ).distinct
       )
@@ -158,19 +163,28 @@ lazy val props =
     val SonatypeCredentialHost = "s01.oss.sonatype.org"
     val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
 
-    final val hedgehogVersion = "0.9.0"
+    final val HedgehogVersion = "0.9.0"
+
+    final val HedgehogLatestVersion = "0.10.1"
 
   }
 
 lazy val libs =
   new {
 
-    def hedgehogLibs(hedgehogVersion: String): List[ModuleID] = List(
-      "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
-      "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
-      "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
-    )
+    def hedgehogLibs(scalaVersion: String): List[ModuleID] = {
+      val hedgehogVersion =
+        if (scalaVersion.startsWith("3.0"))
+          props.HedgehogVersion
+        else
+          props.HedgehogLatestVersion
 
+      List(
+        "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
+        "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
+        "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
+      )
+    }
   }
 
 def isGhaPublishing: Boolean = sys.env.get("GHA_IS_PUBLISHING").fold(false)(_.toBoolean)
@@ -180,7 +194,7 @@ def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
 lazy val mavenCentralPublishSettings: SettingsDefinition = List(
   /* Publish to Maven Central { */
   sonatypeCredentialHost := props.SonatypeCredentialHost,
-  sonatypeRepository     := props.SonatypeRepository,
+  sonatypeRepository := props.SonatypeRepository,
   /* } Publish to Maven Central */
 )
 
@@ -221,19 +235,19 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
         ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
       },
       //    useAggressiveScalacOptions := true,
-      libraryDependencies                  :=
+      libraryDependencies :=
         crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
           case (SemVer.Major(3), SemVer.Minor(0), _) =>
-            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value ++
+            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value ++
               libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
 
           case (Major(3), _, _) =>
-            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
 
           case x =>
-            libs.hedgehogLibs(props.hedgehogVersion) ++ libraryDependencies.value
+            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
         },
-      libraryDependencies                  := (
+      libraryDependencies := (
         if (isScala3(scalaVersion.value)) {
           libraryDependencies
             .value
@@ -244,7 +258,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
       ),
       scalacOptions ++= (if (isGhaPublishing) List.empty[String]
                          else ProjectInfo.commonWarts(scalaVersion.value)),
-      publishTo                            := updateSnapshotPublishTo(publishTo.value),
+      publishTo := updateSnapshotPublishTo(publishTo.value),
     )
     .settings(mavenCentralPublishSettings)
 }
