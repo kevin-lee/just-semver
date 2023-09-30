@@ -142,8 +142,8 @@ lazy val props =
     val isWartRemover: ModuleID => Boolean =
       m => m.name == "wartremover"
 
-    final val ProjectScalaVersion: String      = "3.1.2"
-//    final val ProjectScalaVersion: String     = "2.13.6"
+//    final val ProjectScalaVersion: String      = "3.1.3"
+    final val ProjectScalaVersion: String     = "2.13.11"
     final val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing)
@@ -152,10 +152,9 @@ lazy val props =
           identity[List[String]] _
       ) (
         List(
-          "2.11.12",
-          "2.12.13",
-          "2.13.6",
-          "3.0.2",
+          "2.12.17",
+          "2.13.11",
+          "3.1.3",
           ProjectScalaVersion
         ).distinct
       )
@@ -218,10 +217,8 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
           SemVer.majorMinorPatch(SemVer.parseUnsafe(scalaVersion.value)) match {
             case (Major(2), Minor(11), _) =>
               List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
-            case (Major(3), Minor(0), _) =>
-              List.empty[ModuleID]
             case (_, _, _) =>
-              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.0.0" cross CrossVersion.full))
+              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.1.4" cross CrossVersion.full))
           }
         }
       },
