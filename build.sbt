@@ -150,7 +150,7 @@ lazy val props =
       m => m.name == "wartremover"
 
 //    final val ProjectScalaVersion: String      = "3.1.3"
-    final val ProjectScalaVersion: String      = "2.13.11"
+    final val ProjectScalaVersion: String      = "2.13.12"
     final val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing) {
@@ -162,9 +162,9 @@ lazy val props =
         }
       ) (
         List(
-          "2.12.17",
-          "2.13.11",
-          "3.1.3",
+          "2.12.18",
+          "2.13.12",
+          "3.2.2",
           ProjectScalaVersion
         ).distinct
       )
