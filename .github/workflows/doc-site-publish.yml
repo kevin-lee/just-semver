@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { version: "2.13.8", binary-version: "2.13", java-version: "adopt@1.11" }
+          - { version: "2.13.11", binary-version: "2.13", java-version: "adopt@1.11" }
         node:
           - { version: "16.16.0" }
 

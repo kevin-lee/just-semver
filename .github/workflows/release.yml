@@ -19,11 +19,9 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2",   version: "2.11.12", binary-version: "2.11", java-version: "adopt@1.8",  params: "" }
-          - { name: "Scala 2",   version: "2.12.13", binary-version: "2.12", java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 2",   version: "2.13.6",  binary-version: "2.13", java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 3",   version: "3.0.0",   binary-version: "3",    java-version: "adopt@1.11", params: "" }
-          - { name: "Scala 3.1", version: "3.1.2",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
+          - { name: "Scala 2",   version: "2.12.17", binary-version: "2.12", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 2",   version: "2.13.11", binary-version: "2.13", java-version: "adopt@1.11", params: "" }
+          - { name: "Scala 3.1", version: "3.1.3",   binary-version: "3",    java-version: "adopt@1.11", params: '; set useAggressiveScalacOptions := true ;' }
 
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +53,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2", version: "2.13.6", binary-version: "2.13", java-version: "adopt@1.11" }
+          - { name: "Scala 2", version: "2.13.11", binary-version: "2.13", java-version: "adopt@1.11" }
 
     steps:
       - uses: actions/checkout@v4

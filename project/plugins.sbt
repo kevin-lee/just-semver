@@ -1,14 +1,14 @@
 logLevel := sbt.Level.Warn
 
-addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.11")
-addSbtPlugin("org.scoverage"  % "sbt-scoverage"  % "2.0.6")
+addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
+addSbtPlugin("org.scoverage"  % "sbt-scoverage"  % "2.0.9")
 addSbtPlugin("ch.epfl.scala"  % "sbt-scalafix"   % "0.10.4")
 
 addSbtPlugin("org.scalameta" % "sbt-mdoc"     % "2.3.7")
 addSbtPlugin("io.kevinlee"   % "sbt-docusaur" % "0.13.0")
 
-addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.11.0")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.2.0")
+addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.13.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.1")
 
 val sbtDevOopsVersion = "2.24.0"
 addSbtPlugin("io.kevinlee" % "sbt-devoops-scala"     % sbtDevOopsVersion)
