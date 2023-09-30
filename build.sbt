@@ -111,7 +111,14 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
       "SUPPORTED_SCALA_VERSIONS" -> {
         val versions = props
           .CrossScalaVersions
-          .map(CrossVersion.binaryScalaVersion)
+          .map { scalaVersion =>
+            if (scalaVersion.startsWith("3")) {
+              val scalaV = SemVer.unsafeParse(scalaVersion)
+              s"${scalaV.major.value.toString}.${scalaV.minor.value.toString}+"
+            } else {
+              CrossVersion.binaryScalaVersion(scalaVersion)
+            }
+          }
           .distinct
           .map(binVer => s"`$binVer`")
         if (versions.length > 1)
@@ -143,7 +150,7 @@ lazy val props =
       m => m.name == "wartremover"
 
 //    final val ProjectScalaVersion: String      = "3.1.3"
-    final val ProjectScalaVersion: String     = "2.13.11"
+    final val ProjectScalaVersion: String      = "2.13.11"
     final val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing) {
