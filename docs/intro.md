@@ -24,7 +24,7 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 
 # Get just-semver
 ```scala
-"io.kevinlee" %% "just-semver" % "@VERSION@"
+"io.kevinlee" %% "just-semver-core" % "@VERSION@"
 ```
 
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
@@ -32,14 +32,14 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 Since `0.6.0` `just-semver` supports Scala.js.
 
 ```scala
-"io.kevinlee" %%% "just-semver" % "@VERSION@"
+"io.kevinlee" %%% "just-semver-core" % "@VERSION@"
 ```
 
 
 e.g.)
 ```scala
-libraryDependencies += "io.kevinlee" %% "just-semver" % "@VERSION@"
+libraryDependencies += "io.kevinlee" %% "just-semver-core" % "@VERSION@"
 ```
 ```scala
-libraryDependencies += "io.kevinlee" %%% "just-semver" % "@VERSION@"
+libraryDependencies += "io.kevinlee" %%% "just-semver-core" % "@VERSION@"
 ```
