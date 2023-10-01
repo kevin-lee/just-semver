@@ -86,7 +86,7 @@ lazy val coreJs  = core.js.settings(Test / fork := false)
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
   .settings(
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.11",
     name := prefixedProjectName("docs"),
     mdocIn := file("docs"),
     mdocOut := file("generated-docs/docs"),
@@ -146,10 +146,13 @@ lazy val props =
     final val ProjectScalaVersion: String     = "2.13.11"
     final val CrossScalaVersions: List[String] =
       (
-        if (isGhaPublishing)
-          (_: List[String]).diff(List(ProjectScalaVersion))
-        else
+        if (isGhaPublishing) {
+          // Publish version and the project version are the same so this logic is no longer required.
+          //          (_: List[String]).diff(List(ProjectScalaVersion))
           identity[List[String]] _
+        } else {
+          identity[List[String]] _
+        }
       ) (
         List(
           "2.12.17",
