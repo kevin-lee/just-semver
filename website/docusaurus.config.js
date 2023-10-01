@@ -21,6 +21,12 @@ const classicConfig = {
   docs: {
     path: '../generated-docs/docs/',
     sidebarPath: require.resolve('./sidebars.js'),
+    lastVersion: 'current',
+    "versions": {
+      "current": {
+        "label": "0.12.0"
+      },
+    }
     // Please change this to your repo.
     // Remove this to remove the "edit this page" links.
   },
@@ -81,6 +87,17 @@ const config = {
             docId: 'intro',
             position: 'left',
             label: 'Docs',
+          },
+          {
+            type: 'docsVersionDropdown',
+            position: 'right',
+            dropdownActiveClassDisabled: true,
+            dropdownItemsAfter: [
+              {
+                to: '/versions',
+                label: 'All versions',
+              },
+            ],
           },
           {
             href: 'https://github.com/Kevin-Lee/just-semver',
