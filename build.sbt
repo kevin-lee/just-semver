@@ -98,7 +98,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
       val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
 
       List(
-        "io.kevinlee" %% "just-semver" % latestVersion,
+        "io.kevinlee" %%% "just-semver-core" % latestVersion,
       )
     },
     mdocVariables := Map(
