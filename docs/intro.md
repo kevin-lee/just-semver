@@ -22,7 +22,10 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 :::
 
 
-# Get just-semver
+## Get just-semver
+
+### `@VERSION@`
+
 ```scala
 "io.kevinlee" %% "just-semver-core" % "@VERSION@"
 ```
@@ -42,4 +45,70 @@ libraryDependencies += "io.kevinlee" %% "just-semver-core" % "@VERSION@"
 ```
 ```scala
 libraryDependencies += "io.kevinlee" %%% "just-semver-core" % "@VERSION@"
+```
+
+## Older Versions
+
+### `0.9.0`
+
+:::info
+Supported Scala Versions: `2.12`, `2.13` and `3.1+`.
+
+Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/just-semver/artifacts)
+:::
+
+
+#### Get just-semver
+
+```scala
+"io.kevinlee" %% "just-semver-core" % "0.9.0"
+```
+
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
+
+Since `0.6.0` `just-semver` supports Scala.js.
+
+```scala
+"io.kevinlee" %%% "just-semver-core" % "0.9.0"
+```
+
+
+e.g.)
+```scala
+libraryDependencies += "io.kevinlee" %% "just-semver-core" % "0.9.0"
+```
+```scala
+libraryDependencies += "io.kevinlee" %%% "just-semver-core" % "0.9.0"
+```
+
+### `0.6.0`
+
+:::info
+Supported Scala Versions: `2.11`, `2.12`, `2.13` and `3`.
+
+Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/just-semver/artifacts)
+:::
+
+
+#### Get just-semver
+
+```scala
+"io.kevinlee" %% "just-semver-core" % "0.6.0"
+```
+
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
+
+Since `0.6.0` `just-semver` supports Scala.js.
+
+```scala
+"io.kevinlee" %%% "just-semver-core" % "0.6.0"
+```
+
+
+e.g.)
+```scala
+libraryDependencies += "io.kevinlee" %% "just-semver-core" % "0.6.0"
+```
+```scala
+libraryDependencies += "io.kevinlee" %%% "just-semver-core" % "0.6.0"
 ```
