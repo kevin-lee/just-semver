@@ -164,7 +164,7 @@ lazy val props =
         List(
           "2.12.18",
           "2.13.12",
-          "3.2.2",
+          "3.3.0",
           ProjectScalaVersion
         ).distinct
       )
