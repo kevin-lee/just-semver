@@ -35,15 +35,17 @@ lazy val justSemVer = (project in file("."))
   .dependsOn(
     coreJvm,
     coreJs,
+    coreNative,
   )
   .aggregate(
     coreJvm,
     coreJs,
+    coreNative,
   )
 
 import sbtcrossproject.CrossProject
 
-lazy val core = module("core", crossProject(JVMPlatform, JSPlatform))
+lazy val core = module("core", crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
 //    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
 //                                           else ProjectInfo.commonWarts(scalaVersion.value)),
@@ -82,6 +84,8 @@ lazy val core = module("core", crossProject(JVMPlatform, JSPlatform))
 
 lazy val coreJvm = core.jvm
 lazy val coreJs  = core.js.settings(Test / fork := false)
+
+lazy val coreNative = core.native.settings(nativeSettings)
 
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
@@ -279,3 +283,7 @@ def updateSnapshotPublishTo(resolver: Option[Resolver]): Option[Resolver] = reso
   case None =>
     none
 }
+
+lazy val nativeSettings: SettingsDefinition = List(
+  Test / fork := false
+)
