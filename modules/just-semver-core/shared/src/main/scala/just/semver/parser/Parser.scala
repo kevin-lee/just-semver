@@ -62,15 +62,16 @@ object Parser {
 
   def charsWhile(f: Char => Boolean): Parser[String] = new Parser[String] {
     override def parseTo(state: State): String = {
-      val parsed    = state.value.zipWithIndex.drop(state.offset).takeWhile { case (c, index) => f(c) }
+      val parsed    = state.value.zipWithIndex.drop(state.offset).takeWhile { case (c, index @ _) => f(c) }
       val parsedStr = parsed.map(_._1).mkString
       val offset    = parsed.lastOption.map(_._2).getOrElse(0)
       if (parsedStr.isEmpty) {
-        state.error = Some(ParserError("", None, Some(state.value)))
+        state.error = Some(ParserError("", None: Option[String], Some(state.value)))
         ""
-      } else
+      } else {
         state.offset = offset + 1
         parsedStr
+      }
     }
   }
 
