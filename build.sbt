@@ -154,6 +154,7 @@ lazy val props =
       m => m.name == "wartremover"
 
 //    final val ProjectScalaVersion: String      = "3.1.3"
+//    final val ProjectScalaVersion: String      = "3.3.1"
     final val ProjectScalaVersion: String      = "2.13.12"
     final val CrossScalaVersions: List[String] =
       (
