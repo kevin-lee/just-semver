@@ -95,6 +95,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
     mdocIn := file("docs"),
     mdocOut := file("generated-docs/docs"),
     cleanFiles += file("generated-docs/docs"),
+    scalacOptions ~= (ops => ops.filterNot(x => x == "-Wnonunit-statement")),
     libraryDependencies ++= {
       import sys.process._
       "git fetch --tags".!
