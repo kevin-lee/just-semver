@@ -36,11 +36,17 @@ lazy val justSemVer = (project in file("."))
     coreJvm,
     coreJs,
     coreNative,
+    decverJvm,
+    decverJs,
+    decverNative,
   )
   .aggregate(
     coreJvm,
     coreJs,
     coreNative,
+    decverJvm,
+    decverJs,
+    decverNative,
   )
 
 import sbtcrossproject.CrossProject
@@ -86,6 +92,14 @@ lazy val coreJvm = core.jvm
 lazy val coreJs  = core.js.settings(Test / fork := false)
 
 lazy val coreNative = core.native.settings(nativeSettings)
+
+lazy val decver = module("decver", crossProject(JVMPlatform, JSPlatform, NativePlatform))
+  .dependsOn(core)
+
+lazy val decverJvm = decver.jvm
+lazy val decverJs  = decver.js.settings(Test / fork := false)
+
+lazy val decverNative = decver.native.settings(nativeSettings)
 
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
