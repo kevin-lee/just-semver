@@ -20,33 +20,38 @@ object Dsv extends Compat {
     def render: String = dsv.values.map(_.render).mkString
   }
 
-  def parse(value: String): Either[ParseError, Dsv] = {
+  def parse(value: String): Either[DsvParseError, Dsv] = {
 
     @tailrec
-    def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[ParseError, Vector[Anh]] =
+    def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[DsvParseError, Vector[Anh]] =
       cs match {
         case x :: xs =>
           if (x.isDigit) {
             chars match {
-              case Num(ns) => accumulate(xs, Num(ns :+ x), acc)
+              case Num(ns) =>
+                accumulate(xs, Num(ns :+ x), acc)
 
-              case _ => accumulate(xs, Num(x.toString), acc :+ chars)
+              case _ =>
+                accumulate(xs, Num(x.toString), acc :+ chars)
             }
-          } else if (x == '-') {
+          } else if (x === '-') {
             accumulate(xs, Hyphen, acc :+ chars)
           } else if (x.isUpper || x.isLower) {
             chars match {
-              case Alphabet(as) => accumulate(xs, Alphabet(as :+ x), acc)
+              case Alphabet(as) =>
+                accumulate(xs, Alphabet(as :+ x), acc)
 
-              case _ => accumulate(xs, Alphabet(x.toString), acc :+ chars)
+              case _ =>
+                accumulate(xs, Alphabet(x.toString), acc :+ chars)
             }
           } else {
             Left(
-              ParseError.invalidAlphaNumHyphenError(x, xs)
+              DsvParseError.invalidAlphaNumHyphenError(x, xs)
             )
           }
 
-        case Nil => Right(acc :+ chars)
+        case Nil =>
+          Right(acc :+ chars)
       }
 
     value.toList match {
@@ -54,19 +59,32 @@ object Dsv extends Compat {
         val result =
           if (x.isDigit) {
             accumulate(xs, Num(x.toString), Vector.empty)
-          } else if (x == '-')
+          } else if (x === '-')
             accumulate(xs, Hyphen, Vector.empty)
           else if (x.isLower || x.isUpper)
             accumulate(xs, Alphabet(x.toString), Vector.empty)
           else
             Left(
-              ParseError.invalidAlphaNumHyphenError(x, xs)
+              DsvParseError.invalidAlphaNumHyphenError(x, xs)
             )
 
         result.map(groups => Dsv(groups.toList))
 
-      case Nil => Left(ParseError.emptyAlphaNumHyphenError)
+      case Nil =>
+        Left(DsvParseError.emptyAlphaNumHyphenError)
     }
+
+  }
+
+  enum DsvParseError {
+    case InvalidAlphaNumHyphenError(c: Char, rest: List[Char])
+    case EmptyAlphaNumHyphenError
+  }
+  object DsvParseError {
+    def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): DsvParseError =
+      DsvParseError.InvalidAlphaNumHyphenError(c, rest)
+
+    def emptyAlphaNumHyphenError: DsvParseError = DsvParseError.EmptyAlphaNumHyphenError
 
   }
 }

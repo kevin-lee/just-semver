@@ -21,13 +21,13 @@ object Dsv extends Compat {
     @inline def render: String = Dsv.render(dsv)
   }
 
-  def render(alphaNumHyphenGroup: Dsv): String =
-    alphaNumHyphenGroup.values.map(Anh.render).mkString
+  def render(dsv: Dsv): String =
+    dsv.values.map(Anh.render).mkString
 
-  def parse(value: String): Either[ParseError, Dsv] = {
+  def parse(value: String): Either[DsvParseError, Dsv] = {
 
     @tailrec
-    def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[ParseError, Vector[Anh]] =
+    def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[DsvParseError, Vector[Anh]] =
       cs match {
         case x :: xs =>
           if (x.isDigit) {
@@ -50,7 +50,7 @@ object Dsv extends Compat {
             }
           } else {
             Left(
-              ParseError.invalidAlphaNumHyphenError(x, xs)
+              DsvParseError.invalidAlphaNumHyphenError(x, xs)
             )
           }
 
@@ -69,14 +69,25 @@ object Dsv extends Compat {
             accumulate(xs, Alphabet(x.toString), Vector.empty)
           else
             Left(
-              ParseError.invalidAlphaNumHyphenError(x, xs)
+              DsvParseError.invalidAlphaNumHyphenError(x, xs)
             )
 
         result.map(groups => Dsv(groups.toList))
 
       case Nil =>
-        Left(ParseError.emptyAlphaNumHyphenError)
+        Left(DsvParseError.emptyAlphaNumHyphenError)
     }
+
+  }
+
+  sealed trait DsvParseError
+  object DsvParseError {
+    final case class InvalidAlphaNumHyphenError(c: Char, rest: List[Char]) extends DsvParseError
+    case object EmptyAlphaNumHyphenError extends DsvParseError
+
+    def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): DsvParseError = InvalidAlphaNumHyphenError(c, rest)
+
+    def emptyAlphaNumHyphenError: DsvParseError = EmptyAlphaNumHyphenError
 
   }
 }
