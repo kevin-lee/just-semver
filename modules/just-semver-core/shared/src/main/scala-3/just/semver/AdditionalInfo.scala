@@ -1,6 +1,6 @@
 package just.semver
 
-import just.Common._
+import just.Common.*
 
 /** @author Kevin Lee
   * @since 2018-10-21
@@ -25,41 +25,41 @@ object AdditionalInfo extends Compat {
     }
   }
 
-  def parsePreRelease(value: String): Either[ParseError, Option[PreRelease]] =
+  def parsePreRelease(value: String): Either[AdditionalInfoParseError, Option[PreRelease]] =
     parse(
       value,
       {
         case a @ Dsv(Num(n) :: Nil) =>
-          if ((n === "0") || n.takeWhile(_ === '0').length == 0)
+          if ((n === "0") || n.takeWhile(_ === '0').length === 0)
             Right(a)
           else
-            Left(ParseError.leadingZeroNumError(n))
+            Left(AdditionalInfoParseError.leadingZeroNumError(n))
         case a @ Dsv(_) =>
           Right(a)
       }
     ).map(_.map(PreRelease.apply))
 
-  def parseBuildMetaInfo(value: String): Either[ParseError, Option[BuildMetaInfo]] =
+  def parseBuildMetaInfo(value: String): Either[AdditionalInfoParseError, Option[BuildMetaInfo]] =
     parse(value, Right.apply).map(_.map(BuildMetaInfo.apply))
 
   def parse(
     value: String,
-    validator: Dsv => Either[ParseError, Dsv]
-  ): Either[ParseError, Option[List[Dsv]]] = {
-    val alphaNumHyphens: Either[ParseError, List[Dsv]] =
+    validator: Dsv => Either[AdditionalInfoParseError, Dsv]
+  ): Either[AdditionalInfoParseError, Option[List[Dsv]]] = {
+    val alphaNumHyphens: Either[AdditionalInfoParseError, List[Dsv]] =
       Option(value)
-        .flatMap { s =>
-          Option(s.split("\\.")).map { array =>
-            array.nn.toList.collect {
-              case s: String =>
-                s
-            }
-          }
-        }
+        .map(_.split("\\."))
         .map(_.map(Dsv.parse)) match {
         case Some(preRelease) =>
-          preRelease.foldRight(List.empty[Dsv].asRight[ParseError]) { (x, acc) =>
-            x.flatMap(validator) match {
+          preRelease.foldRight(List.empty[Dsv].asRight[AdditionalInfoParseError]) { (x, acc) =>
+            x.left
+              .map {
+                case Dsv.DsvParseError.InvalidAlphaNumHyphenError(c, rest) =>
+                  AdditionalInfoParseError.invalidAlphaNumHyphenError(c, rest)
+                case Dsv.DsvParseError.EmptyAlphaNumHyphenError =>
+                  AdditionalInfoParseError.emptyAlphaNumHyphenError
+              }
+              .flatMap(validator) match {
               case Right(alp) =>
                 acc.map(alps => alp :: alps)
               case Left(error) =>
@@ -67,7 +67,7 @@ object AdditionalInfo extends Compat {
             }
           }
         case None =>
-          List.empty[Dsv].asRight[ParseError]
+          List.empty[Dsv].asRight[AdditionalInfoParseError]
       }
     alphaNumHyphens.map {
       case Nil =>
@@ -76,4 +76,20 @@ object AdditionalInfo extends Compat {
         xs.some
     }
   }
+
+  sealed trait AdditionalInfoParseError
+  object AdditionalInfoParseError {
+    final case class LeadingZeroNumError(n: String) extends AdditionalInfoParseError
+
+    final case class InvalidAlphaNumHyphenError(c: Char, rest: List[Char]) extends AdditionalInfoParseError
+    case object EmptyAlphaNumHyphenError extends AdditionalInfoParseError
+
+    def leadingZeroNumError(n: String): AdditionalInfoParseError = LeadingZeroNumError(n)
+
+    def invalidAlphaNumHyphenError(c: Char, rest: List[Char]): AdditionalInfoParseError =
+      InvalidAlphaNumHyphenError(c, rest)
+
+    def emptyAlphaNumHyphenError: AdditionalInfoParseError = EmptyAlphaNumHyphenError
+  }
+
 }

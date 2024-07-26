@@ -49,6 +49,16 @@ object ParseError {
 
   def semVerMatchersParseErrors(error: SemVerMatchers.ParseErrors): ParseError = SemVerMatchersParseErrors(error)
 
+  def fromAdditionalInfoParserError(additionalInfoParseError: AdditionalInfo.AdditionalInfoParseError): ParseError =
+    additionalInfoParseError match {
+      case AdditionalInfo.AdditionalInfoParseError.LeadingZeroNumError(n) =>
+        ParseError.leadingZeroNumError(n)
+      case AdditionalInfo.AdditionalInfoParseError.InvalidAlphaNumHyphenError(c, rest) =>
+        ParseError.invalidAlphaNumHyphenError(c, rest)
+      case AdditionalInfo.AdditionalInfoParseError.EmptyAlphaNumHyphenError =>
+        ParseError.emptyAlphaNumHyphenError
+    }
+
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def render(parseError: ParseError): String = parseError match {
     case InvalidAlphaNumHyphenError(c, rest) =>

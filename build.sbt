@@ -53,6 +53,7 @@ import sbtcrossproject.CrossProject
 
 lazy val core = module("core", crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
+    libraryDependencies ++= List(libs.tests.scalaCollectionCompat),
 //    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
 //                                           else ProjectInfo.commonWarts(scalaVersion.value)),
 //    (Test / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
@@ -94,7 +95,10 @@ lazy val coreJs  = core.js.settings(Test / fork := false)
 lazy val coreNative = core.native.settings(nativeSettings)
 
 lazy val decver = module("decver", crossProject(JVMPlatform, JSPlatform, NativePlatform))
-  .dependsOn(core)
+  .settings(
+    libraryDependencies ++= List(libs.tests.scalaCollectionCompat),
+  )
+  .dependsOn(core % props.IncludeTest)
 
 lazy val decverJvm = decver.jvm
 lazy val decverJs  = decver.js.settings(Test / fork := false)
@@ -168,10 +172,11 @@ lazy val props =
     val isWartRemover: ModuleID => Boolean =
       m => m.name == "wartremover"
 
-//    final val ProjectScalaVersion: String      = "3.1.3"
-//    final val ProjectScalaVersion: String      = "3.3.1"
-    final val ProjectScalaVersion: String      = "2.13.12"
-    final val CrossScalaVersions: List[String] =
+//    val ProjectScalaVersion: String      = "2.12.18"
+//    val ProjectScalaVersion: String      = "3.1.3"
+//    val ProjectScalaVersion: String      = "3.3.1"
+    val ProjectScalaVersion: String      = "2.13.12"
+    val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing) {
           // Publish version and the project version are the same so this logic is no longer required.
@@ -189,6 +194,8 @@ lazy val props =
         ).distinct
       )
 
+    val IncludeTest = "compile->compile;test->test"
+
     val SonatypeCredentialHost = "s01.oss.sonatype.org"
     val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
 
@@ -196,23 +203,31 @@ lazy val props =
 
     final val HedgehogLatestVersion = "0.10.1"
 
+    val ScalaCollectionCompatVersion = "2.12.0"
+
   }
 
 lazy val libs =
   new {
 
-    def hedgehogLibs(scalaVersion: String): List[ModuleID] = {
-      val hedgehogVersion =
-        if (scalaVersion.startsWith("3.0"))
-          props.HedgehogVersion
-        else
-          props.HedgehogLatestVersion
+    lazy val tests = new {
 
-      List(
-        "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
-        "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
-        "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
-      )
+      def hedgehogLibs(scalaVersion: String): List[ModuleID] = {
+        val hedgehogVersion =
+          if (scalaVersion.startsWith("3.0"))
+            props.HedgehogVersion
+          else
+            props.HedgehogLatestVersion
+
+        List(
+          "qa.hedgehog" %% "hedgehog-core" % hedgehogVersion % Test,
+          "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
+          "qa.hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test
+        )
+      }
+
+      val scalaCollectionCompat =
+        "org.scala-lang.modules" %% "scala-collection-compat" % props.ScalaCollectionCompatVersion % Test
     }
   }
 
@@ -237,7 +252,6 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
     .in(file(s"modules/$prefixedName"))
     .settings(
       name := prefixedName,
-      testFrameworks ~= (testFws => (TestFramework("hedgehog.sbt.Framework") +: testFws).distinct),
     )
     .settings(
       libraryDependencies ++= {
@@ -265,14 +279,14 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
       libraryDependencies :=
         crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
           case (SemVer.Major(3), SemVer.Minor(0), _) =>
-            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value ++
+            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value ++
               libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
 
           case (Major(3), _, _) =>
-            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
+            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
 
           case x =>
-            libs.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
+            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
         },
       libraryDependencies := (
         if (isScala3(scalaVersion.value)) {
