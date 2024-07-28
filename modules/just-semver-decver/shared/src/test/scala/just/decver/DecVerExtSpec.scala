@@ -4,7 +4,9 @@ import hedgehog._
 import hedgehog.runner._
 import just.Common._
 import just.decver.DecVerExt.{Major, Minor}
+import just.decver.matcher.{DecVerExtComparison, DecVerExtMatcher, DecVerExtMatchers, Gens => MatcherGens}
 import just.decver.{Gens => DecVerGens}
+import just.semver.expr.ComparisonOperator
 import just.semver.{AdditionalInfo, Anh, Dsv}
 
 /** @author
@@ -105,12 +107,133 @@ object DecVerExtSpec extends Properties {
     property("test Isomorphism: parse <=> render", testIsomorphismParseRender),
     property("test Isomorphism: parseUnsafe <=> render", testIsomorphismParseUnsafeRender)
   ) ++ List(
+    example(
+      "test Example-1 DecVerExt(1.0).matches(DecVerExtMatchers(1.0 - 2.0)) should return true",
+      MatchesSpec.testExample1
+    ),
+    example(
+      "test Example-2 DecVerExt(2.0).matches(DecVerExtMatchers(1.0 - 2.0)) should return true",
+      MatchesSpec.testExample2
+    ),
+    example(
+      "test Example-3 DecVerExt(1.1).matches(DecVerExtMatchers(1.0 - 2.0)) should return true",
+      MatchesSpec.testExample3
+    ),
+    example(
+      "test Example-4 DecVerExt(1.999).matches(DecVerExtMatchers(1.0 - 2.0)) should return true",
+      MatchesSpec.testExample4
+    ),
+    example(
+      "test Example-5 DecVerExt(1.0).matches(DecVerExtMatchers(>1.0 <2.0)) should return false",
+      MatchesSpec.testExample5
+    ),
+    example(
+      "test Example-6 DecVerExt(2.0).matches(DecVerExtMatchers(>1.0 <2.0)) should return false",
+      MatchesSpec.testExample6
+    ),
+    example(
+      "test Example-7 DecVerExt(1.1).matches(DecVerExtMatchers(>1.0 <2.0)) should return true",
+      MatchesSpec.testExample7
+    ),
+    example(
+      "test Example-8 DecVerExt(1.999).matches(DecVerExtMatchers(>1.0 <2.0)) should return true",
+      MatchesSpec.testExample8
+    ),
+    example(
+      "test Example-9 DecVerExt(1.0).matches(DecVerExtMatchers(>=1.0 <=2.0)) should return true",
+      MatchesSpec.testExample5
+    ),
+    example(
+      "test Example-10 DecVerExt(2.0).matches(DecVerExtMatchers(>=1.0 <=2.0)) should return true",
+      MatchesSpec.testExample6
+    ),
+    example(
+      "test Example-11 DecVerExt(1.1).matches(DecVerExtMatchers(>=1.0 <=2.0)) should return true",
+      MatchesSpec.testExample7
+    ),
+    example(
+      "test Example-12 DecVerExt(1.999).matches(DecVerExtMatchers(>=1.0 <=2.0)) should return true",
+      MatchesSpec.testExample8
+    ),
+    property(
+      "test DecVerExt(Valid).matches(DecVerExtMatchers(Range || Comparison))",
+      MatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparison
+    ),
+    property(
+      "test DecVerExt(Valid).matches(DecVerExtMatchers(Comparison and Comparison))",
+      MatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersComparisonAndComparison
+    ),
+    property(
+      "test DecVerExt.matches(DecVerExtMatchers(Range || Comparison and Comparison))",
+      MatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparisonAndComparison
+    )
+  ) ++ List(
+    example(
+      "test Example-1 DecVerExt(1.0).unsafeMatches(1.0 - 2.0) should return true",
+      UnsafeMatchesSpec.testExample1
+    ),
+    example(
+      "test Example-2 DecVerExt(2.0).unsafeMatches(1.0 - 2.0) should return true",
+      UnsafeMatchesSpec.testExample2
+    ),
+    example(
+      "test Example-3 DecVerExt(1.1).unsafeMatches(1.0 - 2.0) should return true",
+      UnsafeMatchesSpec.testExample3
+    ),
+    example(
+      "test Example-4 DecVerExt(1.999).unsafeMatches(1.0 - 2.0) should return true",
+      UnsafeMatchesSpec.testExample4
+    ),
+    example(
+      "test Example-5 DecVerExt(1.0).unsafeMatches(>1.0 <2.0) should return false",
+      UnsafeMatchesSpec.testExample5
+    ),
+    example(
+      "test Example-6 DecVerExt(2.0).unsafeMatches(>1.0 <2.0) should return false",
+      UnsafeMatchesSpec.testExample6
+    ),
+    example(
+      "test Example-7 DecVerExt(1.1).unsafeMatches(>1.0 <2.0) should return true",
+      UnsafeMatchesSpec.testExample7
+    ),
+    example(
+      "test Example-8 DecVerExt(1.999).unsafeMatches(>1.0 <2.0) should return true",
+      UnsafeMatchesSpec.testExample8
+    ),
+    example(
+      "test Example-9 DecVerExt(1.0).unsafeMatches(>=1.0 <=2.0) should return true",
+      UnsafeMatchesSpec.testExample5
+    ),
+    example(
+      "test Example-10 DecVerExt(2.0).unsafeMatches(>=1.0 <=2.0) should return true",
+      UnsafeMatchesSpec.testExample6
+    ),
+    example(
+      "test Example-11 DecVerExt(1.1).unsafeMatches(>=1.0 <=2.0) should return true",
+      UnsafeMatchesSpec.testExample7
+    ),
+    example(
+      "test Example-12 DecVerExt(1.999).unsafeMatches(>=1.0 <=2.0) should return true",
+      UnsafeMatchesSpec.testExample8
+    ),
+    property(
+      "test DecVerExt(Valid).unsafeMatches(Range || Comparison)",
+      UnsafeMatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparison
+    ),
+    property(
+      "test DecVerExt(Valid).unsafeMatches(Comparison and Comparison)",
+      UnsafeMatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersComparisonAndComparison
+    ),
+    property(
+      "test DecVerExt.unsafeMatches(Range || Comparison and Comparison)",
+      UnsafeMatchesSpec.testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparisonAndComparison
+    ),
     property(
       "DecVerExt(major, minor, patch).toDecVer should return DecVer(major, minor)",
       testDecVerExtToDecVer
     ),
     property(
-      "DecVerExt.fromDecVer(DecVer(major, minor)) should return DecVerExt(major, minor, 0)",
+      "DecVerExt.fromDecVer(DecVer(major, minor)) should return DecVerExt(major, minor)",
       testDecVerExtFromDecVer
     )
   )
@@ -704,6 +827,498 @@ object DecVerExtSpec extends Properties {
     val actual   = DecVerExt.unsafeParse(input)
     val expected = decVerExt
     actual ==== expected
+  }
+
+  object MatchesSpec {
+
+    def testExample1: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.0").matches(DecVerExtMatchers.unsafeParse("1.0 - 2.0")))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.0) failed")
+    }
+
+    def testExample2: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("2.0").matches(DecVerExtMatchers.unsafeParse("1.0 - 2.0")))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(2.0) failed")
+    }
+
+    def testExample3: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").matches(DecVerExtMatchers.unsafeParse("1.0 - 2.0")))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.1) failed")
+    }
+
+    def testExample4: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").matches(DecVerExtMatchers.unsafeParse("1.0 - 2.0")))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.999) failed")
+    }
+
+    def testExample5: Result = {
+      Result
+        .diff(DecVerExt.unsafeParse("1.0").matches(DecVerExtMatchers.unsafeParse(">1.0 <2.0")), false)(_ === _)
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.0) failed")
+    }
+
+    def testExample6: Result = {
+      Result
+        .diff(DecVerExt.unsafeParse("2.0").matches(DecVerExtMatchers.unsafeParse(">1.0 <2.0")), false)(_ === _)
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(2.0) failed")
+    }
+
+    def testExample7: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").matches(DecVerExtMatchers.unsafeParse(">1.0 <2.0")))
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.1) failed")
+    }
+
+    def testExample8: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").matches(DecVerExtMatchers.unsafeParse(">1.0 <2.0")))
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.999) failed")
+    }
+
+    def testExample9: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.0").matches(DecVerExtMatchers.unsafeParse(">=1.0 <=2.0")))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.0) failed")
+    }
+
+    def testExample10: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("2.0").matches(DecVerExtMatchers.unsafeParse(">=1.0 <=2.0")))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(2.0) failed")
+    }
+
+    def testExample11: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").matches(DecVerExtMatchers.unsafeParse(">=1.0 <=2.0")))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.1) failed")
+    }
+
+    def testExample12: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").matches(DecVerExtMatchers.unsafeParse(">=1.0 <=2.0")))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.999) failed")
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparison: Property = for {
+      major  <- Gen.int(Range.linear(5, 10)).log("major")
+      minor  <- Gen.int(Range.linear(1, 10)).log("minor")
+      major2 <- Gen.int(Range.linear(5, 10)).map(_ + major).log("major2")
+      minor2 <- Gen.int(Range.linear(1, 10)).map(_ + minor).log("minor2")
+      op     <- MatcherGens.genComparisonOperator.log("op")
+    } yield {
+      val decVerExt = DecVerExt.withMajorMinor(DecVerExt.Major(major), DecVerExt.Minor(minor))
+
+      val v1       = DecVerExt.withMajorMinor(DecVerExt.Major(major - 1), DecVerExt.Minor(minor - 1))
+      val v2       = DecVerExt.withMajorMinor(DecVerExt.Major(major + 1), DecVerExt.Minor(minor + 1))
+      val matcher1 = DecVerExtMatcher.range(v1, v2)
+
+      val decVerExt2 = DecVerExt.withMajorMinor(DecVerExt.Major(major2), DecVerExt.Minor(minor2))
+      val matcher2   = DecVerExtMatcher.comparison(DecVerExtComparison(op, decVerExt2))
+
+        // format: off
+        val versions = op match {
+          case ComparisonOperator.Lt =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)  ),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1))
+            )
+          case ComparisonOperator.Le =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1)),
+              decVerExt2.copy()
+            )
+          case ComparisonOperator.Eql =>
+            List(
+              decVerExt2.copy()
+            )
+          case ComparisonOperator.Ne =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1))
+            )
+          case ComparisonOperator.Gt =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1))
+            )
+          case ComparisonOperator.Ge =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1)),
+              decVerExt2.copy()
+            )
+        }
+        // format: on
+
+      val decVerExtMatchers = DecVerExtMatchers.unsafeParse(s"${matcher1.render} || ${matcher2.render}")
+
+      println(
+        s"""# Range || Comparison:
+             |-   matchers: ${decVerExtMatchers.render}
+             |-  decVerExt: ${decVerExt.render}
+             |- decVerExts: ${versions.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
+             |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(decVerExt.matches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison - range test failed
+                   |>  matchers: ${decVerExtMatchers.render}
+                   |> decVerExt: ${decVerExt.render}
+                   |""".stripMargin
+            ),
+          Result
+            .assert(versions.forall(v => v.matches(decVerExtMatchers)))
+            .log(
+              s""" Range || Comparison - comparison test failed
+                   |>   matchers: ${decVerExtMatchers.render}
+                   |> decVerExts: ${versions.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
+                   |""".stripMargin
+            )
+        )
+      )
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersComparisonAndComparison: Property = for {
+      v1V2DecVerExt <- MatcherGens
+                         .genRangedDecVerExtComparison(
+                           Range.linear(11, 30),
+                           Range.linear(11, 50),
+                         )
+                         .log("(v1, v2, decVerExt)")
+      (v1, v2, decVerExt) = v1V2DecVerExt
+    } yield {
+      val decVerExtMatchers = DecVerExtMatchers.unsafeParse(s"${v1.render} ${v2.render}")
+
+      println(
+        s"""# Comparison and Comparison
+             |- matchers: ${decVerExtMatchers.render}
+             |-   decVerExt: ${decVerExt.render}
+             |""".stripMargin
+      )
+
+      Result
+        .assert(decVerExt.matches(decVerExtMatchers))
+        .log(
+          s""" Comparison and Comparison - failed
+               |> matchers: ${decVerExtMatchers.render}
+               |>   decVerExt: ${decVerExt.render}
+               |""".stripMargin
+        )
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparisonAndComparison: Property = for {
+      rangeMatcherDecVerExtInRange <- MatcherGens
+                                        .genDecVerExtMatcherRangeAndDecVerInRange(
+                                          majorRange = Range.linear(11, 30),
+                                          minorRange = Range.linear(11, 50),
+                                        )
+                                        .log("(rangeMatcher, decVerExtInRange)")
+      (rangeMatcher, decVerExtInRange) = rangeMatcherDecVerExtInRange
+      v1V2DecVerExt <- MatcherGens
+                         .genRangedDecVerExtComparison(
+                           majorRange = Range.linear(31, 100),
+                           minorRange = Range.linear(51, 100),
+                         )
+                         .log("(v1, v2, decVerExt)")
+      (v1, v2, decVerExt) = v1V2DecVerExt
+    } yield {
+      val decVerExtMatchers = DecVerExtMatchers.unsafeParse(s"${rangeMatcher.render} || ${v1.render} ${v2.render}")
+
+      println(
+        s"""# Range || Comparison and Comparison
+             |-      matchers: ${decVerExtMatchers.render}
+             |- decVerExtInRange: ${decVerExtInRange.render}
+             |-  decVerExtInComp: ${decVerExt.render}
+             |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(decVerExtInRange.matches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing range failed
+                   |>      matchers: ${decVerExtMatchers.render}
+                   |> decVerExtInRange: ${decVerExtInRange.render}
+                   |""".stripMargin
+            ),
+          Result
+            .assert(decVerExt.matches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing (comparison and comparison) failed
+                   |>     matchers: ${decVerExtMatchers.render}
+                   |> decVerExtInComp: ${decVerExt.render}
+                   |""".stripMargin
+            )
+        )
+      )
+    }
+
+  }
+
+  object UnsafeMatchesSpec {
+
+    def testExample1: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.0").unsafeMatches("1.0 - 2.0"))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.0) failed")
+    }
+
+    def testExample2: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("2.0").unsafeMatches("1.0 - 2.0"))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(2.0) failed")
+    }
+
+    def testExample3: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").unsafeMatches("1.0 - 2.0"))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.1) failed")
+    }
+
+    def testExample4: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").unsafeMatches("1.0 - 2.0"))
+        .log("DecVerExtMatchers(1.0 - 2.0).matches(1.999) failed")
+    }
+
+    def testExample5: Result = {
+      Result
+        .diff(DecVerExt.unsafeParse("1.0").unsafeMatches(">1.0 <2.0"), false)(_ === _)
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.0) failed")
+    }
+
+    def testExample6: Result = {
+      Result
+        .diff(DecVerExt.unsafeParse("2.0").unsafeMatches(">1.0 <2.0"), false)(_ === _)
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(2.0) failed")
+    }
+
+    def testExample7: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").unsafeMatches(">1.0 <2.0"))
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.1) failed")
+    }
+
+    def testExample8: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").unsafeMatches(">1.0 <2.0"))
+        .log("DecVerExtMatchers(>1.0 <2.0).matches(1.999) failed")
+    }
+
+    def testExample9: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.0").unsafeMatches(">=1.0 <=2.0"))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.0) failed")
+    }
+
+    def testExample10: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("2.0").unsafeMatches(">=1.0 <=2.0"))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(2.0) failed")
+    }
+
+    def testExample11: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.1").unsafeMatches(">=1.0 <=2.0"))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.1) failed")
+    }
+
+    def testExample12: Result = {
+      Result
+        .assert(DecVerExt.unsafeParse("1.999").unsafeMatches(">=1.0 <=2.0"))
+        .log("DecVerExtMatchers(>=1.0 <=2.0).matches(1.999) failed")
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparison: Property = for {
+      major  <- Gen.int(Range.linear(5, 10)).log("major")
+      minor  <- Gen.int(Range.linear(1, 10)).log("minor")
+      major2 <- Gen.int(Range.linear(5, 10)).map(_ + major).log("major2")
+      minor2 <- Gen.int(Range.linear(1, 10)).map(_ + minor).log("minor2")
+      op     <- MatcherGens.genComparisonOperator.log("op")
+    } yield {
+      val decVerExt = DecVerExt.withMajorMinor(DecVerExt.Major(major), DecVerExt.Minor(minor))
+
+      val v1       = DecVerExt.withMajorMinor(DecVerExt.Major(major - 1), DecVerExt.Minor(minor - 1))
+      val v2       = DecVerExt.withMajorMinor(DecVerExt.Major(major + 1), DecVerExt.Minor(minor + 1))
+      val matcher1 = DecVerExtMatcher.range(v1, v2)
+
+      val decVerExt2 = DecVerExt.withMajorMinor(DecVerExt.Major(major2), DecVerExt.Minor(minor2))
+      val matcher2   = DecVerExtMatcher.comparison(DecVerExtComparison(op, decVerExt2))
+
+        // format: off
+        val versions = op match {
+          case ComparisonOperator.Lt =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1))
+            )
+          case ComparisonOperator.Le =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1)),
+              decVerExt2.copy()
+            )
+          case ComparisonOperator.Eql =>
+            List(
+              decVerExt2.copy()
+            )
+          case ComparisonOperator.Ne =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 - 1), DecVerExt.Minor(minor2 - 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1))
+            )
+          case ComparisonOperator.Gt =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1))
+            )
+          case ComparisonOperator.Ge =>
+            List(
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2 + 1)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2),     DecVerExt.Minor(minor2)),
+              DecVerExt.withMajorMinor(DecVerExt.Major(major2 + 1), DecVerExt.Minor(minor2 + 1)),
+              decVerExt2.copy()
+            )
+        }
+        // format: on
+
+      val decVerExtMatchers = s"${matcher1.render} || ${matcher2.render}"
+
+      println(
+        s"""# Range || Comparison:
+             |-   matchers: ${decVerExtMatchers}
+             |-  decVerExt: ${decVerExt.render}
+             |- decVerExts: ${versions.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
+             |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(decVerExt.unsafeMatches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison - range test failed
+                   |>  matchers: $decVerExtMatchers
+                   |> decVerExt: ${decVerExt.render}
+                   |""".stripMargin
+            ),
+          Result
+            .assert(versions.forall(v => v.unsafeMatches(decVerExtMatchers)))
+            .log(
+              s""" Range || Comparison - comparison test failed
+                   |>   matchers: $decVerExtMatchers
+                   |> decVerExts: ${versions.map(_.render).mkString("[\n>   - ", "\n>   - ", "\n> ]")}
+                   |""".stripMargin
+            )
+        )
+      )
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersComparisonAndComparison: Property = for {
+      v1V2DecVerExt <- MatcherGens
+                         .genRangedDecVerExtComparison(
+                           Range.linear(11, 30),
+                           Range.linear(11, 50)
+                         )
+                         .log("(v1, v2, decVerExt)")
+      (v1, v2, decVerExt) = v1V2DecVerExt
+    } yield {
+      val decVerExtMatchers = s"${v1.render} ${v2.render}"
+
+      println(
+        s"""# Comparison and Comparison
+             |-  matchers: $decVerExtMatchers
+             |- decVerExt: ${decVerExt.render}
+             |""".stripMargin
+      )
+
+      Result
+        .assert(decVerExt.unsafeMatches(decVerExtMatchers))
+        .log(
+          s""" Comparison and Comparison - failed
+               |>  matchers: ${decVerExtMatchers}
+               |> decVerExt: ${decVerExt.render}
+               |""".stripMargin
+        )
+    }
+
+    def testDecVerExtValidMatchesDecVerExtMatchersRangeOrComparisonAndComparison: Property = for {
+      rangeMatcherDecVerExtInRange <- MatcherGens
+                                        .genDecVerExtMatcherRangeAndDecVerInRange(
+                                          majorRange = Range.linear(11, 30),
+                                          minorRange = Range.linear(11, 50),
+                                        )
+                                        .log("(rangeMatcher, decVerExtInRange)")
+      (rangeMatcher, decVerExtInRange) = rangeMatcherDecVerExtInRange
+      v1V2DecVerExt <- MatcherGens
+                         .genRangedDecVerExtComparison(
+                           majorRange = Range.linear(31, 100),
+                           minorRange = Range.linear(51, 100),
+                         )
+                         .log("(v1, v2, decVerExt)")
+      (v1, v2, decVerExt) = v1V2DecVerExt
+    } yield {
+      val decVerExtMatchers = s"${rangeMatcher.render} || ${v1.render} ${v2.render}"
+
+      println(
+        s"""# Range || Comparison and Comparison
+             |-         matchers: $decVerExtMatchers
+             |- decVerExtInRange: ${decVerExtInRange.render}
+             |-  decVerExtInComp: ${decVerExt.render}
+             |""".stripMargin
+      )
+
+      Result.all(
+        List(
+          Result
+            .assert(decVerExtInRange.unsafeMatches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing range failed
+                   |>         matchers: $decVerExtMatchers
+                   |> decVerExtInRange: ${decVerExtInRange.render}
+                   |""".stripMargin
+            ),
+          Result
+            .assert(decVerExt.unsafeMatches(decVerExtMatchers))
+            .log(
+              s""" Range || Comparison and Comparison - testing (comparison and comparison) failed
+                   |>        matchers: $decVerExtMatchers
+                   |> decVerExtInComp: ${decVerExt.render}
+                   |""".stripMargin
+            )
+        )
+      )
+    }
+
   }
 
   def testDecVerExtToDecVer: Property = for {

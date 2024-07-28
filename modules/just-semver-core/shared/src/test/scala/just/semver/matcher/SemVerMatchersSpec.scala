@@ -402,7 +402,7 @@ object SemVerMatchersSpec extends Properties {
 
     def testSemVerMatchersRangeOrComparisonAndComparisonMatchesValid: Property = for {
       rangeMatcherSemVerInRange <- Gens
-                                     .genSemVerMatcherRangeAndSemverInRange(
+                                     .genSemVerMatcherRangeAndSemVerInRange(
                                        majorRange = Range.linear(11, 30),
                                        minorRange = Range.linear(11, 50),
                                        patchRange = Range.linear(11, 100)

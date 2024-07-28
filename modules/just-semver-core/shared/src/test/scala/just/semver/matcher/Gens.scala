@@ -23,13 +23,13 @@ object Gens {
     majorRange: Range[Int],
     minorRange: Range[Int],
     patchRange: Range[Int]
-  ): Gen[SemVerMatcher] = genSemVerMatcherRangeAndSemverInRange(
+  ): Gen[SemVerMatcher] = genSemVerMatcherRangeAndSemVerInRange(
     majorRange,
     minorRange,
     patchRange
   ).map { case (matcher, _) => matcher }
 
-  def genSemVerMatcherRangeAndSemverInRange(
+  def genSemVerMatcherRangeAndSemVerInRange(
     majorRange: Range[Int],
     minorRange: Range[Int],
     patchRange: Range[Int]
