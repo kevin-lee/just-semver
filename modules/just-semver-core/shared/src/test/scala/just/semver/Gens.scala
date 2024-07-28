@@ -68,14 +68,11 @@ object Gens {
   def genVersionNumber: Gen[Int] =
     Gen.frequency1(30 -> Gen.elementUnsafe((0 to 10).toList), 70 -> genNonNegativeInt)
 
-  def genVersionNumberWithRange(range: Range[Int]): Gen[Int] =
-    Gen.int(range)
-
   def genMajor: Gen[Major] =
     genVersionNumber.map(Major.apply)
 
   def genMajorWithRange(range: Range[Int]): Gen[Major] =
-    genVersionNumberWithRange(range).map(Major.apply)
+    CommonGens.genVersionNumberWithRange(range).map(Major.apply)
 
   def genMinMaxMajors: Gen[(Major, Major)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Major.apply))
@@ -84,7 +81,7 @@ object Gens {
     genVersionNumber.map(Minor.apply)
 
   def genMinorWithRange(range: Range[Int]): Gen[Minor] =
-    genVersionNumberWithRange(range).map(Minor.apply)
+    CommonGens.genVersionNumberWithRange(range).map(Minor.apply)
 
   def genMinMaxMinors: Gen[(Minor, Minor)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Minor.apply))
@@ -93,7 +90,7 @@ object Gens {
     genVersionNumber.map(Patch.apply)
 
   def genPatchWithRange(range: Range[Int]): Gen[Patch] =
-    genVersionNumberWithRange(range).map(Patch.apply)
+    CommonGens.genVersionNumberWithRange(range).map(Patch.apply)
 
   def genMinMaxPatches: Gen[(Patch, Patch)] =
     genMinMaxNonNegInts.map(pairFromIntsTo(Patch.apply))

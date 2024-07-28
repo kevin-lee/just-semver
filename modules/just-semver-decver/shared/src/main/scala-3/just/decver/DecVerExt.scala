@@ -1,5 +1,6 @@
 package just.decver
 
+import just.decver.matcher.DecVerExtMatchers
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.{AdditionalInfo, Compat, SemVer}
 
@@ -61,6 +62,18 @@ object DecVerExt extends Compat {
           }
         versionString + additionalInfoString
     }
+
+    def renderMajorMinor: String = decVerExt match {
+      case DecVerExt(major, minor, _, _) =>
+        s"${major.value.toString}.${minor.value.toString}"
+    }
+
+    def matches(decVerExtMatchers: DecVerExtMatchers): Boolean = decVerExtMatchers.matches(decVerExt)
+
+    def unsafeMatches(decVerExtMatchers: String): Boolean =
+      DecVerExtMatchers
+        .unsafeParse(decVerExtMatchers)
+        .matches(decVerExt)
 
     def toSemVer: SemVer = SemVer(
       SemVer.Major(decVerExt.major.value),
@@ -162,6 +175,8 @@ object DecVerExt extends Compat {
 
     final case class CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError) extends ParseError
 
+    final case class DecVerExtMatchersParseErrors(error: matcher.DecVerExtMatchers.ParseErrors) extends ParseError
+
     def nullValue: ParseError                = NullValue
     def empty: ParseError                    = Empty
     def invalid(version: String): ParseError = Invalid(version)
@@ -186,6 +201,9 @@ object DecVerExt extends Compat {
         preReleaseParseError(preReleaseError),
         buildMetadataParseError(buildMetadataError)
       )
+
+    def decVerExtMatchersParseErrors(error: matcher.DecVerExtMatchers.ParseErrors): ParseError =
+      DecVerExtMatchersParseErrors(error)
 
     def fromAdditionalInfoParserError(additionalInfoParseError: AdditionalInfo.AdditionalInfoParseError): ParseError =
       additionalInfoParseError match {
@@ -224,6 +242,9 @@ object DecVerExt extends Compat {
            |[1] ${preReleaseError.render}
            |[2] ${buildMetadataError.render}
            |""".stripMargin
+
+        case DecVerExtMatchersParseErrors(error) =>
+          s"Error when parsing DecVerExtMatchers: ${error.render}"
 
       }
 
