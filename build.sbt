@@ -220,9 +220,9 @@ lazy val libs =
             props.HedgehogLatestVersion
 
         List(
-          "qa.hedgehog" %% "hedgehog-core" % hedgehogVersion % Test,
+          "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
           "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
-          "qa.hedgehog" %% "hedgehog-sbt" % hedgehogVersion % Test
+          "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
         )
       }
 
@@ -299,6 +299,26 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
       ),
       scalacOptions ++= (if (isGhaPublishing) List.empty[String]
                          else ProjectInfo.commonWarts(scalaVersion.value)),
+      Compile / console / scalacOptions :=
+        (console / scalacOptions)
+          .value
+          .filterNot(option => option.contains("wartremover") || option.contains("import")),
+      Compile / console / scalacOptions := {
+        val wartOptions = ProjectInfo.commonWarts(scalaVersion.value)
+        (console / scalacOptions)
+          .value
+          .filterNot(option => wartOptions.contains(option) || option.contains("-Wunused"))
+      },
+      Test / console / scalacOptions :=
+        (console / scalacOptions)
+          .value
+          .filterNot(option => option.contains("wartremover") || option.contains("import")),
+      Test / console / scalacOptions := {
+        val wartOptions = ProjectInfo.commonWarts(scalaVersion.value)
+        (console / scalacOptions)
+          .value
+          .filterNot(option => wartOptions.contains(option) || option.contains("-Wunused"))
+      },
       publishTo := updateSnapshotPublishTo(publishTo.value),
     )
     .settings(mavenCentralPublishSettings)
