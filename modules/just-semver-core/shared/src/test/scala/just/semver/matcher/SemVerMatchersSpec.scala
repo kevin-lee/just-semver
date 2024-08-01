@@ -52,19 +52,19 @@ object SemVerMatchersSpec extends Properties {
     ),
     example(
       "test  Example-9 SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.0) should return true",
-      MatchesSpec.testExample5
+      MatchesSpec.testExample9
     ),
     example(
       "test Example-10 SemVerMatchers(>=1.0.0 <=2.0.0).matches(2.0.0) should return true",
-      MatchesSpec.testExample6
+      MatchesSpec.testExample10
     ),
     example(
       "test Example-11 SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.0.1) should return true",
-      MatchesSpec.testExample7
+      MatchesSpec.testExample11
     ),
     example(
       "test Example-12 SemVerMatchers(>=1.0.0 <=2.0.0).matches(1.999.999) should return true",
-      MatchesSpec.testExample8
+      MatchesSpec.testExample12
     ),
     property(
       "test SemVerMatchers(Range || Comparison).matches(Valid)",
@@ -343,9 +343,9 @@ object SemVerMatchersSpec extends Properties {
 
       println(
         s"""# Range || Comparison:
-           |- matchers: ${semVerMatchers.render}
-           |-   semVer: ${semVer.render}
-           |-  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |> matchers: ${semVerMatchers.render}
+           |>   semVer: ${semVer.render}
+           |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
            |""".stripMargin
       )
 
@@ -364,7 +364,7 @@ object SemVerMatchersSpec extends Properties {
             .log(
               s""" Range || Comparison - comparison test failed
                  |> matchers: ${semVerMatchers.render}
-                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
                  |""".stripMargin
             )
         )
@@ -385,8 +385,8 @@ object SemVerMatchersSpec extends Properties {
 
       println(
         s"""# Comparison and Comparison
-           |- matchers: ${semVerMatchers.render}
-           |-   semVer: ${semVer.render}
+           |> matchers: ${semVerMatchers.render}
+           |>   semVer: ${semVer.render}
            |""".stripMargin
       )
 
@@ -422,9 +422,9 @@ object SemVerMatchersSpec extends Properties {
 
       println(
         s"""# Range || Comparison and Comparison
-           |-      matchers: ${semVerMatchers.render}
-           |- semVerInRange: ${semVerInRange.render}
-           |-  semVerInComp: ${semVer.render}
+           |>      matchers: ${semVerMatchers.render}
+           |> semVerInRange: ${semVerInRange.render}
+           |>  semVerInComp: ${semVer.render}
            |""".stripMargin
       )
 

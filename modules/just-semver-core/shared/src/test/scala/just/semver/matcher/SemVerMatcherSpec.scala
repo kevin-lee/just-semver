@@ -147,7 +147,7 @@ object SemVerMatcherSpec extends Properties {
       .log(
         s"""Log:
            |> Comparison: ${matcher.render}
-           |>    semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |>    semVers: ${versions.map(_.render).mkString("[\n>      - ", "\n>      - ", "\n>    ]")}
            |""".stripMargin
       )
   }
@@ -215,7 +215,7 @@ object SemVerMatcherSpec extends Properties {
       .log(
         s"""Log:
            |> Comparison: ${matcher.render}
-           |>    semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |>    semVers: ${versions.map(_.render).mkString("[\n>      - ", "\n>      - ", "\n>    ]")}
            |""".stripMargin
       )
   }

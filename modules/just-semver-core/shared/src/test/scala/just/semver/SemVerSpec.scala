@@ -1009,9 +1009,9 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Range || Comparison:
-           |- matchers: ${semVerMatchers.render}
-           |-   semVer: ${semVer.render}
-           |-  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |> matchers: ${semVerMatchers.render}
+           |>   semVer: ${semVer.render}
+           |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
            |""".stripMargin
       )
 
@@ -1030,7 +1030,7 @@ object SemVerSpec extends Properties {
             .log(
               s""" Range || Comparison - comparison test failed
                  |> matchers: ${semVerMatchers.render}
-                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
                  |""".stripMargin
             )
         )
@@ -1051,8 +1051,8 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Comparison and Comparison
-           |- matchers: ${semVerMatchers.render}
-           |-   semVer: ${semVer.render}
+           |> matchers: ${semVerMatchers.render}
+           |>   semVer: ${semVer.render}
            |""".stripMargin
       )
 
@@ -1088,9 +1088,9 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Range || Comparison and Comparison
-           |-      matchers: ${semVerMatchers.render}
-           |- semVerInRange: ${semVerInRange.render}
-           |-  semVerInComp: ${semVer.render}
+           |>      matchers: ${semVerMatchers.render}
+           |> semVerInRange: ${semVerInRange.render}
+           |>  semVerInComp: ${semVer.render}
            |""".stripMargin
       )
 
@@ -1264,9 +1264,9 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Range || Comparison:
-           |- matchers: ${semVerMatchers}
-           |-   semVer: ${semVer.render}
-           |-  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+           |> matchers: ${semVerMatchers}
+           |>   semVer: ${semVer.render}
+           |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
            |""".stripMargin
       )
 
@@ -1285,7 +1285,7 @@ object SemVerSpec extends Properties {
             .log(
               s""" Range || Comparison - comparison test failed
                  |> matchers: $semVerMatchers
-                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>    ]")}
+                 |>  semVers: ${versions.map(_.render).mkString("[\n>    - ", "\n>    - ", "\n>  ]")}
                  |""".stripMargin
             )
         )
@@ -1306,8 +1306,8 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Comparison and Comparison
-           |- matchers: $semVerMatchers
-           |-   semVer: ${semVer.render}
+           |> matchers: $semVerMatchers
+           |>   semVer: ${semVer.render}
            |""".stripMargin
       )
 
@@ -1343,9 +1343,9 @@ object SemVerSpec extends Properties {
 
       println(
         s"""# Range || Comparison and Comparison
-           |-      matchers: $semVerMatchers
-           |- semVerInRange: ${semVerInRange.render}
-           |-  semVerInComp: ${semVer.render}
+           |>      matchers: $semVerMatchers
+           |> semVerInRange: ${semVerInRange.render}
+           |>  semVerInComp: ${semVer.render}
            |""".stripMargin
       )
 
