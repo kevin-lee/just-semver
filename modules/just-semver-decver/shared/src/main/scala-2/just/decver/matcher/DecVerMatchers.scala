@@ -1,22 +1,22 @@
 package just.decver.matcher
 
 import just.Common._
-import just.decver.DecVerExt
-import just.decver.DecVerExt.{ParseError => DecVerExtParseError}
+import just.decver.DecVer
+import just.decver.DecVer.{ParseError => DecVerParseError}
 import just.semver.Compat
 
 /** @author Kevin Lee
   * @since 2022-04-07
   */
-final case class DecVerExtMatchers(matchers: DecVerExtMatchers.Or)
-object DecVerExtMatchers extends Compat {
+final case class DecVerMatchers(matchers: DecVerMatchers.Or)
+object DecVerMatchers extends Compat {
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion", "org.wartremover.warts.ListAppend"))
-  def parse(selector: String): Either[DecVerExtMatchers.ParseErrors, DecVerExtMatchers] = {
+  def parse(selector: String): Either[DecVerMatchers.ParseErrors, DecVerMatchers] = {
     @SuppressWarnings(Array("org.wartremover.warts.JavaSerializable", "org.wartremover.warts.Serializable"))
     def each(
       s: String
-    ): Either[(DecVerExtMatcher.ParseError, List[DecVerExtMatcher.ParseError]), List[DecVerExtMatcher]] = {
+    ): Either[(DecVerMatcher.ParseError, List[DecVerMatcher.ParseError]), List[DecVerMatcher]] = {
       val spaced      = s.split("\\s+")
       val hyphenIndex = spaced.indexWhere(_ === "-")
       if (hyphenIndex >= 0) {
@@ -25,27 +25,27 @@ object DecVerExtMatchers extends Compat {
           rangeBefore
             .lastOption
             .toRight("Range start is missing")
-            .flatMap(v => DecVerExt.parse(v.trim).left.map(_.render)),
+            .flatMap(v => DecVer.parse(v.trim).left.map(_.render)),
           rangeAfter
             .drop(1)
             .headOption
             .toRight("Range end is missing")
-            .flatMap(v => DecVerExt.parse(v.trim).left.map(_.render))
+            .flatMap(v => DecVer.parse(v.trim).left.map(_.render))
         ) match {
           case (Right(from), Right(to)) =>
-            val range             = DecVerExtMatcher.range(from, to)
+            val range             = DecVerMatcher.range(from, to)
             val before            = rangeBefore
               .dropRight(1)
-              .map(DecVerExtComparison.parse)
+              .map(DecVerComparison.parse)
               .map(
-                _.map(DecVerExtMatcher.comparison)
+                _.map(DecVerMatcher.comparison)
                   .left
-                  .map(DecVerExtMatcher.ParseError.decVerExtComparisonParseFailure)
+                  .map(DecVerMatcher.ParseError.decVerComparisonParseFailure)
               )
             val after             = rangeAfter.drop(2)
             val (failed, success) =
               (before :+ Right(range))
-                .foldLeft((List.empty[DecVerExtMatcher.ParseError], List.empty[DecVerExtMatcher])) {
+                .foldLeft((List.empty[DecVerMatcher.ParseError], List.empty[DecVerMatcher])) {
                   case ((failed, success), Left(err)) =>
                     (failed :+ err, success)
                   case ((failed, success), Right(parsed)) =>
@@ -78,7 +78,7 @@ object DecVerExtMatchers extends Compat {
           case (Right(before), Left(err)) =>
             Left(
               (
-                DecVerExtMatcher
+                DecVerMatcher
                   .ParseError
                   .rangeParseFailure("Parsing 'to' in range failed: ", List(err), Some(before)),
                 Nil
@@ -87,14 +87,14 @@ object DecVerExtMatchers extends Compat {
           case (Left(err), Right(end)) =>
             Left(
               (
-                DecVerExtMatcher.ParseError.rangeParseFailure("Parsing 'from' in range failed: ", List(err), Some(end)),
+                DecVerMatcher.ParseError.rangeParseFailure("Parsing 'from' in range failed: ", List(err), Some(end)),
                 Nil
               )
             )
           case (Left(err1), Left(err2)) =>
             Left(
               (
-                DecVerExtMatcher
+                DecVerMatcher
                   .ParseError
                   .rangeParseFailure("Parsing both 'from' and 'to' in range failed: ", List(err1, err2), None),
                 Nil
@@ -106,13 +106,13 @@ object DecVerExtMatchers extends Compat {
         val (failed, success) =
           spaced
             .map(
-              DecVerExtComparison
+              DecVerComparison
                 .parse(_)
-                .map(DecVerExtMatcher.comparison)
+                .map(DecVerMatcher.comparison)
                 .left
-                .map(DecVerExtMatcher.ParseError.decVerExtComparisonParseFailure)
+                .map(DecVerMatcher.ParseError.decVerComparisonParseFailure)
             )
-            .foldLeft((List.empty[DecVerExtMatcher.ParseError], List.empty[DecVerExtMatcher])) {
+            .foldLeft((List.empty[DecVerMatcher.ParseError], List.empty[DecVerMatcher])) {
               case ((failed, success), Left(err)) =>
                 (failed :+ err, success)
               case ((failed, success), Right(parsed)) =>
@@ -133,7 +133,7 @@ object DecVerExtMatchers extends Compat {
 
     val (failed, success) = ors
       .map(each)
-      .foldLeft((List.empty[DecVerExtMatcher.ParseError], List.empty[And])) {
+      .foldLeft((List.empty[DecVerMatcher.ParseError], List.empty[And])) {
         case ((failed, success), Right(ands)) =>
           (failed, success :+ And(ands))
         case ((failed, success), Left((err, errs))) =>
@@ -141,32 +141,32 @@ object DecVerExtMatchers extends Compat {
       }
     failed match {
       case Nil =>
-        Right(DecVerExtMatchers(Or(success)))
+        Right(DecVerMatchers(Or(success)))
       case err :: errs =>
         Left(ParseErrors(err, errs))
     }
   }
 
-  def unsafeParse(matchers: String): DecVerExtMatchers =
+  def unsafeParse(matchers: String): DecVerMatchers =
     parse(matchers).fold(errs => sys.error(errs.render), identity)
 
   final case class Or(value: List[And]) extends AnyVal
-  final case class And(value: List[DecVerExtMatcher]) extends AnyVal
+  final case class And(value: List[DecVerMatcher]) extends AnyVal
 
-  implicit class DecVerExtMatchersOps(private val decVerExtMatchers: DecVerExtMatchers) extends AnyVal {
+  implicit class DecVerMatchersOps(private val decVerMatchers: DecVerMatchers) extends AnyVal {
 
-    def matches(decVerExt: DecVerExt): Boolean = decVerExtMatchers match {
-      case DecVerExtMatchers(DecVerExtMatchers.Or(ors)) =>
+    def matches(decVer: DecVer): Boolean = decVerMatchers match {
+      case DecVerMatchers(DecVerMatchers.Or(ors)) =>
         ors
           .find {
-            case DecVerExtMatchers.And(ands) =>
-              ands.forall(_.matches(decVerExt))
+            case DecVerMatchers.And(ands) =>
+              ands.forall(_.matches(decVer))
           }
           .fold(false)(_ => true)
     }
 
-    def render: String = decVerExtMatchers match {
-      case DecVerExtMatchers(Or(ands)) =>
+    def render: String = decVerMatchers match {
+      case DecVerMatchers(Or(ands)) =>
         ands
           .map {
             case And(matcher) =>
@@ -178,24 +178,24 @@ object DecVerExtMatchers extends Compat {
   }
 
   final case class ParseErrors(
-    private val error: DecVerExtMatcher.ParseError,
-    private val errors: List[DecVerExtMatcher.ParseError]
+    private val error: DecVerMatcher.ParseError,
+    private val errors: List[DecVerMatcher.ParseError]
   )
   object ParseErrors {
 
     implicit class ParseErrorsOps(private val parseErrors: ParseErrors) extends AnyVal {
 
-      /** Returns List[DecVerExtMatcher.ParseError]. The List returned is guaranteed non-empty.
+      /** Returns List[DecVerMatcher.ParseError]. The List returned is guaranteed non-empty.
         */
-      def allErrors: List[DecVerExtMatcher.ParseError] = parseErrors.error :: parseErrors.errors
+      def allErrors: List[DecVerMatcher.ParseError] = parseErrors.error :: parseErrors.errors
 
       def render: String = allErrors.map(_.render).mkString("[", ", ", "]")
     }
 
-    implicit class ParseErrorsOrDecVerExtMatchersOps(private val eth: Either[ParseErrors, DecVerExtMatchers])
+    implicit class ParseErrorsOrDecVerMatchersOps(private val eth: Either[ParseErrors, DecVerMatchers])
         extends AnyVal {
-      def toDecVerExtParseError: Either[DecVerExtParseError, DecVerExtMatchers] =
-        eth.left.map(DecVerExtParseError.decVerExtMatchersParseErrors)
+      def toDecVerParseError: Either[DecVerParseError, DecVerMatchers] =
+        eth.left.map(DecVerParseError.decVerMatchersParseErrors)
     }
   }
 }

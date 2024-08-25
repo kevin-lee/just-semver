@@ -1,7 +1,7 @@
 package just.semver
 
 import just.Common.*
-import just.decver.DecVer
+//import just.decver.DecVer
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.SemVer.{Major, Minor, Patch}
 import just.semver.matcher.SemVerMatchers
@@ -130,7 +130,7 @@ object SemVer {
         .unsafeParse(semVerMatchers)
         .matches(semVer)
 
-    def toDecVer: DecVer = DecVer.fromSemVer(semVer)
+//    def toDecVer: DecVer = DecVer.fromSemVer(semVer)
 
   }
 
@@ -197,7 +197,7 @@ object SemVer {
   def increasePatch(semVer: SemVer): SemVer =
     semVer.copy(patch = Patch(semVer.patch.value + 1))
 
-  def fromDecVer(decVer: DecVer): SemVer =
-    SemVer.semVer(SemVer.Major(decVer.major.value), SemVer.Minor(decVer.minor.value), patch0)
+//  def fromDecVer(decVer: DecVer): SemVer =
+//    SemVer.semVer(SemVer.Major(decVer.major.value), SemVer.Minor(decVer.minor.value), patch0)
 
 }
