@@ -1,6 +1,6 @@
 package just.decver
 
-import just.decver.matcher.DecVerExtMatchers
+import just.decver.matcher.DecVerMatchers
 import just.semver.AdditionalInfo.{BuildMetaInfo, PreRelease}
 import just.semver.{AdditionalInfo, Compat, SemVer}
 
@@ -9,18 +9,17 @@ import scala.util.matching.Regex
 /** @author Kevin Lee
   * @since 2024-04-16
   */
-final case class DecVerExt(
-  major: DecVerExt.Major,
-  minor: DecVerExt.Minor,
+final case class DecVer(
+  major: DecVer.Major,
+  minor: DecVer.Minor,
   pre: Option[PreRelease],
   buildMetadata: Option[BuildMetaInfo]
-) extends Ordered[DecVerExt]
-    derives CanEqual {
-  override def compare(that: DecVerExt): Int = DecVerExt.decVerExtOrdering.compare(this, that)
+) extends Ordered[DecVer] {
+  override def compare(that: DecVer): Int = DecVer.decVerOrdering.compare(this, that)
 }
-object DecVerExt extends Compat {
-  given decVerExtOrdering: Ordering[DecVerExt] with {
-    override def compare(v1: DecVerExt, v2: DecVerExt): Int =
+object DecVer extends Compat {
+  implicit val decVerOrdering: Ordering[DecVer] = new Ordering[DecVer] {
+    override def compare(v1: DecVer, v2: DecVer): Int =
       (
         v1.major.value.compareTo(v2.major.value),
         v1.minor.value.compareTo(v2.minor.value)
@@ -31,62 +30,66 @@ object DecVerExt extends Compat {
       }
   }
 
-  def fromDecVer(decVer: DecVer): DecVerExt = DecVerExt(
-    DecVerExt.Major(decVer.major.value),
-    DecVerExt.Minor(decVer.minor.value),
-    None,
-    None
-  )
+  def render(decVer: DecVer): String = decVer match {
+    case DecVer(major, minor, pre, buildMetadata) =>
+      val versionString = s"${major.value.toString}.${minor.value.toString}"
 
-  extension (decVerExt: DecVerExt) {
+      val additionalInfoString =
+        (pre, buildMetadata) match {
+          case (Some(p), Some(m)) =>
+            s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
+          case (Some(p), None) =>
+            s"-${PreRelease.render(p)}"
+          case (None, Some(m)) =>
+            s"+${BuildMetaInfo.render(m)}"
+          case (None, None) =>
+            ""
+        }
+      versionString + additionalInfoString
+  }
 
-    def increaseMajor: DecVerExt =
-      decVerExt.copy(major = DecVerExt.Major(decVerExt.major.value + 1))
-    def increaseMinor: DecVerExt =
-      decVerExt.copy(minor = DecVerExt.Minor(decVerExt.minor.value + 1))
+  def renderMajorMinor(decVer: DecVer): String = decVer match {
+    case DecVer(major, minor, _, _) =>
+      s"${major.value.toString}.${minor.value.toString}"
+  }
 
-    def render: String = decVerExt match {
-      case DecVerExt(major, minor, pre, buildMetadata) =>
-        val versionString = s"${major.value.toString}.${minor.value.toString}"
+//  def fromDecVer(decVer: DecVer): DecVer = DecVer(
+//    DecVer.Major(decVer.major.value),
+//    DecVer.Minor(decVer.minor.value),
+//    None,
+//    None
+//  )
 
-        val additionalInfoString =
-          (pre, buildMetadata) match {
-            case (Some(p), Some(m)) =>
-              s"-${PreRelease.render(p)}+${BuildMetaInfo.render(m)}"
-            case (Some(p), None) =>
-              s"-${PreRelease.render(p)}"
-            case (None, Some(m)) =>
-              s"+${BuildMetaInfo.render(m)}"
-            case (None, None) =>
-              ""
-          }
-        versionString + additionalInfoString
-    }
+  implicit class DecVerOps(private val decVer: DecVer) extends AnyVal {
 
-    def renderMajorMinor: String = decVerExt match {
-      case DecVerExt(major, minor, _, _) =>
-        s"${major.value.toString}.${minor.value.toString}"
-    }
+    def increaseMajor: DecVer =
+      DecVer(DecVer.Major(decVer.major.value + 1), decVer.minor, decVer.pre, decVer.buildMetadata)
+    def increaseMinor: DecVer =
+      DecVer(decVer.major, DecVer.Minor(decVer.minor.value + 1), decVer.pre, decVer.buildMetadata)
 
-    def matches(decVerExtMatchers: DecVerExtMatchers): Boolean = decVerExtMatchers.matches(decVerExt)
+    def render: String = DecVer.render(decVer)
 
-    def unsafeMatches(decVerExtMatchers: String): Boolean =
-      DecVerExtMatchers
-        .unsafeParse(decVerExtMatchers)
-        .matches(decVerExt)
+    def renderMajorMinor: String = DecVer.renderMajorMinor(decVer)
+
+    def matches(decVerMatchers: DecVerMatchers): Boolean = decVerMatchers.matches(decVer)
+
+    def unsafeMatches(decVerMatchers: String): Boolean =
+      DecVerMatchers
+        .unsafeParse(decVerMatchers)
+        .matches(decVer)
 
     def toSemVer: SemVer = SemVer(
-      SemVer.Major(decVerExt.major.value),
-      SemVer.Minor(decVerExt.minor.value),
+      SemVer.Major(decVer.major.value),
+      SemVer.Minor(decVer.minor.value),
       SemVer.patch0,
-      decVerExt.pre,
-      decVerExt.buildMetadata
+      decVer.pre,
+      decVer.buildMetadata
     )
 
-    def toDecVer: DecVer = DecVer(
-      DecVer.Major(decVerExt.major.value),
-      DecVer.Minor(decVerExt.minor.value),
-    )
+//    def toDecVer: DecVer = DecVer(
+//      DecVer.Major(decVer.major.value),
+//      DecVer.Minor(decVer.minor.value),
+//    )
 
   }
 
@@ -95,7 +98,7 @@ object DecVerExt extends Compat {
 
   val DecimalVersionPattern: Regex = """(\d+)\.(\d+)(?:-([a-zA-Z\d-\.]+)?)?(?:\+([a-zA-Z\d-\.]+)?)?""".r
 
-  def parse(version: String): Either[ParseError, DecVerExt] = Option(version)
+  def parse(version: String): Either[ParseError, DecVer] = Option(version)
     .toRight(ParseError.nullValue)
     .filterOrElse(_.nonEmpty, ParseError.empty)
     .flatMap {
@@ -116,7 +119,7 @@ object DecVerExt extends Compat {
             Left(ParseError.buildMetadataParseError(ParseError.fromAdditionalInfoParserError(metaError)))
           case (Right(preR), Right(metaI)) =>
             Right(
-              DecVerExt(
+              DecVer(
                 Major(major.toInt),
                 Minor(minor.toInt),
                 preR,
@@ -130,28 +133,34 @@ object DecVerExt extends Compat {
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Throw"))
-  def unsafeParse(version: String): DecVerExt =
+  def unsafeParse(version: String): DecVer =
     parse(version) match {
       case Right(ver) => ver
       case Left(err) => throw err // scalafix:ok DisableSyntax.throw
     }
 
-  def fromSemVer(semVer: SemVer): DecVerExt =
-    DecVerExt(
-      DecVerExt.Major(semVer.major.value),
-      DecVerExt.Minor(semVer.minor.value),
+  def fromSemVer(semVer: SemVer): DecVer =
+    DecVer(
+      DecVer.Major(semVer.major.value),
+      DecVer.Minor(semVer.minor.value),
       semVer.pre,
       semVer.buildMetadata
     )
 
-  def withMajorMinor(major: Major, minor: Minor): DecVerExt =
-    DecVerExt(major, minor, None, None)
+  def withMajorMinor(major: Major, minor: Minor): DecVer =
+    DecVer(major, minor, None, None)
 
-  def withMajor(major: Major): DecVerExt =
-    DecVerExt(major, minor0, None, None)
+  def withMajor(major: Major): DecVer =
+    DecVer(major, minor0, None, None)
 
-  def withMinor(minor: Minor): DecVerExt =
-    DecVerExt(major0, minor, None, None)
+  def withMinor(minor: Minor): DecVer =
+    DecVer(major0, minor, None, None)
+
+  def increaseMajor(decVer: DecVer): DecVer =
+    decVer.copy(major = Major(decVer.major.value + 1))
+
+  def increaseMinor(decVer: DecVer): DecVer =
+    decVer.copy(minor = Minor(decVer.minor.value + 1))
 
   final case class Major(value: Int) extends AnyVal
 
@@ -175,7 +184,7 @@ object DecVerExt extends Compat {
 
     final case class CombinedParseError(preReleaseError: ParseError, buildMetadataError: ParseError) extends ParseError
 
-    final case class DecVerExtMatchersParseErrors(error: matcher.DecVerExtMatchers.ParseErrors) extends ParseError
+    final case class DecVerMatchersParseErrors(error: matcher.DecVerMatchers.ParseErrors) extends ParseError
 
     def nullValue: ParseError                = NullValue
     def empty: ParseError                    = Empty
@@ -202,8 +211,8 @@ object DecVerExt extends Compat {
         buildMetadataParseError(buildMetadataError)
       )
 
-    def decVerExtMatchersParseErrors(error: matcher.DecVerExtMatchers.ParseErrors): ParseError =
-      DecVerExtMatchersParseErrors(error)
+    def decVerMatchersParseErrors(error: matcher.DecVerMatchers.ParseErrors): ParseError =
+      DecVerMatchersParseErrors(error)
 
     def fromAdditionalInfoParserError(additionalInfoParseError: AdditionalInfo.AdditionalInfoParseError): ParseError =
       additionalInfoParseError match {
@@ -214,40 +223,41 @@ object DecVerExt extends Compat {
         case AdditionalInfo.AdditionalInfoParseError.EmptyAlphaNumHyphenError =>
           ParseError.emptyAlphaNumHyphenError
       }
-    extension (decVerError: ParseError) {
 
-      @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
-      def render: String = decVerError match {
-        case ParseError.NullValue => "Version String is null"
-        case ParseError.Empty => "Version String is an empty String"
-        case ParseError.Invalid(version) => s"Invalue version: $version"
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def render(decVerError: ParseError): String = decVerError match {
+      case ParseError.NullValue => "Version String is null"
+      case ParseError.Empty => "Version String is an empty String"
+      case ParseError.Invalid(version) => s"Invalue version: $version"
 
-        case InvalidAlphaNumHyphenError(c, rest) =>
-          s"Invalid char for AlphaNumHyphen found. value: ${c.toString} / rest: ${rest.toString}"
+      case InvalidAlphaNumHyphenError(c, rest) =>
+        s"Invalid char for AlphaNumHyphen found. value: ${c.toString} / rest: ${rest.toString}"
 
-        case EmptyAlphaNumHyphenError =>
-          "AlphaNumHyphen cannot be empty but the given value is an empty String."
+      case EmptyAlphaNumHyphenError =>
+        "AlphaNumHyphen cannot be empty but the given value is an empty String."
 
-        case LeadingZeroNumError(n) =>
-          s"Invalid Num value. It should not have any leading zeros. value: $n"
+      case LeadingZeroNumError(n) =>
+        s"Invalid Num value. It should not have any leading zeros. value: $n"
 
-        case PreReleaseParseError(error) =>
-          s"Error in parsing pre-release: ${error.render}"
+      case PreReleaseParseError(error) =>
+        s"Error in parsing pre-release: ${render(error)}"
 
-        case BuildMetadataParseError(error) =>
-          s"Error in parsing build meta data: ${error.render}"
+      case BuildMetadataParseError(error) =>
+        s"Error in parsing build meta data: ${render(error)}"
 
-        case CombinedParseError(preReleaseError, buildMetadataError) =>
-          s"""Errors:
-           |[1] ${preReleaseError.render}
-           |[2] ${buildMetadataError.render}
+      case CombinedParseError(preReleaseError, buildMetadataError) =>
+        s"""Errors:
+           |[1] ${render(preReleaseError)}
+           |[2] ${render(buildMetadataError)}
            |""".stripMargin
 
-        case DecVerExtMatchersParseErrors(error) =>
-          s"Error when parsing DecVerExtMatchers: ${error.render}"
+      case DecVerMatchersParseErrors(error) =>
+        s"Error when parsing DecVerMatchers: ${error.render}"
 
-      }
+    }
 
+    implicit class DecVerErrorOps(private val decVerError: ParseError) extends AnyVal {
+      def render: String = ParseError.render(decVerError)
     }
 
   }
