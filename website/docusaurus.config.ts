@@ -24,7 +24,7 @@ const classicConfig = {
     lastVersion: 'current',
     "versions": {
       "current": {
-        "label": "0.13.0"
+        "label": "1.0.0"
       },
     }
     // Please change this to your repo.

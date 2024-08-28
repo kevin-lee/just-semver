@@ -1,5 +1,5 @@
 
-# How to Use
+# SemVer (Semantic Version)
 
 :::caution NOTE
 For now, please do not use any types and methods from the package other than `just.semver`.
@@ -71,7 +71,7 @@ val v = SemVer.parse("1.0.0-3.123.9a+100.0.12abc")
 v.map(_.render)
 ```
 
-## Compare `SamVer`
+## Compare `SemVer`
 ```scala mdoc:reset-object
 import just.semver.SemVer
 
