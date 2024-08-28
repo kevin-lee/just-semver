@@ -7,6 +7,19 @@ For now, please do not use any types and methods from the package other than `ju
 * `just.semver.matcher` or any other `just.semver.xxx` packages: You can use it but not recommended as it's currently experimental.
 :::
 
+***
+
+It requires the `just-semver-core` module.
+
+```scala
+"io.kevinlee" %% "just-semver-core" % "@VERSION@"
+```
+
+```scala
+"io.kevinlee" %%% "just-semver-core" % "@VERSION@"
+```
+
+
 ## `SemVer.parse`
 
 ```scala mdoc:reset-object

@@ -1,6 +1,17 @@
 
 # DecVer (Decimal Version)
 
+It requires the `just-semver-decver` module.
+
+```scala
+"io.kevinlee" %% "just-semver-decver" % "@VERSION@"
+```
+
+```scala
+"io.kevinlee" %%% "just-semver-decver" % "@VERSION@"
+```
+
+
 ## `DecVer.parse`
 
 ```scala mdoc:reset-object
