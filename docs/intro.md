@@ -8,7 +8,7 @@ slug: '/'
 
 [![Build Status](https://github.com/Kevin-Lee/just-semver/workflows/Build%20All/badge.svg)](https://github.com/Kevin-Lee/just-semver/actions?workflow=Build+All)
 [![Release Status](https://github.com/Kevin-Lee/just-semver/workflows/Release/badge.svg)](https://github.com/Kevin-Lee/just-semver/actions?workflow=Release)
-[![Coverage Status](https://coveralls.io/repos/github/Kevin-Lee/just-semver/badge.svg?branch=master)](https://coveralls.io/github/Kevin-Lee/just-semver?branch=master)
+[![codecov](https://codecov.io/gh/kevin-lee/just-semver/graph/badge.svg?token=SO5LB2BWOL)](https://codecov.io/gh/kevin-lee/just-semver)
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.kevinlee/just-semver_2.13/badge.svg)](https://search.maven.org/artifact/io.kevinlee/just-semver_2.13)
 [![Latest version](https://index.scala-lang.org/kevin-lee/just-semver/just-semver/latest.svg)](https://index.scala-lang.org/kevin-lee/just-semver/just-semver)
@@ -26,13 +26,14 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 
 ### `@VERSION@`
 
-```scala
-"io.kevinlee" %% "just-semver-core" % "@VERSION@"
-```
-
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
 
 Since `0.6.0` `just-semver` supports Scala.js.
+
+#### Core
+```scala
+"io.kevinlee" %% "just-semver-core" % "@VERSION@"
+```
 
 ```scala
 "io.kevinlee" %%% "just-semver-core" % "@VERSION@"
@@ -47,7 +48,57 @@ libraryDependencies += "io.kevinlee" %% "just-semver-core" % "@VERSION@"
 libraryDependencies += "io.kevinlee" %%% "just-semver-core" % "@VERSION@"
 ```
 
+
+#### DecVer: Decimal version module
+```scala
+"io.kevinlee" %% "just-semver-decver" % "@VERSION@"
+```
+
+```scala
+"io.kevinlee" %%% "just-semver-decver" % "@VERSION@"
+```
+
+
+e.g.)
+```scala
+libraryDependencies += "io.kevinlee" %% "just-semver-decver" % "@VERSION@"
+```
+```scala
+libraryDependencies += "io.kevinlee" %%% "just-semver-decver" % "@VERSION@"
+```
+
+#### All modules
+
+```scala
+"io.kevinlee" %% "just-semver-core" % "@VERSION@",
+"io.kevinlee" %% "just-semver-decver" % "@VERSION@",
+```
+
+```scala
+"io.kevinlee" %%% "just-semver-core" % "@VERSION@",
+"io.kevinlee" %%% "just-semver-decver" % "@VERSION@",
+```
+
+```scala
+libraryDependencies ++= Seq(
+  "io.kevinlee" %% "just-semver-core" % "@VERSION@",
+  "io.kevinlee" %% "just-semver-decver" % "@VERSION@",
+)
+```
+```scala
+libraryDependencies ++= Seq(
+  "io.kevinlee" %%% "just-semver-core" % "@VERSION@",
+  "io.kevinlee" %%% "just-semver-decver" % "@VERSION@",
+)
+```
+
+
+
 ## Older Versions
+
+### `0.13.0`
+
+### `0.12.0`
 
 ### `0.11.0`
 

@@ -122,6 +122,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
 
       List(
         "io.kevinlee" %%% "just-semver-core" % latestVersion,
+        "io.kevinlee" %%% "just-semver-decver" % latestVersion,
       )
     },
     mdocVariables := Map(
