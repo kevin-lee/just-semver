@@ -8,17 +8,17 @@ ThisBuild / crossScalaVersions := props.CrossScalaVersions
 
 ThisBuild / developers := List(
   Developer(
-    "Kevin-Lee",
+    "kevin-lee",
     "Kevin Lee",
     "kevin.code@kevinlee.io",
-    url("https://github.com/Kevin-Lee")
+    url("https://github.com/kevin-lee")
   )
 )
-ThisBuild / homepage := url("https://github.com/Kevin-Lee/just-semver").some
+ThisBuild / homepage := url("https://github.com/kevin-lee/just-semver").some
 ThisBuild / scmInfo :=
   ScmInfo(
-    url("https://github.com/Kevin-Lee/just-semver"),
-    "git@github.com:Kevin-Lee/just-semver.git"
+    url("https://github.com/kevin-lee/just-semver"),
+    "git@github.com:kevin-lee/just-semver.git"
   ).some
 ThisBuild / licenses := props.licenses
 
