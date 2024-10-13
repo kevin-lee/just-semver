@@ -53,7 +53,7 @@ import sbtcrossproject.CrossProject
 
 lazy val core = module("core", crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
-    libraryDependencies ++= List(libs.tests.scalaCollectionCompat),
+    libraryDependencies ++= List(libs.tests.scalaCollectionCompat.value),
 //    (Compile / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
 //                                           else ProjectInfo.commonWarts(scalaVersion.value)),
 //    (Test / compile) / scalacOptions ++= (if (isGhaPublishing) List.empty[String]
@@ -96,7 +96,7 @@ lazy val coreNative = core.native.settings(nativeSettings)
 
 lazy val decver = module("decver", crossProject(JVMPlatform, JSPlatform, NativePlatform))
   .settings(
-    libraryDependencies ++= List(libs.tests.scalaCollectionCompat),
+    libraryDependencies ++= List(libs.tests.scalaCollectionCompat.value),
   )
   .dependsOn(core % props.IncludeTest)
 
@@ -121,7 +121,7 @@ lazy val docs = (project in file("docs-gen-tmp/docs"))
       val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
 
       List(
-        "io.kevinlee" %%% "just-semver-core" % latestVersion,
+        "io.kevinlee" %%% "just-semver-core"   % latestVersion,
         "io.kevinlee" %%% "just-semver-decver" % latestVersion,
       )
     },
@@ -202,7 +202,7 @@ lazy val props =
 
     final val HedgehogVersion = "0.9.0"
 
-    final val HedgehogLatestVersion = "0.10.1"
+    val HedgehogLatestVersion = "0.11.0-RC1"
 
     val ScalaCollectionCompatVersion = "2.12.0"
 
@@ -213,22 +213,27 @@ lazy val libs =
 
     lazy val tests = new {
 
-      def hedgehogLibs(scalaVersion: String): List[ModuleID] = {
+      lazy val hedgehogLibs = Def.setting {
+        val scalaV          = scalaVersion.value
         val hedgehogVersion =
-          if (scalaVersion.startsWith("3.0"))
+          if (scalaV.startsWith("3.0"))
             props.HedgehogVersion
           else
             props.HedgehogLatestVersion
 
         List(
-          "qa.hedgehog" %% "hedgehog-core"   % hedgehogVersion % Test,
-          "qa.hedgehog" %% "hedgehog-runner" % hedgehogVersion % Test,
-          "qa.hedgehog" %% "hedgehog-sbt"    % hedgehogVersion % Test
+          // TODO: Once Hedgehog v0.11.0 or higher is released put the old ones back.
+//          "qa.hedgehog" %%% "hedgehog-core"   % hedgehogVersion % Test,
+//          "qa.hedgehog" %%% "hedgehog-runner" % hedgehogVersion % Test,
+//          "qa.hedgehog" %%% "hedgehog-sbt"    % hedgehogVersion % Test
+          "io.kevinlee" %%% "hedgehog-core"   % hedgehogVersion % Test,
+          "io.kevinlee" %%% "hedgehog-runner" % hedgehogVersion % Test,
+          "io.kevinlee" %%% "hedgehog-sbt"    % hedgehogVersion % Test
         )
       }
 
-      val scalaCollectionCompat =
-        "org.scala-lang.modules" %% "scala-collection-compat" % props.ScalaCollectionCompatVersion % Test
+      lazy val scalaCollectionCompat =
+        Def.setting("org.scala-lang.modules" %%% "scala-collection-compat" % props.ScalaCollectionCompatVersion % Test)
     }
   }
 
@@ -277,18 +282,20 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
         ((Compile / unmanagedSourceDirectories).value ++ moreSrcs).distinct
       },
       //    useAggressiveScalacOptions := true,
-      libraryDependencies :=
+      libraryDependencies := {
+        lazy val hedgehogAll = libs.tests.hedgehogLibs.value
         crossVersionProps(Seq.empty[ModuleID], SemVer.parseUnsafe(scalaVersion.value)) {
           case (SemVer.Major(3), SemVer.Minor(0), _) =>
-            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value ++
+            hedgehogAll ++ libraryDependencies.value ++
               libraryDependencies.value.filterNot(m => m.organization == "org.wartremover" && m.name == "wartremover")
 
           case (Major(3), _, _) =>
-            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
+            hedgehogAll ++ libraryDependencies.value
 
           case x =>
-            libs.tests.hedgehogLibs(scalaVersion.value) ++ libraryDependencies.value
-        },
+            hedgehogAll ++ libraryDependencies.value
+        }
+      },
       libraryDependencies := (
         if (isScala3(scalaVersion.value)) {
           libraryDependencies
