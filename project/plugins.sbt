@@ -1,16 +1,16 @@
 logLevel := sbt.Level.Warn
 
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.12")
-addSbtPlugin("org.scoverage"  % "sbt-scoverage"  % "2.0.9")
-addSbtPlugin("ch.epfl.scala"  % "sbt-scalafix"   % "0.10.4")
+addSbtPlugin("org.scoverage"  % "sbt-scoverage"  % "2.3.1")
+addSbtPlugin("ch.epfl.scala"  % "sbt-scalafix"   % "0.12.0")
 
-addSbtPlugin("org.scalameta" % "sbt-mdoc"     % "2.3.7")
+addSbtPlugin("org.scalameta" % "sbt-mdoc"     % "2.5.2")
 addSbtPlugin("io.kevinlee"   % "sbt-docusaur" % "0.15.0")
 
-addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.13.0")
-addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.1")
+addSbtPlugin("org.scala-js"       % "sbt-scalajs"              % "1.18.2")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "1.3.2")
 
-addSbtPlugin("org.scala-native"   % "sbt-scala-native"              % "0.5.2")
+addSbtPlugin("org.scala-native"   % "sbt-scala-native"              % "0.5.7")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 
 addSbtPlugin("org.scalameta" % "sbt-native-image" % "0.3.4")

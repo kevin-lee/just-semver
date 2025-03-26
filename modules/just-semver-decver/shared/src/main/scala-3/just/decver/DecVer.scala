@@ -216,7 +216,7 @@ object DecVer extends Compat {
       }
     extension (decVerError: ParseError) {
 
-      @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+      @SuppressWarnings(Array("org.wartremover.warts.Recursion", "org.wartremover.warts.ToString"))
       def render: String = decVerError match {
         case ParseError.NullValue => "Version String is null"
         case ParseError.Empty => "Version String is an empty String"

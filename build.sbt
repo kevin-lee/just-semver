@@ -176,7 +176,7 @@ lazy val props =
 //    val ProjectScalaVersion: String      = "2.12.18"
 //    val ProjectScalaVersion: String      = "3.1.3"
 //    val ProjectScalaVersion: String      = "3.3.1"
-    val ProjectScalaVersion: String      = "2.13.12"
+    val ProjectScalaVersion: String      = "2.13.16"
     val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing) {
@@ -189,8 +189,8 @@ lazy val props =
       ) (
         List(
           "2.12.18",
-          "2.13.12",
-          "3.3.1",
+          "2.13.16",
+          "3.3.5",
           ProjectScalaVersion
         ).distinct
       )
@@ -202,9 +202,9 @@ lazy val props =
 
     final val HedgehogVersion = "0.9.0"
 
-    val HedgehogLatestVersion = "0.11.0-RC1"
+    val HedgehogLatestVersion = "0.11.0"
 
-    val ScalaCollectionCompatVersion = "2.12.0"
+    val ScalaCollectionCompatVersion = "2.13.0"
 
   }
 
@@ -222,13 +222,9 @@ lazy val libs =
             props.HedgehogLatestVersion
 
         List(
-          // TODO: Once Hedgehog v0.11.0 or higher is released put the old ones back.
-//          "qa.hedgehog" %%% "hedgehog-core"   % hedgehogVersion % Test,
-//          "qa.hedgehog" %%% "hedgehog-runner" % hedgehogVersion % Test,
-//          "qa.hedgehog" %%% "hedgehog-sbt"    % hedgehogVersion % Test
-          "io.kevinlee" %%% "hedgehog-core"   % hedgehogVersion % Test,
-          "io.kevinlee" %%% "hedgehog-runner" % hedgehogVersion % Test,
-          "io.kevinlee" %%% "hedgehog-sbt"    % hedgehogVersion % Test
+          "qa.hedgehog" %%% "hedgehog-core"   % hedgehogVersion % Test,
+          "qa.hedgehog" %%% "hedgehog-runner" % hedgehogVersion % Test,
+          "qa.hedgehog" %%% "hedgehog-sbt"    % hedgehogVersion % Test
         )
       }
 
@@ -268,7 +264,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
             case (Major(2), Minor(11), _) =>
               List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
             case (_, _, _) =>
-              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.1.4" cross CrossVersion.full))
+              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.3.1" cross CrossVersion.full))
           }
         }
       },

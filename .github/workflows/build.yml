@@ -16,8 +16,8 @@ jobs:
       matrix:
         scala:
           - { name: "Scala 2",   version: "2.12.18", binary-version: "2.12", java-version: "11", java-distribution: "temurin", params: "" }
-          - { name: "Scala 2",   version: "2.13.12", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
-          - { name: "Scala 3.1", version: "3.3.1",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
+          - { name: "Scala 2",   version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
+          - { name: "Scala 3.1", version: "3.3.5",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
 
     steps:
       - uses: actions/checkout@v4
@@ -52,13 +52,17 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GH_JAVA_VERSION: "adopt@1.11"
+      GH_JAVA_VERSION: "11"
+      GH_JAVA_DISTRIBUTION: "temurin"
 
     steps:
       - uses: actions/checkout@v4
-      - uses: olafurpg/setup-scala@v14
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
+          distribution: ${{ env.GH_JAVA_DISTRIBUTION }}
+          cache: 'sbt'
+      - uses: sbt/setup-sbt@v1
 
       - name: Cache SBT
         uses: actions/cache@v4
@@ -82,8 +86,19 @@ jobs:
 
   build_with_test_coverage:
     runs-on: ubuntu-latest
+
+    env:
+      GH_JAVA_VERSION: "11"
+      GH_JAVA_DISTRIBUTION: "temurin"
+
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.GH_JAVA_VERSION }}
+          distribution: ${{ env.GH_JAVA_DISTRIBUTION }}
+          cache: 'sbt'
+      - uses: sbt/setup-sbt@v1
 
       - name: Cache Coursier
         uses: actions/cache@v4
@@ -115,7 +130,7 @@ jobs:
           echo "RUN_ID=${RUN_ID}"
           echo "RUN_NUMBER=${RUN_NUMBER}"
           export CI_BRANCH=$CURRENT_BRANCH_NAME
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.12
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.16
 
       - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
         if: github.event_name == 'pull_request'
@@ -131,7 +146,7 @@ jobs:
           echo "RUN_NUMBER=${RUN_NUMBER}"
           echo "PR #${PR_NUMBER}"
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.12
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.16
 
       - if: github.event_name == 'pull_request'
         uses: codecov/codecov-action@v5
