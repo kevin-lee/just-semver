@@ -56,6 +56,7 @@ object ParseError {
     }
 
   extension (parseError: ParseError) {
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion", "org.wartremover.warts.ToString"))
     def render: String = parseError match {
       case InvalidAlphaNumHyphenError(c, rest) =>
         s"Invalid char for AlphaNumHyphen found. value: ${c.toString} / rest: ${rest.toString}"

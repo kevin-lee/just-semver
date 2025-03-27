@@ -21,8 +21,8 @@ jobs:
       matrix:
         scala:
           - { name: "Scala 2",   version: "2.12.18", binary-version: "2.12", java-version: "11", java-distribution: "temurin", params: "" }
-          - { name: "Scala 2",   version: "2.13.12", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
-          - { name: "Scala 3.1", version: "3.3.1",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
+          - { name: "Scala 2",   version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
+          - { name: "Scala 3.1", version: "3.3.5",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
 
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2", version: "2.13.12", binary-version: "2.13", java-version: "11", java-distribution: "temurin" }
+          - { name: "Scala 2", version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin" }
 
     steps:
       - uses: actions/checkout@v4
@@ -154,9 +154,12 @@ jobs:
 #      - uses: actions/checkout@v4
 #        with:
 #          fetch-depth: 0
-#      - uses: olafurpg/setup-scala@v14
+#      - uses: actions/setup-java@v4
 #        with:
 #          java-version: ${{ env.GH_JAVA_VERSION }}
+#          distribution: ${{ env.GH_JAVA_DISTRIBUTION }}
+#          cache: 'sbt'
+#      - uses: sbt/setup-sbt@v1
 #      - uses: olafurpg/setup-gpg@v3
 #
 #      - name: Cache SBT
