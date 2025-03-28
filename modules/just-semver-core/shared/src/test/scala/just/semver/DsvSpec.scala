@@ -11,7 +11,7 @@ import scala.collection.compat.immutable._
 object DsvSpec extends Properties {
   override def tests: List[Test] = List(
     property("test Dsv.parse(valid String)", testParse),
-    property("test Dsv.parse(invalid String)", testParseInvalid),
+    property("test Dsv.parse(invalid String)", testParseInvalid).withTests(20000).noShrinking,
     example("test Dsv.parse(an empty String)", testParseInvalid2),
   )
 
@@ -139,13 +139,13 @@ object DsvSpec extends Properties {
              ),
              Range.linear(1, 3)
            )
-           .map(_.mkString)
            .log("s")
   } yield {
     val actual = Dsv.parse(s)
     (actual ==== Left(Dsv.DsvParseError.invalidAlphaNumHyphenError(s.head, s.tail.toList)))
       .log(
-        s"s=${s.map(_.toInt).mkString("[", ", ", "]")}"
+        s">>> Invalid char detection failed: " +
+          s"s=$s / Int=${s.map(_.toInt).mkString("[", ", ", "]")} / unicode=${s.map(c => "\\u%04x".format(c.toInt)).mkString}"
       )
   }
 

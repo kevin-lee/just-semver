@@ -30,7 +30,7 @@ object Dsv extends Compat {
     def accumulate(cs: List[Char], chars: Anh, acc: Vector[Anh]): Either[DsvParseError, Vector[Anh]] =
       cs match {
         case x :: xs =>
-          if (x.isDigit) {
+          if (x >= '0' && x <= '9') {
             chars match {
               case Num(ns) =>
                 accumulate(xs, Num(ns :+ x), acc)
@@ -40,7 +40,7 @@ object Dsv extends Compat {
             }
           } else if (x === '-') {
             accumulate(xs, Hyphen, acc :+ chars)
-          } else if (x.isUpper || x.isLower) {
+          } else if ((x >= 'A' && x <= 'Z') || (x >= 'a' && x <= 'z')) {
             chars match {
               case Alphabet(as) =>
                 accumulate(xs, Alphabet(as :+ x), acc)
@@ -61,11 +61,11 @@ object Dsv extends Compat {
     value.toList match {
       case x :: xs =>
         val result =
-          if (x.isDigit) {
+          if (x >= '0' && x <= '9') {
             accumulate(xs, Num(x.toString), Vector.empty)
           } else if (x === '-')
             accumulate(xs, Hyphen, Vector.empty)
-          else if (x.isLower || x.isUpper)
+          else if ((x >= 'A' && x <= 'Z') || (x >= 'a' && x <= 'z'))
             accumulate(xs, Alphabet(x.toString), Vector.empty)
           else
             Left(
