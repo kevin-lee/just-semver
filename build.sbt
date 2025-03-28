@@ -200,7 +200,7 @@ lazy val props =
     val SonatypeCredentialHost = "s01.oss.sonatype.org"
     val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
 
-    final val HedgehogVersion = "0.9.0"
+    final val HedgehogVersion = "0.11.0"
 
     val HedgehogLatestVersion = "0.11.0"
 

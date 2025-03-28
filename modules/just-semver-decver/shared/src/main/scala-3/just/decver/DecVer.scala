@@ -220,7 +220,7 @@ object DecVer extends Compat {
       def render: String = decVerError match {
         case ParseError.NullValue => "Version String is null"
         case ParseError.Empty => "Version String is an empty String"
-        case ParseError.Invalid(version) => s"Invalue version: $version"
+        case ParseError.Invalid(version) => s"Invalid version: $version"
 
         case InvalidAlphaNumHyphenError(c, rest) =>
           s"Invalid char for AlphaNumHyphen found. value: ${c.toString} / rest: ${rest.toString}"
