@@ -126,20 +126,29 @@ object DsvSpec extends Properties {
     }
     .toList
 
-  private val someNonAnhChars = someNonAnhCharInts
-    .map { case (start, end) => start.toChar -> end.toChar }
+//  private val someNonAnhChars = someNonAnhCharInts
+//    .map { case (start, end) => start.toChar -> end.toChar }
 
   @SuppressWarnings(Array("org.wartremover.warts.IterableOps", "org.wartremover.warts.ToString"))
   def testParseInvalid: Property = for {
-    s <- Gen
-           .string(
-             Gen.choice(
-               (Gen.char _).tupled(someNonAnhChars.head),
-               someNonAnhChars.tail.map { case (start, end) => Gen.char(start, end) }
-             ),
-             Range.linear(1, 3)
-           )
-           .log("s")
+    charInt <- Gen
+                 .choice(
+                   Gen.int((Range.linear[Int] _).tupled(someNonAnhCharInts.head)),
+                   someNonAnhCharInts.tail.map { case (start, end) => Gen.int(Range.linear[Int](start, end)) }
+                 )
+                 .list(Range.linear(1, 3))
+                 .log("charInt")
+//    _ = println(s"charInt=${charInt.mkString("[", ", ", "]")}")
+    s       <- Gen.constant(charInt.map(_.toChar).mkString).log("s")
+//    s <- Gen
+//           .string(
+//             Gen.choice(
+//               (Gen.char _).tupled(someNonAnhChars.head),
+//               someNonAnhChars.tail.map { case (start, end) => Gen.char(start, end) }
+//             ),
+//             Range.linear(1, 3)
+//           )
+//           .log("s")
   } yield {
     val actual = Dsv.parse(s)
     (actual ==== Left(Dsv.DsvParseError.invalidAlphaNumHyphenError(s.head, s.tail.toList)))
