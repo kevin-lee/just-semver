@@ -3,6 +3,8 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
+project/**/metals.sbt
+.bloop/
 generated-docs*/
 docs-gen-tmp/
 
