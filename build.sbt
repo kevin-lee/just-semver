@@ -22,16 +22,12 @@ ThisBuild / scmInfo :=
   ).some
 ThisBuild / licenses := props.licenses
 
-ThisBuild / resolvers += "sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots"
-ThisBuild / publishTo := updateSnapshotPublishTo((ThisBuild / publishTo).value)
-
 lazy val justSemVer = (project in file("."))
   .enablePlugins(DevOopsGitHubReleasePlugin)
   .settings(
     name := props.RepoName,
     description := "Semantic Versioning (SemVer) for Scala",
   )
-  .settings(mavenCentralPublishSettings)
   .dependsOn(
     coreJvm,
     coreJs,
@@ -197,9 +193,6 @@ lazy val props =
 
     val IncludeTest = "compile->compile;test->test"
 
-    val SonatypeCredentialHost = "s01.oss.sonatype.org"
-    val SonatypeRepository     = s"https://$SonatypeCredentialHost/service/local"
-
     final val HedgehogVersion = "0.11.0"
 
     val HedgehogLatestVersion = "0.11.0"
@@ -236,13 +229,6 @@ lazy val libs =
 def isGhaPublishing: Boolean = sys.env.get("GHA_IS_PUBLISHING").fold(false)(_.toBoolean)
 
 def isScala3(scalaVersion: String): Boolean = scalaVersion.startsWith("3.")
-
-lazy val mavenCentralPublishSettings: SettingsDefinition = List(
-  /* Publish to Maven Central { */
-  sonatypeCredentialHost := props.SonatypeCredentialHost,
-  sonatypeRepository := props.SonatypeRepository,
-  /* } Publish to Maven Central */
-)
 
 // scalafmt: off
 def prefixedProjectName(name: String) = s"${props.RepoName}${if (name.isEmpty) "" else s"-$name"}"
@@ -323,19 +309,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
           .value
           .filterNot(option => wartOptions.contains(option) || option.contains("-Wunused"))
       },
-      publishTo := updateSnapshotPublishTo(publishTo.value),
     )
-    .settings(mavenCentralPublishSettings)
-}
-
-def updateSnapshotPublishTo(resolver: Option[Resolver]): Option[Resolver] = resolver match {
-  case Some(resolver) =>
-    if (resolver.name == "sonatype-snapshots")
-      ("sonatype-snapshots" at s"https://${props.SonatypeCredentialHost}/content/repositories/snapshots").some
-    else
-      resolver.some
-  case None =>
-    none
 }
 
 lazy val nativeSettings: SettingsDefinition = List(
