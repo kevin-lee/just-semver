@@ -16,7 +16,8 @@ slug: '/'
 Semantic Versioning (`SemVer`) for Scala
 
 :::info
-Supported Scala Versions: @SUPPORTED_SCALA_VERSIONS@
+Supported Scala Versions: @SUPPORTED_SCALA_VERSIONS@.<br/>
+It also supports Scala.js and Scala Native.
 
 Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/just-semver/artifacts)
 :::
@@ -79,6 +80,8 @@ libraryDependencies += "io.kevinlee" %%% "just-semver-decver" % "@VERSION@"
 "io.kevinlee" %%% "just-semver-decver" % "@VERSION@",
 ```
 
+***
+
 ```scala
 libraryDependencies ++= Seq(
   "io.kevinlee" %% "just-semver-core" % "@VERSION@",
@@ -96,9 +99,17 @@ libraryDependencies ++= Seq(
 
 ## Older Versions
 
+### `1.1.0`
+Please use a higher version.
+
+### `1.0.0`
+Please use a higher version.
+
 ### `0.13.0`
+Please use a higher version.
 
 ### `0.12.0`
+Please use a higher version.
 
 ### `0.11.0`
 
@@ -115,7 +126,7 @@ Show [**all `just-semver` versions**](https://index.scala-lang.org/kevin-lee/jus
 "io.kevinlee" %% "just-semver-core" % "0.11.0"
 ```
 
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.18.0.svg)](https://www.scala-js.org)
 
 Since `0.6.0` `just-semver` supports Scala.js.
 
