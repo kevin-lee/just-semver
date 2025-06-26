@@ -104,7 +104,7 @@ lazy val decverNative = decver.native.settings(nativeSettings)
 lazy val docs = (project in file("docs-gen-tmp/docs"))
   .enablePlugins(MdocPlugin, DocusaurPlugin)
   .settings(
-    scalaVersion := "2.13.11",
+    scalaVersion := props.ProjectScalaVersion,
     name := prefixedProjectName("docs"),
     mdocIn := file("docs"),
     mdocOut := file("generated-docs/docs"),
