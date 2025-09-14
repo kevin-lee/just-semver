@@ -11,7 +11,7 @@ on:
 
 env:
   GH_SBT_OPTS: "-Xss64m -Xms1024m -Xmx4G -XX:MaxInlineLevel=18 -XX:+UnlockExperimentalVMOptions"
-  GH_JVM_OPTS: "-Xss64m -Xms1024m -Xmx4G -XX:MaxInlineLevel=18 -XX:+UnlockExperimentalVMOptions -XX:+UseJVMCICompiler"
+  GH_JVM_OPTS: "-Xss64m -Xms1024m -Xmx4G -XX:MaxInlineLevel=18 -XX:+UnlockExperimentalVMOptions"
 
 jobs:
 
@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2.13", version: "2.13.16", binary-version: "2.13", java-version: "17", java-distribution: "liberica", report: "report" }
+          - { name: "Scala 2.13", version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin", report: "report" }
 
     steps:
       - uses: actions/checkout@v5

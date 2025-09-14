@@ -86,7 +86,7 @@ lazy val core = module("core", crossProject(JVMPlatform, JSPlatform, NativePlatf
   )
 
 lazy val coreJvm = core.jvm
-lazy val coreJs  = core.js.settings(Test / fork := false)
+lazy val coreJs  = core.js.settings(jsSettings)
 
 lazy val coreNative = core.native.settings(nativeSettings)
 
@@ -97,7 +97,7 @@ lazy val decver = module("decver", crossProject(JVMPlatform, JSPlatform, NativeP
   .dependsOn(core % props.IncludeTest)
 
 lazy val decverJvm = decver.jvm
-lazy val decverJs  = decver.js.settings(Test / fork := false)
+lazy val decverJs  = decver.js.settings(jsSettings)
 
 lazy val decverNative = decver.native.settings(nativeSettings)
 
@@ -193,9 +193,7 @@ lazy val props =
 
     val IncludeTest = "compile->compile;test->test"
 
-    final val HedgehogVersion = "0.11.0"
-
-    val HedgehogLatestVersion = "0.11.0"
+    val HedgehogVersion = "0.13.0"
 
     val ScalaCollectionCompatVersion = "2.13.0"
 
@@ -208,11 +206,7 @@ lazy val libs =
 
       lazy val hedgehogLibs = Def.setting {
         val scalaV          = scalaVersion.value
-        val hedgehogVersion =
-          if (scalaV.startsWith("3.0"))
-            props.HedgehogVersion
-          else
-            props.HedgehogLatestVersion
+        val hedgehogVersion = props.HedgehogVersion
 
         List(
           "qa.hedgehog" %%% "hedgehog-core"   % hedgehogVersion % Test,
@@ -312,6 +306,12 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
     )
 }
 
+lazy val jsSettings: SettingsDefinition = List(
+  Test / fork := false,
+  coverageEnabled := false
+)
+
 lazy val nativeSettings: SettingsDefinition = List(
-  Test / fork := false
+  Test / fork := false,
+  coverageEnabled := false
 )
