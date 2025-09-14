@@ -90,7 +90,7 @@ object ParseError {
   }
 
   implicit final class ParseErrorOps(private val parseError: ParseError) extends AnyVal {
-    @inline def render: String = ParseError.render(parseError)
+    def render: String = just.semver.ParseError.render(parseError)
   }
 
 }
