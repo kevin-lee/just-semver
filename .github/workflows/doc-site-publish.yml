@@ -24,7 +24,7 @@ jobs:
           distribution: ${{ matrix.scala.java-distribution }}
           cache: 'sbt'
       - uses: sbt/setup-sbt@v1
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node.version }}
           registry-url: 'https://registry.npmjs.org'
