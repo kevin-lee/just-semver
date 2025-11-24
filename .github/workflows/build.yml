@@ -20,7 +20,7 @@ jobs:
           - { name: "Scala 3.1", version: "3.3.5",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.scala.java-version }}
@@ -56,7 +56,7 @@ jobs:
       GH_JAVA_DISTRIBUTION: "temurin"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
@@ -92,7 +92,7 @@ jobs:
       GH_JAVA_DISTRIBUTION: "temurin"
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
           java-version: ${{ env.GH_JAVA_VERSION }}
