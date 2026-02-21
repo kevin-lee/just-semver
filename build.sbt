@@ -101,56 +101,6 @@ lazy val decverJs  = decver.js.settings(jsSettings)
 
 lazy val decverNative = decver.native.settings(nativeSettings)
 
-lazy val docs = (project in file("docs-gen-tmp/docs"))
-  .enablePlugins(MdocPlugin, DocusaurPlugin)
-  .settings(
-    scalaVersion := props.ProjectScalaVersion,
-    name := prefixedProjectName("docs"),
-    mdocIn := file("docs"),
-    mdocOut := file("generated-docs/docs"),
-    cleanFiles += file("generated-docs/docs"),
-    scalacOptions ~= (ops => ops.filterNot(x => x == "-Wnonunit-statement")),
-    libraryDependencies ++= {
-      import sys.process._
-      "git fetch --tags".!
-      val tag           = "git rev-list --tags --max-count=1".!!.trim
-      val latestVersion = s"git describe --tags $tag".!!.trim.stripPrefix("v")
-
-      List(
-        "io.kevinlee" %%% "just-semver-core"   % latestVersion,
-        "io.kevinlee" %%% "just-semver-decver" % latestVersion,
-      )
-    },
-    mdocVariables := Map(
-      "VERSION"                  -> {
-        import sys.process._
-        "git fetch --tags".!
-        val tag = "git rev-list --tags --max-count=1".!!.trim
-        s"git describe --tags $tag".!!.trim.stripPrefix("v")
-      },
-      "SUPPORTED_SCALA_VERSIONS" -> {
-        val versions = props
-          .CrossScalaVersions
-          .map { scalaVersion =>
-            if (scalaVersion.startsWith("3")) {
-              val scalaV = SemVer.unsafeParse(scalaVersion)
-              s"${scalaV.major.value.toString}.${scalaV.minor.value.toString}+"
-            } else {
-              CrossVersion.binaryScalaVersion(scalaVersion)
-            }
-          }
-          .distinct
-          .map(binVer => s"`$binVer`")
-        if (versions.length > 1)
-          s"${versions.init.mkString(", ")} and ${versions.last}"
-        else
-          versions.mkString
-      },
-    ),
-    docusaurDir := (ThisBuild / baseDirectory).value / "website",
-    docusaurBuildDir := docusaurDir.value / "build",
-  )
-  .settings(noPublish)
 
 lazy val props =
   new {
