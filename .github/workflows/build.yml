@@ -149,4 +149,4 @@ jobs:
           .github/workflows/sbt-build-all-with-coverage.sh 2.13.16
 
       - if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
