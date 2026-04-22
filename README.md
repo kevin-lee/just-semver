@@ -6,7 +6,7 @@
 
 ![Maven Central Version](https://img.shields.io/maven-central/v/io.kevinlee/just-semver-core_3)
 [![Latest version](https://index.scala-lang.org/kevin-lee/just-semver/just-semver/latest.svg)](https://index.scala-lang.org/kevin-lee/just-semver/just-semver)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.11.0.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.19.0.svg)](https://www.scala-js.org)
 
 
 Semantic Versioning (`SemVer`) for Scala
