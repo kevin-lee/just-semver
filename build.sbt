@@ -101,7 +101,6 @@ lazy val decverJs  = decver.js.settings(jsSettings)
 
 lazy val decverNative = decver.native.settings(nativeSettings)
 
-
 lazy val props =
   new {
     val RepoName = "just-semver"
@@ -264,4 +263,14 @@ lazy val jsSettings: SettingsDefinition = List(
 lazy val nativeSettings: SettingsDefinition = List(
   Test / fork := false,
   coverageEnabled := false
+) ++ List(
+  dependencyOverrides ++= {
+    import just.semver.SemVer
+    libraryDependencies.value.collect {
+      case dep
+          if dep.organization == "org.scala-native" &&
+            SemVer.parse(dep.revision).exists(_ >= SemVer.parseUnsafe("0.5.0")) =>
+        dep
+    }
+  }
 )
