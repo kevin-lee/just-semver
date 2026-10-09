@@ -133,7 +133,7 @@ lazy val props =
         }
       ) (
         List(
-          "2.12.18",
+          "2.12.21",
           "2.13.17",
           "3.3.5",
           ProjectScalaVersion
