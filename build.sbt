@@ -1,6 +1,7 @@
 import just.semver.SemVer
 import SemVer.{Major, Minor}
 import kevinlee.sbt.SbtCommon.crossVersionProps
+import org.typelevel.scalacoptions.ScalacOptions
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
@@ -121,7 +122,7 @@ lazy val props =
 //    val ProjectScalaVersion: String      = "2.12.18"
 //    val ProjectScalaVersion: String      = "3.1.3"
 //    val ProjectScalaVersion: String      = "3.3.1"
-    val ProjectScalaVersion: String      = "2.13.16"
+    val ProjectScalaVersion: String      = "2.13.17"
     val CrossScalaVersions: List[String] =
       (
         if (isGhaPublishing) {
@@ -133,8 +134,8 @@ lazy val props =
         }
       ) (
         List(
-          "2.12.18",
-          "2.13.16",
+          "2.12.21",
+          "2.13.17",
           "3.3.5",
           ProjectScalaVersion
         ).distinct
@@ -142,7 +143,7 @@ lazy val props =
 
     val IncludeTest = "compile->compile;test->test"
 
-    val HedgehogVersion = "0.13.0"
+    val HedgehogVersion = "0.15.0"
 
     val ScalaCollectionCompatVersion = "2.13.0"
 
@@ -193,7 +194,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
             case (Major(2), Minor(11), _) =>
               List(compilerPlugin("org.wartremover" %% "wartremover" % "2.4.19" cross CrossVersion.full))
             case (_, _, _) =>
-              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.3.1" cross CrossVersion.full))
+              List(compilerPlugin("org.wartremover" %% "wartremover" % "3.5.0" cross CrossVersion.full))
           }
         }
       },
@@ -230,6 +231,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
           libraryDependencies.value
         }
       ),
+      tpolecatScalacOptions += ScalacOptions.lintStrictUnsealedPatmat,
       scalacOptions ++= (if (isGhaPublishing) List.empty[String]
                          else ProjectInfo.commonWarts(scalaVersion.value)),
       Compile / console / scalacOptions :=

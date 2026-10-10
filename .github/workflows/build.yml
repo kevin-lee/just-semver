@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         scala:
-          - { name: "Scala 2",   version: "2.12.18", binary-version: "2.12", java-version: "11", java-distribution: "temurin", params: "" }
-          - { name: "Scala 2",   version: "2.13.16", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
+          - { name: "Scala 2",   version: "2.12.21", binary-version: "2.12", java-version: "11", java-distribution: "temurin", params: "" }
+          - { name: "Scala 2",   version: "2.13.17", binary-version: "2.13", java-version: "11", java-distribution: "temurin", params: "" }
           - { name: "Scala 3.1", version: "3.3.5",   binary-version: "3",    java-version: "11", java-distribution: "temurin", params: '' }
 
     steps:
@@ -130,7 +130,7 @@ jobs:
           echo "RUN_ID=${RUN_ID}"
           echo "RUN_NUMBER=${RUN_NUMBER}"
           export CI_BRANCH=$CURRENT_BRANCH_NAME
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.16
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.17
 
       - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
         if: github.event_name == 'pull_request'
@@ -146,7 +146,7 @@ jobs:
           echo "RUN_NUMBER=${RUN_NUMBER}"
           echo "PR #${PR_NUMBER}"
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.16
+          .github/workflows/sbt-build-all-with-coverage.sh 2.13.17
 
       - if: github.event_name == 'pull_request'
         uses: codecov/codecov-action@v7

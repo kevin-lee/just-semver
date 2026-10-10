@@ -33,7 +33,7 @@ object Gens {
   ): Gen[(DecVerMatcher, DecVer)] = for {
     v1  <- DecVerGens.genDecVerWithRange(majorRange, minorRange)
     one <- Gen.element1(1, 2, 4)
-    (m, n, p) = ((4 & one) >> 2, (2 & one) >> 1, 1 & one)
+    (m, n) = ((4 & one) >> 2, (2 & one) >> 1)
     v2     <- DecVerGens.genDecVerWithRange(
                 Range.linear(v1.major.value + m, v1.major.value + 100),
                 Range.linear(v1.minor.value + n, v1.minor.value + 100),
@@ -71,10 +71,10 @@ object Gens {
     majorRange: Range[Int],
     minorRange: Range[Int],
   ): Gen[(DecVerComparison, DecVerComparison, DecVer)] = for {
-    v1DecVer <- DecVerGens.genDecVerWithRange(majorRange, minorRange)
-    m           <- Gen.int(Range.linear(1, 10))
-    n           <- Gen.int(Range.linear(1, 10))
-    inclusive   <- Gen.boolean
+    v1DecVer  <- DecVerGens.genDecVerWithRange(majorRange, minorRange)
+    m         <- Gen.int(Range.linear(1, 10))
+    n         <- Gen.int(Range.linear(1, 10))
+    inclusive <- Gen.boolean
   } yield {
     inclusive match {
       case false =>

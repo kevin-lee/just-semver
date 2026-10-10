@@ -1,7 +1,5 @@
 package just
 
-import scala.annotation.tailrec
-
 /** @author
   *   Kevin Lee
   * @since
@@ -27,27 +25,8 @@ object Common {
   }
 
   extension [A](x: Seq[A]) {
-    def compareElems(y: Seq[A])(using ordering: Ordering[A]): Int = {
-      @tailrec
-      def compareElems0(x: Seq[A], y: Seq[A]): Int =
-        (x, y) match {
-          case (head1 +: tail1, head2 +: tail2) =>
-            val result = ordering.compare(head1, head2)
-            if (result == 0) {
-              compareElems0(tail1, tail2)
-            } else {
-              result
-            }
-
-          case (Seq(), _ +: _) =>
-            -1
-          case (_ +: _, Seq()) =>
-            1
-          case (Seq(), Seq()) =>
-            0
-        }
-      compareElems0(x, y)
-    }
+    def compareElems(y: Seq[A])(using ordering: Ordering[A]): Int =
+      Ordering.Implicits.seqOrdering[Seq, A].compare(x, y)
   }
   // $COVERAGE-ON$
 

@@ -1,7 +1,5 @@
 package just
 
-import scala.annotation.tailrec
-
 /** @author
   *   Kevin Lee
   * @since
@@ -26,28 +24,10 @@ object Common {
   }
 
   implicit final class SeqPlus[A](private val x: Seq[A]) extends AnyVal {
-    def compareElems(y: Seq[A])(implicit ordering: Ordering[A]): Int =
-      Common.compareElems(x, y)
-  }
-
-  @tailrec
-  private def compareElems[A: Ordering](x: Seq[A], y: Seq[A]): Int = {
-    val ordering = implicitly[Ordering[A]]
-    (x, y) match {
-      case (head1 +: tail1, head2 +: tail2) =>
-        val result = ordering.compare(head1, head2)
-        if (result === 0) {
-          compareElems(tail1, tail2)
-        } else {
-          result
-        }
-
-      case (Seq(), _ +: _) =>
-        -1
-      case (_ +: _, Seq()) =>
-        1
-      case (Seq(), Seq()) | (_, _) =>
-        0
+    def compareElems(y: Seq[A])(implicit ordering: Ordering[A]): Int = {
+      /* The name is seqDerivedOrdering in 2.12 and seqOrdering in 2.13, so find it by type. */
+      import scala.math.Ordering.Implicits._
+      Ordering[Seq[A]].compare(x, y)
     }
   }
   // $COVERAGE-ON$
