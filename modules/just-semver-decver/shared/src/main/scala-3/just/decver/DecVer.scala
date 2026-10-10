@@ -14,8 +14,7 @@ final case class DecVer(
   minor: DecVer.Minor,
   pre: Option[PreRelease],
   buildMetadata: Option[BuildMetaInfo]
-) extends Ordered[DecVer]
-    derives CanEqual {
+) extends Ordered[DecVer] derives CanEqual {
   override def compare(that: DecVer): Int = DecVer.decVerOrdering.compare(this, that)
 }
 object DecVer extends Compat {

@@ -192,7 +192,7 @@ object DecVerMatchers extends Compat {
       def render: String = allErrors.map(_.render).mkString("[", ", ", "]")
     }
 
-    extension (eth: Either[ParseErrors, DecVerMatchers])  {
+    extension (eth: Either[ParseErrors, DecVerMatchers]) {
       def toDecVerParseError: Either[DecVerParseError, DecVerMatchers] =
         eth.left.map(DecVerParseError.decVerMatchersParseErrors)
     }
