@@ -1,6 +1,7 @@
 import just.semver.SemVer
 import SemVer.{Major, Minor}
 import kevinlee.sbt.SbtCommon.crossVersionProps
+import org.typelevel.scalacoptions.ScalacOptions
 
 ThisBuild / scalaVersion := props.ProjectScalaVersion
 ThisBuild / organization := "io.kevinlee"
@@ -230,6 +231,7 @@ def module(projectName: String, crossProject: CrossProject.Builder): CrossProjec
           libraryDependencies.value
         }
       ),
+      tpolecatScalacOptions += ScalacOptions.lintStrictUnsealedPatmat,
       scalacOptions ++= (if (isGhaPublishing) List.empty[String]
                          else ProjectInfo.commonWarts(scalaVersion.value)),
       Compile / console / scalacOptions :=
