@@ -192,8 +192,7 @@ object DecVerMatchers extends Compat {
       def render: String = allErrors.map(_.render).mkString("[", ", ", "]")
     }
 
-    implicit class ParseErrorsOrDecVerMatchersOps(private val eth: Either[ParseErrors, DecVerMatchers])
-        extends AnyVal {
+    implicit class ParseErrorsOrDecVerMatchersOps(private val eth: Either[ParseErrors, DecVerMatchers]) extends AnyVal {
       def toDecVerParseError: Either[DecVerParseError, DecVerMatchers] =
         eth.left.map(DecVerParseError.decVerMatchersParseErrors)
     }

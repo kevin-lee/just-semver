@@ -53,7 +53,8 @@ object DecVerComparison extends Compat {
   object ParseError {
     def render(decVerComparisonParseError: ParseError): String = decVerComparisonParseError match {
       case ParseError(message, err, success) =>
-        s"DecVerComparison.ParseError($message: ParserError($err)${success.fold(", Success:")(succ => s", Success: $succ")})"
+        val successResult = success.fold("")(succ => s" $succ")
+        s"DecVerComparison.ParseError($message: ParserError($err), Success:$successResult)"
     }
 
     implicit class ParseErrorOps(private val decVerComparisonParseError: DecVerComparison.ParseError) extends AnyVal {
