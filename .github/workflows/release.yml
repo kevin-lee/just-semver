@@ -35,7 +35,7 @@ jobs:
 
       - name: "Build All for Scala ${{ matrix.scala.version }}"
         env:
-          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           java -version
           .github/workflows/sbt-build-test.sh ${{ matrix.scala.version }} "${{ matrix.scala.params }}"
@@ -62,7 +62,7 @@ jobs:
           CURRENT_BRANCH_NAME: ${{ github.ref }}
           RUN_ID: ${{ github.run_id }}
           RUN_NUMBER: ${{ github.run_number }}
-          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
           export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
@@ -92,16 +92,14 @@ jobs:
       - name: sbt GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
-          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "Run] sbt GitHub release"
           export SOURCE_DATE_EPOCH=$(date +%s)
           echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
           echo "====================="
-          echo 'sbt -J-Xmx2048m devOopsGitHubRelease'
+          echo 'sbt devOopsGitHubRelease'
           sbt \
-            -J-XX:MaxMetaspaceSize=1024m \
-            -J-Xmx2048m \
             devOopsGitHubRelease
 
   publish:
@@ -129,16 +127,14 @@ jobs:
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_AUTH_TOKEN_GITHUB }}
-          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
           GHA_IS_PUBLISHING: "true"
         run: |
           echo "Run] sbt ci-release"
           export SOURCE_DATE_EPOCH=$(date +%s)
           echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-          echo 'sbt -J-Xmx2048m -v clean +test +packagedArtifacts ci-release'
+          echo 'sbt -v clean +packagedArtifacts ci-release'
           sbt \
-            -J-XX:MaxMetaspaceSize=1024m \
-            -J-Xmx2048m \
             -v \
             clean \
             +packagedArtifacts \
@@ -170,13 +166,12 @@ jobs:
           PGP_SECRET: ${{ secrets.PGP_SECRET }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
-          JVM_OPTS: ${{ env.GH_JVM_OPTS }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
           GHA_IS_PUBLISHING: "true"
         run: |
           echo "Run] sbt ci-release"
           export SOURCE_DATE_EPOCH=$(date +%s)
           echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
-          echo "JVM_OPTS=${JVM_OPTS}"
           echo "SBT_OPTS=${SBT_OPTS}"
           echo 'sbt -v clean +packagedArtifacts ci-release'
           sbt \

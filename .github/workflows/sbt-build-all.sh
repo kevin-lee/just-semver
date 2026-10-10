@@ -25,8 +25,6 @@ else
 #    sbt -J-Xmx2048m ++${scala_version}! -v coveralls
 #    sbt -J-Xmx2048m ++${scala_version}! -v clean; packagedArtifacts
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}! \
       -v "${sbt_params}" \
       clean \
@@ -36,8 +34,6 @@ else
 #    sbt -J-Xmx2048m ++${scala_version}! -v clean coverage test coverageReport coverageAggregate package
 #    sbt -J-Xmx2048m ++${scala_version}! -v coveralls
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}! \
       -v "${sbt_params}" \
       clean \
