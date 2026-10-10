@@ -17,8 +17,6 @@ else
   echo ""
 
   sbt \
-    -J-XX:MaxMetaspaceSize=1024m \
-    -J-Xmx2048m \
     ++${scala_version}! \
     -v "${sbt_params}" \
     clean \

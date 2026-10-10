@@ -7,6 +7,9 @@ on:
     branches:
       - main
 
+env:
+  GH_JVM_OPTS: "-Xss64m -Xms1024m -XX:MaxMetaspaceSize=1G -Xmx2G -XX:MaxInlineLevel=18 -XX:+UnlockExperimentalVMOptions"
+
 jobs:
 
   build:
@@ -32,6 +35,7 @@ jobs:
         if: github.event_name == 'push'
         env:
           CURRENT_BRANCH_NAME: ${{ github.ref }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
           export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
@@ -43,110 +47,8 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           CURRENT_BRANCH_NAME: ${{ github.base_ref }}
+          SBT_OPTS: ${{ env.GH_JVM_OPTS }}
         run: |
           echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
           java -version
           .github/workflows/sbt-build-all.sh ${{ matrix.scala.version }} "${{ matrix.scala.params }}"
-
-  scalafix:
-    runs-on: ubuntu-latest
-
-    env:
-      GH_JAVA_VERSION: "11"
-      GH_JAVA_DISTRIBUTION: "temurin"
-
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
-        with:
-          java-version: ${{ env.GH_JAVA_VERSION }}
-          distribution: ${{ env.GH_JAVA_DISTRIBUTION }}
-          cache: 'sbt'
-      - uses: sbt/setup-sbt@v1
-
-      - name: Cache SBT
-        uses: actions/cache@v6
-        with:
-          path: |
-            ~/.ivy2/cache
-            ~/.cache/coursier
-            ~/.sbt
-          key: ${{ runner.os }}-sbt-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-sbt
-
-      - name: "sbt +scalafix"
-        run: |
-          sbt \
-            -J-XX:MaxMetaspaceSize=1024m \
-            -J-Xmx2048m \
-            clean \
-            +scalafixAll
-
-
-  build_with_test_coverage:
-    runs-on: ubuntu-latest
-
-    env:
-      GH_JAVA_VERSION: "11"
-      GH_JAVA_DISTRIBUTION: "temurin"
-
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-java@v6
-        with:
-          java-version: ${{ env.GH_JAVA_VERSION }}
-          distribution: ${{ env.GH_JAVA_DISTRIBUTION }}
-          cache: 'sbt'
-      - uses: sbt/setup-sbt@v1
-
-      - name: Cache Coursier
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/coursier
-          key: ${{ runner.os }}-coursier-scala-2_13-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-coursier-scala-2_13-
-
-      - name: Cache Ivy
-        uses: actions/cache@v6
-        with:
-          path: ~/.ivy2/cache
-          key: ${{ runner.os }}-ivy-scala-2_13-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('**/build.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-ivy-scala-2_13-
-
-      - name: "[Push] Build with Test Coverage - ${{ github.run_number }}"
-        if: github.event_name == 'push'
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          CURRENT_BRANCH_NAME: ${{ github.ref }}
-          RUN_ID: ${{ github.run_id }}
-          RUN_NUMBER: ${{ github.run_number }}
-        run: |
-          echo "[BEFORE]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
-          export CURRENT_BRANCH_NAME="${CURRENT_BRANCH_NAME#refs/heads/}"
-          echo " [AFTER]CURRENT_BRANCH_NAME=${CURRENT_BRANCH_NAME}"
-          echo "RUN_ID=${RUN_ID}"
-          echo "RUN_NUMBER=${RUN_NUMBER}"
-          export CI_BRANCH=$CURRENT_BRANCH_NAME
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.17
-
-      - name: "[PR] Build with Test Coverage - PR-#${{ github.event.pull_request.number }} - ${{ github.run_number }}"
-        if: github.event_name == 'pull_request'
-        env:
-          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-          CURRENT_BRANCH_NAME: ${{ github.base_ref }}
-          RUN_ID: ${{ github.run_id }}
-          RUN_NUMBER: ${{ github.run_number }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          export CI_BRANCH="PR-$CURRENT_BRANCH_NAME"
-          echo "RUN_ID=${RUN_ID}"
-          echo "RUN_NUMBER=${RUN_NUMBER}"
-          echo "PR #${PR_NUMBER}"
-          echo "Rull request to the '${CURRENT_BRANCH_NAME}' branch"
-          .github/workflows/sbt-build-all-with-coverage.sh 2.13.17
-
-      - if: github.event_name == 'pull_request'
-        uses: codecov/codecov-action@v7

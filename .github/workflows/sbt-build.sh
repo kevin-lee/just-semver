@@ -21,8 +21,6 @@ else
   if [[ "$CURRENT_BRANCH_NAME" == "main" || "$CURRENT_BRANCH_NAME" == "release" ]]
   then
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}! \
       clean \
       coverage \
@@ -30,19 +28,13 @@ else
       coverageReport \
       coverageAggregate
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}!
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}! \
       clean \
       packagedArtifacts
   else
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}! \
       clean \
       coverage \
@@ -51,8 +43,6 @@ else
       coverageAggregate \
       package
     sbt \
-      -J-XX:MaxMetaspaceSize=1024m \
-      -J-Xmx2048m \
       ++${scala_version}!
   fi
 
