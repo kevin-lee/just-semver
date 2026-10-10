@@ -232,7 +232,7 @@ object SemVerSpec extends Properties {
     property(
       "test SemVer.unsafeMatches(Range || Comparison and Comparison)",
       UnsafeMatchesSpec.testSemVerValidMatchesSemVerMatchersRangeOrComparisonAndComparison
-    )//,
+    ),
 //    property(
 //      "SemVer(major, minor, patch).toDecVer should return DecVer(major, minor)",
 //      testSemVerToDecVer

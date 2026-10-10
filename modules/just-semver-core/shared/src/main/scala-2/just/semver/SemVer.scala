@@ -135,11 +135,24 @@ object SemVer {
       val metaInfo   = AdditionalInfo.parseBuildMetaInfo(meta)
       (preRelease, metaInfo) match {
         case (Left(preError), Left(metaError)) =>
-          Left(ParseError.combine(ParseError.fromAdditionalInfoParserError(preError), ParseError.fromAdditionalInfoParserError(metaError)))
+          Left(
+            ParseError.combine(
+              ParseError.fromAdditionalInfoParserError(preError),
+              ParseError.fromAdditionalInfoParserError(metaError)
+            )
+          )
         case (Left(preError), _) =>
-          Left(ParseError.preReleaseParseError(ParseError.fromAdditionalInfoParserError(preError)))
+          Left(
+            ParseError.preReleaseParseError(
+              ParseError.fromAdditionalInfoParserError(preError)
+            )
+          )
         case (_, Left(metaError)) =>
-          Left(ParseError.buildMetadataParseError(ParseError.fromAdditionalInfoParserError(metaError)))
+          Left(
+            ParseError.buildMetadataParseError(
+              ParseError.fromAdditionalInfoParserError(metaError)
+            )
+          )
         case (Right(preR), Right(metaI)) =>
           Right(
             SemVer(

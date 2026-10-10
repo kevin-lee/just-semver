@@ -52,7 +52,8 @@ object SemVerComparison extends Compat {
   object ParseError {
     def render(semVerComparisonParseError: ParseError): String = semVerComparisonParseError match {
       case ParseError(message, err, success) =>
-        s"SemVerComparison.ParseError($message: ParserError($err)${success.fold(", Success:")(succ => s", Success: $succ")})"
+        val successResult = success.fold("")(succ => s" $succ")
+        s"SemVerComparison.ParseError($message: ParserError($err), Success:$successResult)"
     }
 
     implicit class ParseErrorOps(private val semVerComparisonParseError: SemVerComparison.ParseError) extends AnyVal {
