@@ -17,8 +17,7 @@ final case class SemVer(
   patch: Patch,
   pre: Option[PreRelease],
   buildMetadata: Option[BuildMetaInfo]
-) extends Ordered[SemVer]
-    derives CanEqual {
+) extends Ordered[SemVer] derives CanEqual {
 
   override def compare(that: SemVer): Int = {
     (
